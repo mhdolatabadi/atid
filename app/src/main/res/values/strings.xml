@@ -1,6 +1,29 @@
 <resources>
     <string name="app_name">Atid</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+
+    <string name="title_home">قضا</string>
+    <string name="title_dashboard">تقویم</string>
+    <string name="title_notifications">اوقات شرعی</string>
+
+    <string name="label_qada_prayers">نماز‌های قضا</string>
+    <string name="label_qada_fast">روزه قضا</string>
+    <string name="qada_fajr">نماز صبح</string>
+    <string name="qada_zohr">نماز ظهر</string>
+    <string name="qada_asr">نماز عصر</string>
+    <string name="qada_maghrib">نماز مغرب</string>
+    <string name="qada_isha">نماز عشا</string>
+    <string name="qada_fast_row">روزه</string>
+
+    <string name="label_next_month">ماه بعد</string>
+    <string name="label_prev_month">ماه قبل</string>
+
+    <string name="label_prayer_times">اوقات شرعی امروز</string>
+    <string name="label_use_my_location">استفاده از موقعیت مکانی من</string>
+    <string name="label_fajr">اذان صبح</string>
+    <string name="label_sunrise">طلوع آفتاب</string>
+    <string name="label_dhuhr">اذان ظهر</string>
+    <string name="label_asr">اذان عصر</string>
+    <string name="label_sunset">غروب آفتاب</string>
+    <string name="label_maghrib">اذان مغرب</string>
+    <string name="label_isha">اذان عشا</string>
 </resources>
