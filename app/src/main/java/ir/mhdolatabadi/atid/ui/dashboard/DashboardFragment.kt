@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -30,8 +31,8 @@ class DashboardFragment : Fragment() {
         val dashboardViewModel = ViewModelProvider(this)[DashboardViewModel::class.java]
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
 
-        weekdayLabels.forEach { label ->
-            binding.containerWeekdayHeader.addView(createWeekdayLabel(label))
+        weekdayLabels.forEachIndexed { index, label ->
+            binding.containerWeekdayHeader.addView(createWeekdayLabel(label, isFriday = index == FRIDAY_INDEX))
         }
 
         binding.buttonPrevMonth.setOnClickListener { dashboardViewModel.goToPreviousMonth() }
@@ -56,34 +57,52 @@ class DashboardFragment : Fragment() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
             }
-            week.forEach { day ->
-                row.addView(createDayCell(day, day != null && day == todayDay))
+            week.forEachIndexed { index, day ->
+                row.addView(createDayCell(day, day != null && day == todayDay, isFriday = index == FRIDAY_INDEX))
             }
             repeat(WEEK_LENGTH - week.size) {
-                row.addView(createDayCell(null, false))
+                row.addView(createDayCell(null, false, isFriday = false))
             }
             binding.containerDays.addView(row)
         }
     }
 
-    private fun createWeekdayLabel(text: String): TextView = TextView(requireContext()).apply {
+    private fun createWeekdayLabel(text: String, isFriday: Boolean): TextView = TextView(requireContext()).apply {
         layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
         gravity = Gravity.CENTER
         setTypeface(typeface, Typeface.BOLD)
+        textSize = 13f
         setText(text)
-    }
-
-    private fun createDayCell(day: Int?, isToday: Boolean): TextView = TextView(requireContext()).apply {
-        layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-        gravity = Gravity.CENTER
-        setPadding(0, 24, 0, 24)
-        textSize = 15f
-        text = day?.let { PersianDateUtils.toPersianDigits(it) }.orEmpty()
-        if (isToday) {
-            setTypeface(typeface, Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(context, R.color.purple_500))
+        if (isFriday) {
+            setTextColor(ContextCompat.getColor(context, R.color.friday_text))
         }
     }
+
+    private fun createDayCell(day: Int?, isToday: Boolean, isFriday: Boolean): View {
+        val frame = FrameLayout(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(0, dpToPx(44), 1f)
+        }
+        val label = TextView(requireContext()).apply {
+            layoutParams = FrameLayout.LayoutParams(dpToPx(34), dpToPx(34), Gravity.CENTER)
+            gravity = Gravity.CENTER
+            textSize = 14f
+            text = day?.let { PersianDateUtils.toPersianDigits(it) }.orEmpty()
+            when {
+                isToday -> {
+                    setBackgroundResource(R.drawable.bg_today_circle)
+                    setTextColor(ContextCompat.getColor(context, R.color.white))
+                    setTypeface(typeface, Typeface.BOLD)
+                }
+                isFriday && day != null -> {
+                    setTextColor(ContextCompat.getColor(context, R.color.friday_text))
+                }
+            }
+        }
+        frame.addView(label)
+        return frame
+    }
+
+    private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -92,5 +111,6 @@ class DashboardFragment : Fragment() {
 
     companion object {
         private const val WEEK_LENGTH = 7
+        private const val FRIDAY_INDEX = 6
     }
 }

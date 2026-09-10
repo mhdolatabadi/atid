@@ -10,6 +10,7 @@ import ir.mhdolatabadi.atid.R
 import ir.mhdolatabadi.atid.data.QadaPrayer
 import ir.mhdolatabadi.atid.databinding.FragmentHomeBinding
 import ir.mhdolatabadi.atid.databinding.ItemQadaCounterBinding
+import ir.mhdolatabadi.atid.util.PersianDateUtils
 
 class HomeFragment : Fragment() {
 
@@ -51,11 +52,14 @@ class HomeFragment : Fragment() {
 
         homeViewModel.prayerCounts.observe(viewLifecycleOwner) { counts ->
             counts.forEach { (prayer, count) ->
-                prayerRows[prayer]?.textCount?.text = count.toString()
+                prayerRows[prayer]?.textCount?.text = PersianDateUtils.toPersianDigits(count)
             }
         }
         homeViewModel.fastCount.observe(viewLifecycleOwner) { count ->
-            fastRow.textCount.text = count.toString()
+            fastRow.textCount.text = PersianDateUtils.toPersianDigits(count)
+        }
+        homeViewModel.totalOutstanding.observe(viewLifecycleOwner) { total ->
+            binding.textTotal.text = PersianDateUtils.toPersianDigits(total)
         }
 
         return binding.root

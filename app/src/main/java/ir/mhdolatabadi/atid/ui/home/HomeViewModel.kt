@@ -17,6 +17,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _fastCount = MutableLiveData<Int>()
     val fastCount: LiveData<Int> = _fastCount
 
+    private val _totalOutstanding = MutableLiveData<Int>()
+    val totalOutstanding: LiveData<Int> = _totalOutstanding
+
     init {
         refresh()
     }
@@ -42,7 +45,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun refresh() {
-        _prayerCounts.value = QadaPrayer.values().associateWith { repository.getPrayerCount(it) }
-        _fastCount.value = repository.getFastCount()
+        val counts = QadaPrayer.values().associateWith { repository.getPrayerCount(it) }
+        val fast = repository.getFastCount()
+        _prayerCounts.value = counts
+        _fastCount.value = fast
+        _totalOutstanding.value = counts.values.sum() + fast
     }
 }

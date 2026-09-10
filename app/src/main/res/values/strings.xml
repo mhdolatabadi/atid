@@ -4,7 +4,10 @@
     <string name="title_home">قضا</string>
     <string name="title_dashboard">تقویم</string>
     <string name="title_notifications">اوقات شرعی</string>
+    <string name="title_texts">متون مذهبی</string>
+    <string name="label_religious_texts">زیارت‌ها، ادعیه و احادیث</string>
 
+    <string name="label_total_outstanding">مجموع نماز و روزه قضای باقی‌مانده</string>
     <string name="label_qada_prayers">نماز‌های قضا</string>
     <string name="label_qada_fast">روزه قضا</string>
     <string name="qada_fajr">نماز صبح</string>
@@ -26,4 +29,8 @@
     <string name="label_sunset">غروب آفتاب</string>
     <string name="label_maghrib">اذان مغرب</string>
     <string name="label_isha">اذان عشا</string>
+
+    <string name="notification_channel_name">تاریخ و اوقات شرعی</string>
+    <string name="notification_channel_description">نمایش دائمی تاریخ روز و اوقات شرعی در نوار اعلان‌ها</string>
+    <string name="notification_times_line">صبح %1$s • طلوع %2$s • ظهر %3$s • عصر %4$s • غروب %5$s • مغرب %6$s • عشا %7$s</string>
 </resources>

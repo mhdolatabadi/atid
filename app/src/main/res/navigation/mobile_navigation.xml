@@ -22,4 +22,24 @@
         android:name="ir.mhdolatabadi.atid.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_texts"
+        android:name="ir.mhdolatabadi.atid.ui.texts.TextsFragment"
+        android:label="@string/title_texts"
+        tools:layout="@layout/fragment_texts">
+        <action
+            android:id="@+id/action_texts_to_detail"
+            app:destination="@id/navigation_text_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_text_detail"
+        android:name="ir.mhdolatabadi.atid.ui.texts.TextDetailFragment"
+        android:label="@string/title_texts"
+        tools:layout="@layout/fragment_text_detail">
+        <argument
+            android:name="textId"
+            app:argType="string" />
+    </fragment>
 </navigation>

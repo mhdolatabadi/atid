@@ -1,21 +1,20 @@
 package ir.mhdolatabadi.atid.ui.notifications
 
-import android.Manifest
 import android.app.Application
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationManager
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import ir.mhdolatabadi.atid.notification.DailyNotificationHelper
+import ir.mhdolatabadi.atid.util.LocationUtils
 import ir.mhdolatabadi.atid.util.PrayerTimes
 import ir.mhdolatabadi.atid.util.PrayerTimesCalculator
+import java.util.Calendar
 
 data class PrayerTimesUiState(
     val times: PrayerTimes,
-    val locationLabel: String
+    val locationLabel: String,
+    /** Key of the next upcoming prayer (fajr/sunrise/dhuhr/asr/sunset/maghrib/isha), for highlighting. */
+    val nextPrayerKey: String
 )
 
 class NotificationsViewModel(application: Application) : AndroidViewModel(application) {
@@ -29,46 +28,41 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
 
     /** Recomputes prayer times, using the device's last known location when permitted. */
     fun refresh() {
-        val location = lastKnownLocation()
-        val latitude: Double
-        val longitude: Double
-        val locationLabel: String
-        if (location != null) {
-            latitude = location.latitude
-            longitude = location.longitude
-            locationLabel = "بر اساس موقعیت مکانی شما"
+        val context = getApplication<Application>()
+        val coordinates = LocationUtils.resolve(context)
+        val locationLabel = if (coordinates.isDeviceLocation) {
+            "بر اساس موقعیت مکانی شما"
         } else {
-            latitude = DEFAULT_LATITUDE
-            longitude = DEFAULT_LONGITUDE
-            locationLabel = "تهران (پیش‌فرض؛ دسترسی به موقعیت مکانی فعال نیست)"
+            "تهران (پیش‌فرض؛ دسترسی به موقعیت مکانی فعال نیست)"
         }
 
+        val times = PrayerTimesCalculator.calculateForToday(coordinates.latitude, coordinates.longitude)
         _uiState.value = PrayerTimesUiState(
-            times = PrayerTimesCalculator.calculateForToday(latitude, longitude),
-            locationLabel = locationLabel
+            times = times,
+            locationLabel = locationLabel,
+            nextPrayerKey = computeNextPrayerKey(times)
         )
+        DailyNotificationHelper.show(context, times)
     }
 
-    private fun lastKnownLocation(): Location? {
-        val context = getApplication<Application>()
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context, Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-            context, Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-        if (!hasPermission) return null
-
-        val locationManager =
-            context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager ?: return null
-
-        return listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
-            .mapNotNull { provider -> runCatching { locationManager.getLastKnownLocation(provider) }.getOrNull() }
-            .maxByOrNull { it.time }
+    private fun computeNextPrayerKey(times: PrayerTimes): String {
+        val ordered = listOf(
+            "fajr" to times.fajr,
+            "sunrise" to times.sunrise,
+            "dhuhr" to times.dhuhr,
+            "asr" to times.asr,
+            "sunset" to times.sunset,
+            "maghrib" to times.maghrib,
+            "isha" to times.isha
+        )
+        val nowCalendar = Calendar.getInstance()
+        val nowMinutes = nowCalendar.get(Calendar.HOUR_OF_DAY) * 60 + nowCalendar.get(Calendar.MINUTE)
+        return ordered.firstOrNull { (_, time) -> toMinutesOfDay(time) > nowMinutes }?.first
+            ?: ordered.first().first
     }
 
-    companion object {
-        // Tehran coordinates, used when location access isn't available.
-        private const val DEFAULT_LATITUDE = 35.6892
-        private const val DEFAULT_LONGITUDE = 51.3890
+    private fun toMinutesOfDay(hhmm: String): Int {
+        val (hour, minute) = hhmm.split(":").map { it.toInt() }
+        return hour * 60 + minute
     }
 }
