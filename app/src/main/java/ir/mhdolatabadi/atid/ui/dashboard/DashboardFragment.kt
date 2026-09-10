@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ir.mhdolatabadi.atid.R
@@ -70,7 +71,7 @@ class DashboardFragment : Fragment() {
     private fun createWeekdayLabel(text: String, isFriday: Boolean): TextView = TextView(requireContext()).apply {
         layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
         gravity = Gravity.CENTER
-        setTypeface(typeface, Typeface.BOLD)
+        typeface = semiBoldTypeface
         textSize = 13f
         setText(text)
         if (isFriday) {
@@ -86,12 +87,13 @@ class DashboardFragment : Fragment() {
             layoutParams = FrameLayout.LayoutParams(dpToPx(34), dpToPx(34), Gravity.CENTER)
             gravity = Gravity.CENTER
             textSize = 14f
+            typeface = regularTypeface
             text = day?.let { PersianDateUtils.toPersianDigits(it) }.orEmpty()
             when {
                 isToday -> {
                     setBackgroundResource(R.drawable.bg_today_circle)
                     setTextColor(ContextCompat.getColor(context, R.color.white))
-                    setTypeface(typeface, Typeface.BOLD)
+                    typeface = semiBoldTypeface
                 }
                 isFriday && day != null -> {
                     setTextColor(ContextCompat.getColor(context, R.color.friday_text))
@@ -100,6 +102,14 @@ class DashboardFragment : Fragment() {
         }
         frame.addView(label)
         return frame
+    }
+
+    private val regularTypeface: Typeface? by lazy {
+        ResourcesCompat.getFont(requireContext(), R.font.vazirmatn_regular)
+    }
+
+    private val semiBoldTypeface: Typeface? by lazy {
+        ResourcesCompat.getFont(requireContext(), R.font.vazirmatn_semibold)
     }
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
