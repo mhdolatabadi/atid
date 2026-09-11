@@ -68,7 +68,9 @@
             android:minHeight="0dp"
             android:padding="0dp"
             android:text="+"
+            android:textColor="@color/on_surface_light"
             android:textSize="20sp"
+            app:backgroundTint="?attr/colorSecondary"
             app:cornerRadius="24dp" />
 
     </LinearLayout>

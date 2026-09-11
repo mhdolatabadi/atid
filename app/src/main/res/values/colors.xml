@@ -14,11 +14,11 @@
     <color name="on_surface_muted_light">#5F6866</color>
     <color name="divider_light">#E4E0D6</color>
 
-    <color name="background_dark">#0F1710</color>
-    <color name="surface_dark">#182019</color>
+    <color name="background_dark">#0B120D</color>
+    <color name="surface_dark">#1E2922</color>
     <color name="on_surface_dark">#EDEFEE</color>
     <color name="on_surface_muted_dark">#A6ADAB</color>
-    <color name="divider_dark">#28322B</color>
+    <color name="divider_dark">#3C4A41</color>
 
     <color name="today_highlight">#15803D</color>
     <color name="friday_text">#B0472F</color>
