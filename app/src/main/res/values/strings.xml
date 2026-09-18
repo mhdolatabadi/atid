@@ -32,5 +32,5 @@
 
     <string name="notification_channel_name">تاریخ و اوقات شرعی</string>
     <string name="notification_channel_description">نمایش دائمی تاریخ روز و اوقات شرعی در نوار اعلان‌ها</string>
-    <string name="notification_times_line">صبح %1$s • طلوع %2$s • ظهر %3$s • عصر %4$s • غروب %5$s • مغرب %6$s • عشا %7$s</string>
+    <string name="notification_summary_line">اذان ظهر %1$s • اذان مغرب %2$s</string>
 </resources>

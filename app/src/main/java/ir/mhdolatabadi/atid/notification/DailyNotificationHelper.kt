@@ -40,10 +40,21 @@ object DailyNotificationHelper {
             "${PersianDateUtils.toPersianDigits(today.day)} ${PersianDateUtils.monthName(today.month)} " +
             PersianDateUtils.toPersianDigits(today.year)
 
-        val timesLine = context.getString(
-            R.string.notification_times_line,
-            times.fajr, times.sunrise, times.dhuhr, times.asr, times.sunset, times.maghrib, times.isha
+        val summaryLine = context.getString(
+            R.string.notification_summary_line,
+            times.dhuhr,
+            times.maghrib
         )
+
+        val linesStyle = NotificationCompat.InboxStyle()
+            .setBigContentTitle(dateLine)
+            .addLine("${context.getString(R.string.label_fajr)}  ${times.fajr}")
+            .addLine("${context.getString(R.string.label_sunrise)}  ${times.sunrise}")
+            .addLine("${context.getString(R.string.label_dhuhr)}  ${times.dhuhr}")
+            .addLine("${context.getString(R.string.label_asr)}  ${times.asr}")
+            .addLine("${context.getString(R.string.label_sunset)}  ${times.sunset}")
+            .addLine("${context.getString(R.string.label_maghrib)}  ${times.maghrib}")
+            .addLine("${context.getString(R.string.label_isha)}  ${times.isha}")
 
         val contentIntent = PendingIntent.getActivity(
             context,
@@ -54,9 +65,10 @@ object DailyNotificationHelper {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
+            .setColor(ContextCompat.getColor(context, R.color.brand_primary))
             .setContentTitle(dateLine)
-            .setContentText(timesLine)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(timesLine))
+            .setContentText(summaryLine)
+            .setStyle(linesStyle)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
