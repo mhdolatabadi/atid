@@ -1,0 +1,36 @@
+.texts-page {
+  padding: 20px;
+}
+
+.texts-page__title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.texts-page__subtitle {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  margin-bottom: 16px;
+}
+
+.text-card {
+  display: block;
+  text-decoration: none;
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+.text-card__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.text-card__subtitle {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  margin-top: 4px;
+}

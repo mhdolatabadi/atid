@@ -1,0 +1,94 @@
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../assets/fonts/vazirmatn_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../assets/fonts/vazirmatn_medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../assets/fonts/vazirmatn_semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../assets/fonts/vazirmatn_bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --brand-primary: #15803d;
+  --brand-primary-dark: #166534;
+  --brand-primary-light: #4ade80;
+  --brand-accent: #d97706;
+  --brand-accent-dark: #9a5b04;
+
+  --background: #f7f5ef;
+  --surface: #ffffff;
+  --on-surface: #1b1f1e;
+  --on-surface-muted: #5f6866;
+  --divider: #e4e0d6;
+
+  --today-highlight: #15803d;
+  --friday-text: #b0472f;
+  --on-primary: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand-primary: #4ade80;
+    --brand-primary-dark: #166534;
+    --brand-primary-light: #4ade80;
+
+    --background: #0b120d;
+    --surface: #1e2922;
+    --on-surface: #edefee;
+    --on-surface-muted: #a6adab;
+    --divider: #3c4a41;
+
+    --today-highlight: #4ade80;
+    --on-primary: #0b120d;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  color: var(--on-surface);
+}
+
+body {
+  font-family: 'Vazirmatn', Tahoma, sans-serif;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+}
