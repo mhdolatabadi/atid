@@ -1,0 +1,83 @@
+.calendar-page {
+  padding: 20px;
+}
+
+.calendar-page__today {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  margin-bottom: 8px;
+}
+
+.calendar-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.calendar-page__month-label {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.calendar-nav-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+
+.calendar-weekdays__cell {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-muted);
+  padding: 4px 0;
+}
+
+.calendar-weekdays__cell--friday {
+  color: var(--friday-text);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+}
+
+.calendar-day__circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.calendar-day__circle--today {
+  background: var(--brand-primary);
+  color: var(--on-primary);
+  font-weight: 600;
+}
+
+.calendar-day__circle--friday {
+  color: var(--friday-text);
+}

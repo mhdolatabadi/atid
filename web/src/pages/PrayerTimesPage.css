@@ -1,0 +1,48 @@
+.prayer-times-page {
+  padding: 20px;
+}
+
+.prayer-times-page__title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.prayer-times-page__location {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  margin-bottom: 12px;
+}
+
+.prayer-times-page__location-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand-primary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 4px;
+}
+
+.prayer-times-list {
+  margin-top: 8px;
+  border-radius: 20px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.prayer-times-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+
+.prayer-times-row + .prayer-times-row {
+  border-top: 1px solid var(--divider);
+}
+
+.prayer-times-row--next {
+  color: var(--brand-primary);
+  font-weight: 700;
+}

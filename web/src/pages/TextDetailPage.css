@@ -1,0 +1,44 @@
+.text-detail-page {
+  padding: 20px;
+}
+
+.text-detail-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand-primary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 0;
+  margin-bottom: 8px;
+}
+
+.text-detail-page__title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 12px 0 4px;
+}
+
+.text-detail-page__subtitle {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  margin-bottom: 12px;
+}
+
+.text-detail-page__note {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--brand-accent-dark, var(--brand-accent));
+  background: var(--divider);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.text-detail-page__body {
+  font-size: 17px;
+  line-height: 1.9;
+  text-align: justify;
+  white-space: pre-line;
+  padding-bottom: 32px;
+}
