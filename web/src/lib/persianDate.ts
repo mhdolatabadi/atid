@@ -66,6 +66,12 @@ export function firstDayOfWeek(year: number, month: number): number {
   return new Date(gy, gm - 1, gd).getDay();
 }
 
+/** The local-time Date (at noon, so DST shifts never move it to another day) for a Jalali date. */
+export function toGregorianDate(year: number, month: number, day: number): Date {
+  const [gy, gm, gd] = jalaliToGregorian(year, month, day);
+  return new Date(gy, gm - 1, gd, 12);
+}
+
 /** Converts a JS weekday constant (Sunday=0) to a 0..6 index with Saturday first (Iranian week). */
 export function weekdayIndexSaturdayFirst(dayOfWeek: number): number {
   return dayOfWeek === 6 ? 0 : dayOfWeek + 1;
@@ -73,9 +79,21 @@ export function weekdayIndexSaturdayFirst(dayOfWeek: number): number {
 
 const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
 
-export function toPersianDigits(number: number): string {
-  return String(number).replace(/[0-9]/g, (c) => persianDigits[Number(c)]);
+export function toPersianDigits(value: number | string): string {
+  return String(value).replace(/[0-9]/g, (c) => persianDigits[Number(c)]);
 }
+
+const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+/** Arabic-Indic digits, used for lunar day numbers the way printed Iranian calendars show them. */
+export function toArabicDigits(value: number | string): string {
+  return String(value).replace(/[0-9]/g, (c) => arabicDigits[Number(c)]);
+}
+
+export const gregorianMonthNames = [
+  'ژانویه', 'فوریه', 'مارس', 'آوریل', 'مه', 'ژوئن',
+  'ژوئیه', 'اوت', 'سپتامبر', 'اکتبر', 'نوامبر', 'دسامبر',
+];
 
 // --- Gregorian <-> Jalali conversion (Julian day number based) ---
 
