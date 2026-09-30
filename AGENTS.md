@@ -27,7 +27,7 @@ This file defines the standing rules for every contributor and coding agent work
 - Desktop content must use a centered maximum width and must not stick to the viewport edges.
 - Support both light and dark color schemes; colors come from the tokens in `web/src/styles/theme.css`, not raw hex in components.
 - Preserve accessibility semantics, visible focus, useful labels, and adequate contrast.
-- Before making substantial UI changes, inspect and follow the relevant guidance stored under `.skill/`.
+- Before making substantial UI changes, inspect and follow the relevant guidance stored under `.skills/`.
 
 ## Dates, calendars and religious data
 
