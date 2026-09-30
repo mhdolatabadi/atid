@@ -39,6 +39,20 @@
   --today-highlight: #15803d;
   --friday-text: #b0472f;
   --on-primary: #ffffff;
+
+  /* Home page (time.ir layout) */
+  --ti-primary: #1766c2;
+  --ti-primary-soft: #e8f1fc;
+  --ti-on-primary: #ffffff;
+  --ti-holiday: #d92638;
+  --ti-holiday-soft: #fdecee;
+  --ti-page: #f2f4f8;
+  --ti-card: #ffffff;
+  --ti-text: #1c2430;
+  --ti-muted: #5b6676;
+  --ti-faint: #9aa4b2;
+  --ti-line: #e3e7ee;
+  --ti-shadow: 0 1px 2px rgb(20 30 50 / 0.05), 0 6px 20px rgb(20 30 50 / 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -55,6 +69,19 @@
 
     --today-highlight: #4ade80;
     --on-primary: #0b120d;
+
+    --ti-primary: #6aa8f0;
+    --ti-primary-soft: #1a2c44;
+    --ti-on-primary: #0b1422;
+    --ti-holiday: #ff6b78;
+    --ti-holiday-soft: #3a1c22;
+    --ti-page: #0e131b;
+    --ti-card: #171e29;
+    --ti-text: #e8edf4;
+    --ti-muted: #a3aebd;
+    --ti-faint: #6b7686;
+    --ti-line: #2a3342;
+    --ti-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
   }
 }
 

@@ -16,3 +16,6 @@ local.properties
 
 # Claude Code skills cloned locally for this session; not part of the app.
 /.claude
+
+# Server secrets for deploy/compose.yaml
+/deploy/.env

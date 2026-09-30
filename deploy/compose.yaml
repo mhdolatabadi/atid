@@ -1,0 +1,31 @@
+services:
+  web:
+    image: ${ATID_IMAGE_REPO:-ghcr.io/mhdolatabadi/atid}/web:${ATID_IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    restart: unless-stopped
+    networks: [edge]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ATID_DOMAIN: ${ATID_DOMAIN:?set ATID_DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - web
+    networks: [edge]
+
+networks:
+  edge:
+
+volumes:
+  caddy-data:
+  caddy-config:

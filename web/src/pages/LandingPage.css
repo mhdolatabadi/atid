@@ -1,109 +1,685 @@
-.landing {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 48px 20px 64px;
-}
-
-.landing__hero {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.landing__badge {
-  display: inline-block;
-  font-size: 13px;
-  color: var(--brand-primary);
-  background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
-  padding: 4px 12px;
-  border-radius: 999px;
-  margin-bottom: 16px;
-}
-
-.landing__title {
-  font-size: 40px;
-  font-weight: 700;
-  margin: 0 0 12px;
-}
-
-.landing__tagline {
-  font-size: 17px;
-  color: var(--on-surface-muted);
-  line-height: 1.8;
-  max-width: 480px;
-  margin: 0 auto 28px;
-}
-
-.landing__actions {
+.ti {
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  background: var(--ti-page);
+  color: var(--ti-text);
 }
 
-.landing__button {
-  display: inline-flex;
+.ti ::selection {
+  background: var(--ti-primary);
+  color: var(--ti-on-primary);
+}
+
+.ti :focus-visible {
+  outline: 2px solid var(--ti-primary);
+  outline-offset: 2px;
+}
+
+/* Header --------------------------------------------------------------------------------------- */
+
+.ti-header {
+  background: var(--ti-primary);
+  color: var(--ti-on-primary);
+}
+
+.ti-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  min-height: 60px;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 13px 26px;
-  border-radius: 14px;
-  font-size: 15px;
-  font-weight: 600;
+  gap: 24px;
+}
+
+.ti-brand {
+  font-size: 22px;
+  font-weight: 700;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
-.landing__button--primary {
-  background: var(--brand-primary);
-  color: var(--on-primary);
+.ti-nav {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.landing__button--secondary {
-  background: var(--surface);
-  color: var(--on-surface);
-  border: 1px solid var(--divider);
+.ti-nav a {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  opacity: 0.92;
+  transition: background-color 150ms ease-out;
 }
 
-.landing__features {
+.ti-nav a:hover {
+  background: rgb(255 255 255 / 0.14);
+  opacity: 1;
+}
+
+.ti-header :focus-visible {
+  outline-color: currentColor;
+}
+
+@media (max-width: 560px) {
+  .ti-header__inner {
+    flex-wrap: wrap;
+    gap: 0 16px;
+    padding: 8px 16px;
+  }
+  .ti-nav {
+    flex-wrap: wrap;
+    margin-inline: -12px;
+  }
+  .ti-nav a {
+    padding: 8px 12px;
+  }
+}
+
+/* Layout --------------------------------------------------------------------------------------- */
+
+.ti-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+.ti-layout {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-top: 8px;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
 }
 
-@media (max-width: 480px) {
-  .landing__title {
-    font-size: 32px;
-  }
-  .landing__features {
-    grid-template-columns: 1fr;
+.ti-layout__primary,
+.ti-layout__aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .ti-layout {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.landing__feature {
-  background: var(--surface);
-  border-radius: 18px;
+.ti-card {
+  background: var(--ti-card);
+  border-radius: 14px;
+  box-shadow: var(--ti-shadow);
   padding: 20px;
 }
 
-.landing__feature-icon {
-  color: var(--brand-primary);
-  margin-bottom: 10px;
+.ti-card__title {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 14px;
 }
 
-.landing__feature-title {
-  font-size: 15.5px;
+.ti-note {
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: var(--ti-muted);
+  margin: 12px 0 0;
+}
+
+.ti-note--error {
+  color: var(--ti-holiday);
+}
+
+/* Today ---------------------------------------------------------------------------------------- */
+
+.ti-today {
+  background: var(--ti-card);
+  border-radius: 14px;
+  box-shadow: var(--ti-shadow);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+/* Each part is its own flex item: Persian digits form an RTL run even inside an LTR box, so a
+   single text run would put the seconds before the hours. */
+.ti-today__clock {
+  display: flex;
+  align-items: baseline;
+  direction: ltr;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ti-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.ti-today__seconds {
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--ti-muted);
+}
+
+.ti-today__dates {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.ti-today__date {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ti-today__label {
+  font-size: 12.5px;
+  color: var(--ti-muted);
+}
+
+.ti-today__value {
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 4px;
 }
 
-.landing__feature-desc {
-  font-size: 13.5px;
-  color: var(--on-surface-muted);
+.ti-today__date--solar .ti-today__value {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.ti-today__date [dir='ltr'] {
+  text-align: right;
+}
+
+@media (max-width: 720px) {
+  .ti-today {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 18px;
+  }
+  .ti-today__clock {
+    justify-content: center;
+    font-size: 44px;
+  }
+  .ti-today__dates {
+    grid-template-columns: 1fr;
+  }
+  .ti-today__date {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 10px;
+    border-top: 1px solid var(--ti-line);
+  }
+}
+
+/* Calendar ------------------------------------------------------------------------------------- */
+
+.ti-calendar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ti-calendar__titles {
+  text-align: center;
+  min-width: 0;
+}
+
+.ti-calendar__month {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.ti-calendar__range {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ti-muted);
+}
+
+.ti-calendar__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ti-faint);
+}
+
+.ti-icon-button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ti-primary);
+  background: var(--ti-primary-soft);
+  transition: filter 150ms ease-out;
+}
+
+.ti-icon-button:hover {
+  filter: brightness(0.96);
+}
+
+/* In RTL "previous" sits on the right and points right; "next" sits on the left and points left. */
+.ti-icon-button--flip svg {
+  transform: scaleX(-1);
+}
+
+.ti-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ti-calendar__weekday {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ti-muted);
+  padding: 6px 0 8px;
+}
+
+.ti-calendar__weekday.is-holiday {
+  color: var(--ti-holiday);
+}
+
+.ti-calendar__weekday-short {
+  display: none;
+}
+
+.ti-day {
+  position: relative;
+  min-height: 74px;
+  padding: 8px 8px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--ti-line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  color: var(--ti-text);
+  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+}
+
+.ti-day:hover {
+  background: var(--ti-primary-soft);
+}
+
+.ti-day__solar {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.ti-day__sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  color: var(--ti-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ti-day__gregorian {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.ti-day.is-holiday .ti-day__solar {
+  color: var(--ti-holiday);
+}
+
+.ti-day.is-holiday {
+  background: var(--ti-holiday-soft);
+  border-color: transparent;
+}
+
+.ti-day.is-outside {
+  background: transparent;
+  border-style: dashed;
+}
+
+.ti-day.is-outside .ti-day__solar,
+.ti-day.is-outside .ti-day__sub {
+  color: var(--ti-faint);
+}
+
+.ti-day.is-selected {
+  border-color: var(--ti-primary);
+  box-shadow: inset 0 0 0 1px var(--ti-primary);
+}
+
+.ti-day.is-today {
+  background: var(--ti-primary);
+  border-color: var(--ti-primary);
+}
+
+.ti-day.is-today .ti-day__solar,
+.ti-day.is-today .ti-day__sub {
+  color: var(--ti-on-primary);
+}
+
+@media (max-width: 560px) {
+  .ti-card {
+    padding: 16px 12px;
+  }
+  .ti-calendar__grid {
+    gap: 3px;
+  }
+  .ti-calendar__weekday-full {
+    display: none;
+  }
+  .ti-calendar__weekday-short {
+    display: inline;
+  }
+  .ti-day {
+    min-height: 58px;
+    padding: 5px 4px 4px;
+    border-radius: 8px;
+  }
+  .ti-day__solar {
+    font-size: 17px;
+    text-align: center;
+  }
+  .ti-day__sub {
+    font-size: 10.5px;
+  }
+}
+
+.ti-calendar__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ti-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--ti-primary);
+  color: var(--ti-on-primary);
+}
+
+.ti-calendar__legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ti-muted);
+}
+
+.ti-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--ti-holiday);
+}
+
+.ti-selected {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ti-line);
+}
+
+.ti-selected__dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  font-size: 14px;
+  color: var(--ti-muted);
+  margin-bottom: 8px;
+}
+
+.ti-selected__dates strong {
+  font-size: 16px;
+  color: var(--ti-text);
+}
+
+/* Occasions ------------------------------------------------------------------------------------ */
+
+.ti-occasions__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ti-occasion {
+  display: flex;
+  gap: 16px;
+  padding: 10px 0;
+  font-size: 14.5px;
   line-height: 1.7;
 }
 
-.landing__footer {
+.ti-occasion + .ti-occasion {
+  border-top: 1px solid var(--ti-line);
+}
+
+.ti-occasion__day {
+  flex: 0 0 76px;
+  font-weight: 600;
+  color: var(--ti-muted);
+}
+
+.ti-occasion__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.ti-occasion--holiday,
+.ti-occasion--holiday .ti-occasion__day {
+  color: var(--ti-holiday);
+}
+
+.ti-occasion__tag {
+  display: inline-block;
+  margin-inline-start: 8px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--ti-holiday-soft);
+  color: var(--ti-holiday);
+}
+
+.ti-occasions__empty {
+  font-size: 14px;
+  color: var(--ti-muted);
+  margin: 0;
+}
+
+/* Prayer times --------------------------------------------------------------------------------- */
+
+.ti-prayer__place {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ti-muted);
+  margin: -6px 0 8px;
+}
+
+.ti-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 0 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ti-primary);
+}
+
+.ti-prayer__list {
+  margin: 0;
+}
+
+.ti-prayer__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.ti-prayer__row:nth-child(odd) {
+  background: var(--ti-page);
+}
+
+.ti-prayer__row dt {
+  color: var(--ti-muted);
+}
+
+.ti-prayer__row dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ti-prayer__row.is-next {
+  background: var(--ti-primary-soft);
+}
+
+.ti-prayer__row.is-next dt,
+.ti-prayer__row.is-next dd {
+  color: var(--ti-primary);
+  font-weight: 700;
+}
+
+.ti-more {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ti-primary);
+  text-underline-offset: 4px;
+}
+
+/* Converter ------------------------------------------------------------------------------------ */
+
+.ti-segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--ti-page);
+  margin-bottom: 14px;
+}
+
+.ti-segmented button {
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ti-muted);
+}
+
+.ti-segmented button[aria-selected='true'] {
+  background: var(--ti-card);
+  color: var(--ti-primary);
+  box-shadow: 0 1px 3px rgb(20 30 50 / 0.12);
+}
+
+.ti-converter__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 8px;
+}
+
+.ti-converter__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--ti-muted);
+}
+
+.ti-converter__field input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--ti-line);
+  background: var(--ti-card);
+  color: var(--ti-text);
+  font: inherit;
+  font-size: 16px;
   text-align: center;
-  margin-top: 40px;
+  caret-color: var(--ti-primary);
+}
+
+.ti-converter__field input:focus-visible {
+  outline: none;
+  border-color: var(--ti-primary);
+  box-shadow: 0 0 0 3px var(--ti-primary-soft);
+}
+
+.ti-converter__result {
+  margin: 14px 0 0;
+}
+
+.ti-converter__result div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.ti-converter__result div + div {
+  border-top: 1px solid var(--ti-line);
+}
+
+.ti-converter__result dt {
+  color: var(--ti-muted);
+}
+
+.ti-converter__result dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Footer --------------------------------------------------------------------------------------- */
+
+.ti-footer {
+  text-align: center;
   font-size: 13px;
-  color: var(--on-surface-muted);
+  color: var(--ti-muted);
+  padding: 20px 16px 32px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ti * {
+    transition: none !important;
+  }
 }

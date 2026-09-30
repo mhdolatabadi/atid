@@ -21,11 +21,7 @@ npm run build
 
 ## دیپلوی
 
-با هر push به شاخه‌ی `master` که پوشه‌ی `web/` را تغییر دهد، ورک‌فلوی `.github/workflows/deploy-web.yml` نسخه‌ی وب را build کرده و روی GitHub Pages منتشر می‌کند. اجرای دستی هم از تب Actions (گزینه‌ی Run workflow) ممکن است.
-
-پیش‌نیاز یک‌باره: در تنظیمات مخزن، بخش **Settings → Pages**، مقدار **Source** را روی **GitHub Actions** بگذارید.
-
-آدرس سایت: `https://mhdolatabadi.github.io/atid/`
+نسخه وب با Docker و Caddy روی سرور اجرا می‌شود و بعد از موفق شدن CI روی `master` خودکار دیپلوی می‌شود. راهنمای کامل در [`deploy/README.md`](../deploy/README.md) است.
 
 ## ساختار
 

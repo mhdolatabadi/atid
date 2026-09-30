@@ -60,3 +60,11 @@ export function ArrowRightIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function ChevronIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" width="20" height="20" {...strokeProps}>
+      <path d="M9 6l6 6-6 6" />
+    </svg>
+  );
+}
