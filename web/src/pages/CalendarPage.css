@@ -1,34 +1,53 @@
 .calendar-page {
-  padding: 20px;
+  padding: 24px 16px;
 }
 
 .calendar-page__today {
   font-size: 14px;
-  color: var(--on-surface-muted);
-  margin-bottom: 8px;
+  color: var(--muted);
+  margin: 0 4px 12px;
+}
+
+.calendar-page__card {
+  padding: 16px 12px 12px;
+  overflow: hidden;
 }
 
 .calendar-page__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .calendar-page__month-label {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 19px;
+  font-weight: 700;
+  animation: rise-in 380ms var(--ease-out) both;
 }
 
 .calendar-nav-button {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: var(--surface);
+  background: var(--glass-weak);
+  border: 1px solid var(--glass-edge);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  transition: transform 160ms var(--ease-out), background-color 180ms ease-out;
+}
+
+.calendar-nav-button:hover {
+  background: var(--accent-soft);
+}
+
+.calendar-nav-button:active {
+  transform: scale(0.9);
+}
+
+.calendar-nav-button__icon--flip {
+  transform: scaleX(-1);
 }
 
 .calendar-weekdays {
@@ -41,17 +60,34 @@
   text-align: center;
   font-size: 12px;
   font-weight: 600;
-  color: var(--on-surface-muted);
+  color: var(--muted);
   padding: 4px 0;
 }
 
 .calendar-weekdays__cell--friday {
-  color: var(--friday-text);
+  color: var(--holiday);
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+}
+
+/* Here "next" sits on the right, so the next month slides in from the right. */
+.calendar-grid.is-from-next {
+  animation: cal-from-right 460ms var(--ease-out) both;
+}
+
+.calendar-grid.is-from-prev {
+  animation: cal-from-left 460ms var(--ease-out) both;
+}
+
+@keyframes cal-from-right {
+  from { opacity: 0; transform: translateX(36px); filter: blur(6px); }
+}
+
+@keyframes cal-from-left {
+  from { opacity: 0; transform: translateX(-36px); filter: blur(6px); }
 }
 
 .calendar-day {
@@ -69,15 +105,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .calendar-day__circle--today {
-  background: var(--brand-primary);
-  color: var(--on-primary);
-  font-weight: 600;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  box-shadow: 0 6px 18px -6px var(--accent);
 }
 
 .calendar-day__circle--friday {
-  color: var(--friday-text);
+  color: var(--holiday);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-page__month-label {
+    animation: none;
+  }
+  .calendar-grid.is-from-next,
+  .calendar-grid.is-from-prev {
+    animation: fade-in 200ms ease-out both;
+  }
 }

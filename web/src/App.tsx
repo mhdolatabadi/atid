@@ -1,5 +1,6 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
+import { SkyBackground } from './components/SkyBackground';
 import { LandingPage } from './pages/LandingPage';
 import { HomePage } from './pages/HomePage';
 import { CalendarPage } from './pages/CalendarPage';
@@ -10,6 +11,7 @@ import { TextDetailPage } from './pages/TextDetailPage';
 export default function App() {
   return (
     <HashRouter>
+      <SkyBackground />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/app" element={<AppShell />}>

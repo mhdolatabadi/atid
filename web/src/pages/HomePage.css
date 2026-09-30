@@ -1,81 +1,128 @@
 .home-page {
-  padding: 20px 20px 16px;
+  padding: 24px 16px 16px;
 }
 
 .home-page__title {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0 0 16px;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 4px 16px;
 }
 
 .home-page__total {
-  border-radius: 20px;
-  background: var(--brand-primary);
-  color: var(--on-primary);
-  padding: 20px;
-  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  padding: 22px 22px 20px;
+  margin-bottom: 8px;
+}
+
+/* A soft wash of the accent behind the number, so the total reads as the page's anchor. */
+.home-page__total::before {
+  content: '';
+  position: absolute;
+  inset: -40% -10% auto auto;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.22;
+  filter: blur(50px);
+  pointer-events: none;
 }
 
 .home-page__total-label {
+  position: relative;
   font-size: 14px;
-  opacity: 0.9;
+  color: var(--muted);
 }
 
 .home-page__total-value {
-  font-size: 36px;
+  position: relative;
+  font-size: 48px;
   font-weight: 700;
-  margin-top: 4px;
+  line-height: 1.2;
+  margin-top: 6px;
+  animation: count-change 380ms var(--ease-out) both;
 }
 
 .home-page__section-title {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--on-surface-muted);
-  margin: 16px 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 20px 4px 10px;
 }
 
 .qada-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--surface);
-  border-radius: 16px;
-  padding: 12px 16px;
+  padding: 10px 12px 10px 16px;
   margin-bottom: 10px;
+  border-radius: 18px;
 }
 
 .qada-row__label {
   font-size: 16px;
+  font-weight: 500;
 }
 
 .qada-row__controls {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .qada-row__count {
-  font-size: 18px;
-  font-weight: 600;
-  min-width: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  min-width: 36px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
+  animation: count-change 320ms var(--ease-out) both;
+}
+
+@keyframes count-change {
+  from { transform: scale(1.35); opacity: 0.4; filter: blur(2px); }
 }
 
 .round-button {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1;
-  background: var(--divider);
-  color: var(--on-surface-muted);
+  background: var(--glass-weak);
+  border: 1px solid var(--glass-edge);
+  color: var(--text);
+  transition: transform 160ms var(--ease-out), background-color 180ms ease-out;
+}
+
+.round-button:hover {
+  background: var(--accent-soft);
+}
+
+.round-button:active {
+  transform: scale(0.88);
 }
 
 .round-button--filled {
-  background: var(--brand-primary);
-  color: var(--on-primary);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 6px 16px -8px var(--accent);
+}
+
+.round-button--filled:hover {
+  background: var(--accent);
+  filter: brightness(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page__total-value,
+  .qada-row__count {
+    animation: fade-in 200ms ease-out both;
+  }
 }

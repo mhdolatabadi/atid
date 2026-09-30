@@ -16,10 +16,7 @@ const rows: { key: keyof PrayerTimes; label: string }[] = [
 ];
 
 function toPersianTime(hhmm: string): string {
-  return hhmm
-    .split(':')
-    .map((part) => toPersianDigits(Number(part)))
-    .join(':');
+  return toPersianDigits(hhmm);
 }
 
 function toMinutesOfDay(hhmm: string): number {
@@ -75,7 +72,7 @@ export function PrayerTimesPage() {
         استفاده از موقعیت مکانی من
       </button>
 
-      <div className="prayer-times-list">
+      <div className="prayer-times-list glass">
         {rows.map(({ key, label }) => (
           <div key={key} className={'prayer-times-row' + (key === nextKey ? ' prayer-times-row--next' : '')}>
             <span>{label}</span>
@@ -83,6 +80,9 @@ export function PrayerTimesPage() {
           </div>
         ))}
       </div>
+      <p className="prayer-times-page__note">
+        محاسبه‌ی تقریبی؛ ممکن است حدود یک دقیقه با جدول رسمی تفاوت داشته باشد.
+      </p>
     </div>
   );
 }

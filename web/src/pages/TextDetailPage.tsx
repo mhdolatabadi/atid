@@ -30,7 +30,7 @@ export function TextDetailPage() {
       <h1 className="text-detail-page__title">{text.title}</h1>
       <div className="text-detail-page__subtitle">{text.subtitle}</div>
       <div className="text-detail-page__note">{text.note}</div>
-      <div className="text-detail-page__body">{text.body}</div>
+      <div className="text-detail-page__body glass">{text.body}</div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   useQadaCounts,
   type QadaPrayer,
 } from '../store/qadaStore';
+import { toPersianDigits } from '../lib/persianDate';
 import './HomePage.css';
 
 const prayerLabels: Record<QadaPrayer, string> = {
@@ -51,11 +52,13 @@ function QadaRow({
   onDecrement: () => void;
 }) {
   return (
-    <div className="qada-row">
+    <div className="qada-row glass">
       <span className="qada-row__label">{label}</span>
       <div className="qada-row__controls">
         <RoundButton symbol="−" onClick={onDecrement} />
-        <span className="qada-row__count">{count}</span>
+        <span key={count} className="qada-row__count" aria-live="polite">
+          {toPersianDigits(count)}
+        </span>
         <RoundButton symbol="+" filled onClick={onIncrement} />
       </div>
     </div>
@@ -71,9 +74,11 @@ export function HomePage() {
     <div className="home-page">
       <h1 className="home-page__title">قضا</h1>
 
-      <div className="home-page__total">
+      <div className="home-page__total glass">
         <div className="home-page__total-label">مجموع نماز و روزه قضای باقی‌مانده</div>
-        <div className="home-page__total-value">{total}</div>
+        <div key={total} className="home-page__total-value">
+          {toPersianDigits(total)}
+        </div>
       </div>
 
       <div className="home-page__section-title">نماز‌های قضا</div>

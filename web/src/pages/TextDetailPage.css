@@ -1,44 +1,44 @@
 .text-detail-page {
-  padding: 20px;
+  padding: 20px 16px;
 }
 
 .text-detail-page__back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--brand-primary);
+  min-height: 44px;
+  color: var(--accent);
   font-size: 14px;
-  font-weight: 500;
-  padding: 6px 0;
-  margin-bottom: 8px;
+  font-weight: 600;
+  padding: 0 4px;
 }
 
 .text-detail-page__title {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
-  margin: 12px 0 4px;
+  margin: 8px 4px 4px;
 }
 
 .text-detail-page__subtitle {
   font-size: 14px;
-  color: var(--on-surface-muted);
-  margin-bottom: 12px;
+  color: var(--muted);
+  margin: 0 4px 12px;
 }
 
 .text-detail-page__note {
   font-size: 13px;
-  font-style: italic;
-  color: var(--brand-accent-dark, var(--brand-accent));
-  background: var(--divider);
+  line-height: 1.8;
+  color: var(--text);
+  background: var(--accent-soft);
   border-radius: 12px;
-  padding: 12px;
+  padding: 12px 14px;
   margin-bottom: 16px;
 }
 
 .text-detail-page__body {
-  font-size: 17px;
-  line-height: 1.9;
+  font-size: 18px;
+  line-height: 2.1;
   text-align: justify;
   white-space: pre-line;
-  padding-bottom: 32px;
+  padding: 20px 18px;
 }
