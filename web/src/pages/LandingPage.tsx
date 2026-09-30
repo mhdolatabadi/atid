@@ -402,7 +402,7 @@ export function LandingPage() {
     <div className="ti">
       <header className="ti-header">
         <div className="ti-header__inner">
-          <Link to="/" className="ti-brand">اتید</Link>
+          <Link to="/" className="ti-brand">عتید</Link>
           <nav className="ti-nav" aria-label="بخش‌ها">
             <Link to="/app/calendar">تقویم</Link>
             <Link to="/app/prayer-times">اوقات شرعی</Link>

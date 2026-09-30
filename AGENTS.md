@@ -4,7 +4,7 @@ This file defines the standing rules for every contributor and coding agent work
 
 ## Product identity and scope
 
-- The product name is **Atid** (اتید).
+- The product name is **Atid** (عتید).
 - The supported clients are **Android** (`app/`, Kotlin + Jetpack Compose) and **Web** (`web/`, Vite + React + TypeScript). Do not add iOS-specific code or workflows unless the owner explicitly changes this rule.
 - The Android application ID is `ir.mhdolatabadi.atid`.
 - Keep Web and Android behavior consistent where platform capabilities allow it. Shared logic (Jalali calendar conversion, prayer-time calculation) is ported 1:1 between the two; a fix in one must be mirrored in the other.
