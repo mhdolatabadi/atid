@@ -10,7 +10,9 @@ data class CalendarMonthUiState(
     val todayLabel: String,
     /** One entry per grid cell; null renders as a blank leading cell. */
     val days: List<Int?>,
-    val todayDay: Int?
+    val todayDay: Int?,
+    /** year * 12 + month, so the screen can tell which way the month moved. */
+    val monthIndex: Int
 )
 
 class DashboardViewModel : ViewModel() {
@@ -61,7 +63,8 @@ class DashboardViewModel : ViewModel() {
                 "${PersianDateUtils.toPersianDigits(today.day)} ${PersianDateUtils.monthName(today.month)} " +
                 PersianDateUtils.toPersianDigits(today.year),
             days = days,
-            todayDay = if (isDisplayingCurrentMonth) today.day else null
+            todayDay = if (isDisplayingCurrentMonth) today.day else null,
+            monthIndex = displayedYear * 12 + displayedMonth
         )
     }
 }

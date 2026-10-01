@@ -17,6 +17,7 @@ import { calculateForToday, type PrayerTimes } from '../lib/prayerTimes';
 import { requestDeviceLocation, TEHRAN, type Coordinates } from '../lib/location';
 import { isHoliday, occasionsOn, type Occasion } from '../data/occasions';
 import { ChevronIcon, LocationIcon } from '../components/icons';
+import { ClientOnly } from '../components/ClientOnly';
 import './LandingPage.css';
 
 const weekdayHeaders = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
@@ -50,15 +51,31 @@ function useNow(): Date {
 
 // --- Today --------------------------------------------------------------------------------------
 
-function TodayPanel({ now }: { now: Date }) {
-  const pad = (n: number) => toPersianDigits(String(n).padStart(2, '0'));
+/** Each digit remounts when it changes, so only the digits that tick roll into place. */
+function Rolling({ value, className }: { value: number; className?: string }) {
+  const digits = toPersianDigits(String(value).padStart(2, '0'));
   return (
-    <section className="ti-today" aria-label="امروز">
-      <div className="ti-today__clock" aria-live="off">
-        <span>{pad(now.getHours())}</span>
-        <span>:</span>
-        <span>{pad(now.getMinutes())}</span>
-        <span className="ti-today__seconds">:{pad(now.getSeconds())}</span>
+    <span className={'ti-roll' + (className ? ` ${className}` : '')}>
+      {[...digits].map((digit, index) => (
+        <span key={`${index}-${digit}`} className="ti-roll__digit">
+          {digit}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function TodayPanel({ now }: { now: Date }) {
+  return (
+    <section className="ti-today glass enter" aria-label="امروز">
+      <div className="ti-today__clock" role="timer" aria-label={now.toLocaleTimeString('fa-IR')}>
+        <Rolling value={now.getHours()} />
+        <span className="ti-today__colon">:</span>
+        <Rolling value={now.getMinutes()} />
+        <span className="ti-today__seconds">
+          <span className="ti-today__colon">:</span>
+          <Rolling value={now.getSeconds()} />
+        </span>
       </div>
       <div className="ti-today__dates">
         <div className="ti-today__date ti-today__date--solar">
@@ -138,22 +155,23 @@ function OccasionList({ items }: { items: { date?: Date; occasion: Occasion }[] 
 
 function CalendarSection({ now }: { now: Date }) {
   const current = fromDate(now);
-  const [view, setView] = useState({ year: current.year, month: current.month });
+  const [view, setView] = useState({ year: current.year, month: current.month, direction: 0 });
   const [selected, setSelected] = useState<Date>(now);
 
-  const cells = useMemo(() => buildCells(view.year, view.month), [view]);
+  const cells = useMemo(() => buildCells(view.year, view.month), [view.year, view.month]);
   const monthDays = cells.filter((c) => c.inMonth);
   const range = rangeLabel(monthDays[0].date, monthDays[monthDays.length - 1].date);
 
   const shift = (delta: number) => {
     setView(({ year, month }) => {
       const index = year * 12 + (month - 1) + delta;
-      return { year: Math.floor(index / 12), month: (index % 12) + 1 };
+      return { year: Math.floor(index / 12), month: (index % 12) + 1, direction: delta };
     });
   };
 
   const goToday = () => {
-    setView({ year: current.year, month: current.month });
+    const delta = current.year * 12 + current.month - (view.year * 12 + view.month);
+    setView({ year: current.year, month: current.month, direction: Math.sign(delta) });
     setSelected(now);
   };
 
@@ -163,13 +181,13 @@ function CalendarSection({ now }: { now: Date }) {
 
   return (
     <>
-      <section className="ti-card ti-calendar" aria-label="تقویم">
+      <section className="ti-card ti-calendar glass enter" style={{ animationDelay: '80ms' }} aria-label="تقویم">
         <header className="ti-calendar__header">
           <button type="button" className="ti-icon-button" onClick={() => shift(-1)} aria-label="ماه قبل">
             <ChevronIcon />
           </button>
           <div className="ti-calendar__titles">
-            <h2 className="ti-calendar__month">
+            <h2 key={`${view.year}-${view.month}`} className="ti-calendar__month">
               {monthName(view.month)} {toPersianDigits(view.year)}
             </h2>
             <div className="ti-calendar__range">
@@ -183,13 +201,23 @@ function CalendarSection({ now }: { now: Date }) {
           </button>
         </header>
 
-        <div className="ti-calendar__grid" role="grid">
+        <div className="ti-calendar__weekdays" aria-hidden="true">
           {weekdayHeaders.map((label, index) => (
-            <div key={label} role="columnheader" className={'ti-calendar__weekday' + (index === 6 ? ' is-holiday' : '')}>
+            <div key={label} className={'ti-calendar__weekday' + (index === 6 ? ' is-holiday' : '')}>
               <span className="ti-calendar__weekday-full">{label}</span>
-              <span className="ti-calendar__weekday-short" aria-hidden="true">{label[0]}</span>
+              <span className="ti-calendar__weekday-short">{label[0]}</span>
             </div>
           ))}
+        </div>
+        <div
+          key={`${view.year}-${view.month}`}
+          className={
+            'ti-calendar__grid' +
+            (view.direction > 0 ? ' is-from-next' : view.direction < 0 ? ' is-from-prev' : '')
+          }
+          role="group"
+          aria-label={`${monthName(view.month)} ${toPersianDigits(view.year)}`}
+        >
           {cells.map((cell) => {
             const holiday = isHoliday(cell.date);
             const classes = [
@@ -203,15 +231,15 @@ function CalendarSection({ now }: { now: Date }) {
               <button
                 key={cell.date.toDateString()}
                 type="button"
-                role="gridcell"
                 className={classes}
                 aria-label={solarLabel(cell.date)}
-                aria-selected={sameDay(cell.date, selected)}
+                aria-pressed={sameDay(cell.date, selected)}
                 onClick={() => {
                   setSelected(cell.date);
                   if (!cell.inMonth) {
                     const p = fromDate(cell.date);
-                    setView({ year: p.year, month: p.month });
+                    const delta = p.year * 12 + p.month - (view.year * 12 + view.month);
+                    setView({ year: p.year, month: p.month, direction: Math.sign(delta) });
                   }
                 }}
               >
@@ -234,7 +262,7 @@ function CalendarSection({ now }: { now: Date }) {
           </span>
         </div>
 
-        <div className="ti-selected">
+        <div key={selected.toDateString()} className="ti-selected">
           <div className="ti-selected__dates">
             <strong>{solarLabel(selected)}</strong>
             <span>{hijriLabel(selected)}</span>
@@ -244,7 +272,7 @@ function CalendarSection({ now }: { now: Date }) {
         </div>
       </section>
 
-      <section className="ti-card ti-occasions" aria-label="مناسبت‌های ماه">
+      <section className="ti-card ti-occasions glass enter" style={{ animationDelay: '160ms' }} aria-label="مناسبت‌های ماه">
         <h2 className="ti-card__title">مناسبت‌های {monthName(view.month)}</h2>
         <OccasionList items={monthOccasions} />
         <p className="ti-note">
@@ -298,7 +326,7 @@ function PrayerTimesCard({ now }: { now: Date }) {
   };
 
   return (
-    <section className="ti-card ti-prayer" aria-label="اوقات شرعی">
+    <section className="ti-card ti-prayer glass enter" style={{ animationDelay: '120ms' }} aria-label="اوقات شرعی">
       <h2 className="ti-card__title">اوقات شرعی</h2>
       <div className="ti-prayer__place">
         {coordinates.isDeviceLocation ? 'موقعیت فعلی شما' : 'به افق تهران'}
@@ -366,7 +394,7 @@ function DateConverterCard() {
   );
 
   return (
-    <section className="ti-card ti-converter" aria-label="تبدیل تاریخ">
+    <section className="ti-card ti-converter glass enter" style={{ animationDelay: '200ms' }} aria-label="تبدیل تاریخ">
       <h2 className="ti-card__title">تبدیل تاریخ</h2>
       <div className="ti-segmented" role="tablist">
         <button type="button" role="tab" aria-selected={mode === 'solar'} onClick={() => switchMode('solar')}>
@@ -382,7 +410,7 @@ function DateConverterCard() {
         {field('year', 'سال')}
       </div>
       {result ? (
-        <dl className="ti-converter__result">
+        <dl key={result.toDateString()} className="ti-converter__result">
           <div><dt>شمسی</dt><dd>{solarLabel(result)}</dd></div>
           <div><dt>قمری</dt><dd>{hijriLabel(result)}</dd></div>
           <div><dt>میلادی</dt><dd dir="ltr">{gregorianLabel(result)}</dd></div>
@@ -396,11 +424,46 @@ function DateConverterCard() {
 
 // --- Page ---------------------------------------------------------------------------------------
 
-export function LandingPage() {
+/** Everything that depends on the current moment; rendered only in the browser. */
+function LiveHome() {
   const now = useNow();
   return (
+    <>
+      <TodayPanel now={now} />
+      <div className="ti-layout">
+        <div className="ti-layout__primary">
+          <CalendarSection now={now} />
+        </div>
+        <aside className="ti-layout__aside">
+          <PrayerTimesCard now={now} />
+          <DateConverterCard />
+        </aside>
+      </div>
+    </>
+  );
+}
+
+/** Same footprint as LiveHome, so nothing jumps when the live content replaces it. */
+function HomePlaceholder() {
+  return (
+    <div aria-hidden="true">
+      <div className="ti-today glass ti-placeholder ti-placeholder--today" />
+      <div className="ti-layout">
+        <div className="ti-layout__primary">
+          <div className="ti-card glass ti-placeholder ti-placeholder--calendar" />
+        </div>
+        <div className="ti-layout__aside">
+          <div className="ti-card glass ti-placeholder ti-placeholder--prayer" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function LandingPage() {
+  return (
     <div className="ti">
-      <header className="ti-header">
+      <header className="ti-header glass">
         <div className="ti-header__inner">
           <Link to="/" className="ti-brand">عتید</Link>
           <nav className="ti-nav" aria-label="بخش‌ها">
@@ -416,16 +479,28 @@ export function LandingPage() {
       </header>
 
       <main className="ti-main">
-        <TodayPanel now={now} />
-        <div className="ti-layout">
-          <div className="ti-layout__primary">
-            <CalendarSection now={now} />
-          </div>
-          <aside className="ti-layout__aside">
-            <PrayerTimesCard now={now} />
-            <DateConverterCard />
-          </aside>
-        </div>
+        <h1 className="sr-only">تقویم شمسی، قمری و میلادی، اوقات شرعی و مناسبت‌های امروز</h1>
+        <ClientOnly fallback={<HomePlaceholder />}>
+          <LiveHome />
+        </ClientOnly>
+
+        <section className="ti-about glass" aria-labelledby="ti-about-title">
+          <h2 id="ti-about-title" className="ti-card__title">درباره‌ی عتید</h2>
+          <p>
+            عتید تقویم کامل شمسی را همراه با تاریخ قمری و میلادی هر روز نشان می‌دهد؛ جمعه‌ها و تعطیلات رسمی
+            به رنگ قرمزند و مناسبت‌های هر ماه زیر تقویم آمده است. اوقات شرعی امروز (اذان صبح، طلوع آفتاب، اذان
+            ظهر، غروب آفتاب، اذان مغرب و نیمه‌شب شرعی) به افق تهران یا موقعیت شما محاسبه می‌شود و با مبدل تاریخ
+            می‌توانید تاریخ شمسی و میلادی را به هم تبدیل کنید.
+          </p>
+          <ul className="ti-about__links">
+            <li><Link to="/app/prayer-times">اوقات شرعی امروز</Link></li>
+            <li><Link to="/app/calendar">تقویم ماه جاری</Link></li>
+            <li><Link to="/app/texts/ziyarat_ashura">متن کامل زیارت عاشورا</Link></li>
+            <li><Link to="/app/texts/sahifa_dua_7">دعای هفتم صحیفه سجادیه</Link></li>
+            <li><Link to="/app/texts/hadith_kisa">حدیث کساء</Link></li>
+            <li><Link to="/app/home">شمارنده‌ی نماز و روزه‌ی قضا</Link></li>
+          </ul>
+        </section>
       </main>
 
       <footer className="ti-footer">اطلاعات شما فقط در همین مرورگر ذخیره می‌شود.</footer>

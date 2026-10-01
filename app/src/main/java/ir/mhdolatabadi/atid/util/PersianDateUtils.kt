@@ -76,8 +76,11 @@ object PersianDateUtils {
 
     private val persianDigits = charArrayOf('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹')
 
-    fun toPersianDigits(number: Int): String =
-        number.toString().map { c -> if (c.isDigit()) persianDigits[c - '0'] else c }.joinToString("")
+    fun toPersianDigits(number: Int): String = toPersianDigits(number.toString())
+
+    /** Replaces ASCII digits and keeps everything else, so "06:05" stays "۰۶:۰۵" with its zeros. */
+    fun toPersianDigits(text: String): String =
+        text.map { c -> if (c in '0'..'9') persianDigits[c - '0'] else c }.joinToString("")
 
     // --- Gregorian <-> Jalali conversion (Julian day number based) ---
 

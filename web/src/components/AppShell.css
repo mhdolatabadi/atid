@@ -2,39 +2,83 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  max-width: 480px;
+  max-width: 520px;
   margin: 0 auto;
   width: 100%;
-  background: var(--background);
 }
 
 .app-shell__content {
   flex: 1;
-  overflow-y: auto;
-  padding-bottom: 8px;
+  /* Clears the floating tab bar so it never covers the last item. */
+  padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+}
+
+.page-enter {
+  animation: rise-in 520ms var(--ease-out) both;
 }
 
 .app-shell__nav {
-  display: flex;
-  border-top: 1px solid var(--divider);
-  background: var(--surface);
-  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  --tab-count: 4;
+  position: fixed;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(488px, calc(100% - 24px));
+  display: grid;
+  grid-template-columns: repeat(var(--tab-count), 1fr);
+  padding: 6px;
+  border-radius: 22px;
+  z-index: 20;
+}
+
+/* The pill glides to the active tab. Tabs run right-to-left, so the offset is measured from the right. */
+.app-shell__indicator {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  right: 6px;
+  width: calc((100% - 12px) / var(--tab-count));
+  border-radius: 16px;
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--glass-edge);
+  transform: translateX(calc(var(--active) * -100%));
+  transition: transform 420ms var(--ease-out);
 }
 
 .app-shell__tab {
-  flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 6px 2px;
-  border-radius: 12px;
+  justify-content: center;
+  gap: 3px;
+  min-height: 56px;
+  border-radius: 16px;
   text-decoration: none;
-  color: var(--on-surface-muted);
-  font-size: 11.5px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 220ms ease-out;
+}
+
+.app-shell__tab svg {
+  transition: transform 320ms var(--ease-out);
 }
 
 .app-shell__tab--active {
-  color: var(--brand-primary);
-  background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.app-shell__tab--active svg {
+  transform: translateY(-2px) scale(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: fade-in 200ms ease-out both;
+  }
+  .app-shell__tab--active svg {
+    transform: none;
+  }
 }

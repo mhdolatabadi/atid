@@ -2,83 +2,72 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--ti-page);
-  color: var(--ti-text);
-}
-
-.ti ::selection {
-  background: var(--ti-primary);
-  color: var(--ti-on-primary);
-}
-
-.ti :focus-visible {
-  outline: 2px solid var(--ti-primary);
-  outline-offset: 2px;
+  color: var(--text);
 }
 
 /* Header --------------------------------------------------------------------------------------- */
 
 .ti-header {
-  background: var(--ti-primary);
-  color: var(--ti-on-primary);
+  position: sticky;
+  top: 12px;
+  z-index: 10;
+  width: min(1200px, calc(100% - 32px));
+  margin: 12px auto 0;
+  border-radius: 18px;
 }
 
 .ti-header__inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 12px 0 8px;
   min-height: 60px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 }
 
 .ti-brand {
   font-size: 22px;
   font-weight: 700;
   text-decoration: none;
+  padding: 6px 10px;
   flex-shrink: 0;
 }
 
 .ti-nav {
   display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  gap: 2px;
 }
 
 .ti-nav a {
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14.5px;
   font-weight: 500;
+  color: var(--muted);
   text-decoration: none;
   white-space: nowrap;
-  opacity: 0.92;
-  transition: background-color 150ms ease-out;
+  transition: background-color 180ms ease-out, color 180ms ease-out;
 }
 
 .ti-nav a:hover {
-  background: rgb(255 255 255 / 0.14);
-  opacity: 1;
+  background: var(--glass-weak);
+  color: var(--text);
 }
 
-.ti-header :focus-visible {
-  outline-color: currentColor;
-}
-
-@media (max-width: 560px) {
+@media (max-width: 640px) {
+  /* Two rows of links are too tall to keep pinned over the content on a phone. */
+  .ti-header {
+    position: static;
+  }
   .ti-header__inner {
     flex-wrap: wrap;
-    gap: 0 16px;
-    padding: 8px 16px;
+    gap: 0;
+    padding: 6px 8px;
   }
   .ti-nav {
     flex-wrap: wrap;
-    margin-inline: -12px;
   }
   .ti-nav a {
-    padding: 8px 12px;
+    padding: 8px 10px;
   }
 }
 
@@ -114,9 +103,6 @@
 }
 
 .ti-card {
-  background: var(--ti-card);
-  border-radius: 14px;
-  box-shadow: var(--ti-shadow);
   padding: 20px;
 }
 
@@ -129,25 +115,22 @@
 .ti-note {
   font-size: 12.5px;
   line-height: 1.8;
-  color: var(--ti-muted);
+  color: var(--muted);
   margin: 12px 0 0;
 }
 
 .ti-note--error {
-  color: var(--ti-holiday);
+  color: var(--holiday);
 }
 
 /* Today ---------------------------------------------------------------------------------------- */
 
 .ti-today {
-  background: var(--ti-card);
-  border-radius: 14px;
-  box-shadow: var(--ti-shadow);
-  padding: 20px 24px;
+  padding: 24px 28px;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 36px;
   flex-wrap: wrap;
 }
 
@@ -157,18 +140,44 @@
   display: flex;
   align-items: baseline;
   direction: ltr;
-  font-size: 52px;
+  font-size: 60px;
   font-weight: 700;
   line-height: 1;
-  color: var(--ti-primary);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
+.ti-today__colon {
+  padding: 0 2px;
+  opacity: 0.55;
+  animation: colon 1s steps(1) infinite;
+}
+
+@keyframes colon {
+  50% { opacity: 0.2; }
+}
+
 .ti-today__seconds {
-  font-size: 26px;
+  display: inline-flex;
+  font-size: 28px;
   font-weight: 500;
-  color: var(--ti-muted);
+  color: var(--muted);
+}
+
+.ti-roll {
+  display: inline-flex;
+  overflow: hidden;
+  /* Room for the incoming digit; the clip hides it until it lands. */
+  padding: 0.08em 0;
+}
+
+.ti-roll__digit {
+  display: inline-block;
+  animation: roll 420ms var(--ease-out) both;
+}
+
+@keyframes roll {
+  from { transform: translateY(-70%); opacity: 0; filter: blur(3px); }
 }
 
 .ti-today__dates {
@@ -187,7 +196,7 @@
 
 .ti-today__label {
   font-size: 12.5px;
-  color: var(--ti-muted);
+  color: var(--muted);
 }
 
 .ti-today__value {
@@ -196,7 +205,7 @@
 }
 
 .ti-today__date--solar .ti-today__value {
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
 }
 
@@ -209,11 +218,11 @@
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
-    padding: 18px;
+    padding: 20px 18px;
   }
   .ti-today__clock {
     justify-content: center;
-    font-size: 44px;
+    font-size: 50px;
   }
   .ti-today__dates {
     grid-template-columns: 1fr;
@@ -223,11 +232,15 @@
     justify-content: space-between;
     align-items: baseline;
     padding-top: 10px;
-    border-top: 1px solid var(--ti-line);
+    border-top: 1px solid var(--glass-line);
   }
 }
 
 /* Calendar ------------------------------------------------------------------------------------- */
+
+.ti-calendar {
+  overflow: hidden;
+}
 
 .ti-calendar__header {
   display: flex;
@@ -243,9 +256,10 @@
 }
 
 .ti-calendar__month {
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 700;
   margin: 0;
+  animation: rise-in 420ms var(--ease-out) both;
 }
 
 .ti-calendar__range {
@@ -256,14 +270,15 @@
   gap: 4px 10px;
   margin-top: 4px;
   font-size: 13px;
-  color: var(--ti-muted);
+  color: var(--muted);
 }
 
 .ti-calendar__dot {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--ti-faint);
+  background: currentColor;
+  opacity: 0.6;
 }
 
 .ti-icon-button {
@@ -274,13 +289,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--ti-primary);
-  background: var(--ti-primary-soft);
-  transition: filter 150ms ease-out;
+  color: var(--text);
+  background: var(--glass-weak);
+  border: 1px solid var(--glass-edge);
+  transition: background-color 180ms ease-out, transform 180ms var(--ease-out);
 }
 
 .ti-icon-button:hover {
-  filter: brightness(0.96);
+  background: var(--accent-soft);
+}
+
+.ti-icon-button:active {
+  transform: scale(0.92);
 }
 
 /* In RTL "previous" sits on the right and points right; "next" sits on the left and points left. */
@@ -288,22 +308,40 @@
   transform: scaleX(-1);
 }
 
+.ti-calendar__weekdays,
 .ti-calendar__grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 
+/* Next month arrives from the left (where its button is), previous from the right. */
+.ti-calendar__grid.is-from-next {
+  animation: month-from-left 480ms var(--ease-out) both;
+}
+
+.ti-calendar__grid.is-from-prev {
+  animation: month-from-right 480ms var(--ease-out) both;
+}
+
+@keyframes month-from-left {
+  from { opacity: 0; transform: translateX(-40px); filter: blur(6px); }
+}
+
+@keyframes month-from-right {
+  from { opacity: 0; transform: translateX(40px); filter: blur(6px); }
+}
+
 .ti-calendar__weekday {
   text-align: center;
   font-size: 13px;
   font-weight: 600;
-  color: var(--ti-muted);
+  color: var(--muted);
   padding: 6px 0 8px;
 }
 
 .ti-calendar__weekday.is-holiday {
-  color: var(--ti-holiday);
+  color: var(--holiday);
 }
 
 .ti-calendar__weekday-short {
@@ -314,18 +352,24 @@
   position: relative;
   min-height: 74px;
   padding: 8px 8px 6px;
-  border-radius: 10px;
-  border: 1px solid var(--ti-line);
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: var(--glass-weak);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   text-align: right;
-  color: var(--ti-text);
-  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+  color: var(--text);
+  transition: background-color 180ms ease-out, border-color 180ms ease-out, transform 220ms var(--ease-out);
 }
 
 .ti-day:hover {
-  background: var(--ti-primary-soft);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+}
+
+.ti-day:active {
+  transform: scale(0.96);
 }
 
 .ti-day__solar {
@@ -339,7 +383,7 @@
   justify-content: space-between;
   align-items: baseline;
   font-size: 12px;
-  color: var(--ti-muted);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -347,44 +391,45 @@
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
-.ti-day.is-holiday .ti-day__solar {
-  color: var(--ti-holiday);
+.ti-day.is-holiday {
+  background: var(--holiday-soft);
 }
 
-.ti-day.is-holiday {
-  background: var(--ti-holiday-soft);
-  border-color: transparent;
+.ti-day.is-holiday .ti-day__solar {
+  color: var(--holiday);
 }
 
 .ti-day.is-outside {
   background: transparent;
+  border-color: var(--glass-line);
   border-style: dashed;
 }
 
 .ti-day.is-outside .ti-day__solar,
 .ti-day.is-outside .ti-day__sub {
-  color: var(--ti-faint);
+  color: var(--faint);
 }
 
 .ti-day.is-selected {
-  border-color: var(--ti-primary);
-  box-shadow: inset 0 0 0 1px var(--ti-primary);
+  border-color: var(--accent);
 }
 
 .ti-day.is-today {
-  background: var(--ti-primary);
-  border-color: var(--ti-primary);
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px -8px var(--accent);
 }
 
 .ti-day.is-today .ti-day__solar,
 .ti-day.is-today .ti-day__sub {
-  color: var(--ti-on-primary);
+  color: var(--on-accent);
 }
 
 @media (max-width: 560px) {
   .ti-card {
     padding: 16px 12px;
   }
+  .ti-calendar__weekdays,
   .ti-calendar__grid {
     gap: 3px;
   }
@@ -397,7 +442,7 @@
   .ti-day {
     min-height: 58px;
     padding: 5px 4px 4px;
-    border-radius: 8px;
+    border-radius: 9px;
   }
   .ti-day__solar {
     font-size: 17px;
@@ -418,12 +463,22 @@
 
 .ti-button {
   min-height: 44px;
-  padding: 0 18px;
-  border-radius: 10px;
+  padding: 0 20px;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 600;
-  background: var(--ti-primary);
-  color: var(--ti-on-primary);
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 8px 20px -10px var(--accent);
+  transition: transform 180ms var(--ease-out), filter 180ms ease-out;
+}
+
+.ti-button:hover {
+  filter: brightness(1.08);
+}
+
+.ti-button:active {
+  transform: scale(0.96);
 }
 
 .ti-calendar__legend {
@@ -431,20 +486,21 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--ti-muted);
+  color: var(--muted);
 }
 
 .ti-legend-dot {
   width: 10px;
   height: 10px;
   border-radius: 3px;
-  background: var(--ti-holiday);
+  background: var(--holiday);
 }
 
 .ti-selected {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid var(--ti-line);
+  border-top: 1px solid var(--glass-line);
+  animation: rise-in 360ms var(--ease-out) both;
 }
 
 .ti-selected__dates {
@@ -453,13 +509,13 @@
   align-items: baseline;
   gap: 4px 16px;
   font-size: 14px;
-  color: var(--ti-muted);
+  color: var(--muted);
   margin-bottom: 8px;
 }
 
 .ti-selected__dates strong {
   font-size: 16px;
-  color: var(--ti-text);
+  color: var(--text);
 }
 
 /* Occasions ------------------------------------------------------------------------------------ */
@@ -479,13 +535,13 @@
 }
 
 .ti-occasion + .ti-occasion {
-  border-top: 1px solid var(--ti-line);
+  border-top: 1px solid var(--glass-line);
 }
 
 .ti-occasion__day {
   flex: 0 0 76px;
   font-weight: 600;
-  color: var(--ti-muted);
+  color: var(--muted);
 }
 
 .ti-occasion__title {
@@ -495,7 +551,7 @@
 
 .ti-occasion--holiday,
 .ti-occasion--holiday .ti-occasion__day {
-  color: var(--ti-holiday);
+  color: var(--holiday);
 }
 
 .ti-occasion__tag {
@@ -505,13 +561,13 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  background: var(--ti-holiday-soft);
-  color: var(--ti-holiday);
+  background: var(--holiday-soft);
+  color: var(--holiday);
 }
 
 .ti-occasions__empty {
   font-size: 14px;
-  color: var(--ti-muted);
+  color: var(--muted);
   margin: 0;
 }
 
@@ -523,7 +579,7 @@
   justify-content: space-between;
   gap: 8px;
   font-size: 13.5px;
-  color: var(--ti-muted);
+  color: var(--muted);
   margin: -6px 0 8px;
 }
 
@@ -535,11 +591,14 @@
   padding: 0 4px;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--ti-primary);
+  color: var(--accent);
 }
 
 .ti-prayer__list {
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .ti-prayer__row {
@@ -547,16 +606,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 15px;
-}
-
-.ti-prayer__row:nth-child(odd) {
-  background: var(--ti-page);
+  transition: background-color 300ms ease-out;
 }
 
 .ti-prayer__row dt {
-  color: var(--ti-muted);
+  color: var(--muted);
 }
 
 .ti-prayer__row dd {
@@ -566,13 +622,30 @@
 }
 
 .ti-prayer__row.is-next {
-  background: var(--ti-primary-soft);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 
 .ti-prayer__row.is-next dt,
 .ti-prayer__row.is-next dd {
-  color: var(--ti-primary);
+  color: var(--accent);
   font-weight: 700;
+}
+
+.ti-prayer__row.is-next dt::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-inline-end: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.3; transform: scale(0.7); }
 }
 
 .ti-more {
@@ -580,7 +653,7 @@
   margin-top: 10px;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--ti-primary);
+  color: var(--accent);
   text-underline-offset: 4px;
 }
 
@@ -590,23 +663,25 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   padding: 4px;
-  border-radius: 10px;
-  background: var(--ti-page);
+  border-radius: 12px;
+  background: var(--glass-weak);
+  border: 1px solid var(--glass-line);
   margin-bottom: 14px;
 }
 
 .ti-segmented button {
   min-height: 40px;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--ti-muted);
+  color: var(--muted);
+  transition: background-color 220ms ease-out, color 220ms ease-out;
 }
 
 .ti-segmented button[aria-selected='true'] {
-  background: var(--ti-card);
-  color: var(--ti-primary);
-  box-shadow: 0 1px 3px rgb(20 30 50 / 0.12);
+  background: var(--glass-strong);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
 }
 
 .ti-converter__fields {
@@ -620,31 +695,33 @@
   flex-direction: column;
   gap: 4px;
   font-size: 12.5px;
-  color: var(--ti-muted);
+  color: var(--muted);
 }
 
 .ti-converter__field input {
   width: 100%;
   min-height: 44px;
   padding: 0 10px;
-  border-radius: 10px;
-  border: 1px solid var(--ti-line);
-  background: var(--ti-card);
-  color: var(--ti-text);
+  border-radius: 12px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-weak);
+  color: var(--text);
   font: inherit;
   font-size: 16px;
   text-align: center;
-  caret-color: var(--ti-primary);
+  caret-color: var(--accent);
+  transition: border-color 180ms ease-out, box-shadow 180ms ease-out;
 }
 
 .ti-converter__field input:focus-visible {
   outline: none;
-  border-color: var(--ti-primary);
-  box-shadow: 0 0 0 3px var(--ti-primary-soft);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .ti-converter__result {
   margin: 14px 0 0;
+  animation: fade-in 260ms ease-out both;
 }
 
 .ti-converter__result div {
@@ -656,11 +733,11 @@
 }
 
 .ti-converter__result div + div {
-  border-top: 1px solid var(--ti-line);
+  border-top: 1px solid var(--glass-line);
 }
 
 .ti-converter__result dt {
-  color: var(--ti-muted);
+  color: var(--muted);
 }
 
 .ti-converter__result dd {
@@ -669,17 +746,90 @@
   text-align: left;
 }
 
+/* Before the live content arrives ------------------------------------------------------------ */
+
+.ti-placeholder {
+  opacity: 0.6;
+}
+
+.ti-placeholder--today {
+  min-height: 140px;
+}
+
+.ti-placeholder--calendar {
+  min-height: 680px;
+}
+
+.ti-placeholder--prayer {
+  min-height: 460px;
+}
+
+/* About ---------------------------------------------------------------------------------------- */
+
+.ti-about {
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.ti-about p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 2;
+  color: var(--muted);
+  max-width: 75ch;
+}
+
+.ti-about__links {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ti-about__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-weak);
+  color: var(--text);
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color 180ms ease-out;
+}
+
+.ti-about__links a:hover {
+  background: var(--accent-soft);
+}
+
 /* Footer --------------------------------------------------------------------------------------- */
 
 .ti-footer {
   text-align: center;
   font-size: 13px;
-  color: var(--ti-muted);
+  color: var(--muted);
   padding: 20px 16px 32px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ti * {
-    transition: none !important;
+  .ti-roll__digit,
+  .ti-calendar__month,
+  .ti-selected,
+  .ti-today__colon {
+    animation: none;
+  }
+  .ti-calendar__grid.is-from-next,
+  .ti-calendar__grid.is-from-prev {
+    animation: fade-in 200ms ease-out both;
+  }
+  .ti-prayer__row.is-next dt::before {
+    animation: none;
+  }
+  .ti-day:hover {
+    transform: none;
   }
 }

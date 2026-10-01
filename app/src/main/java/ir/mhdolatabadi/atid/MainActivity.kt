@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import ir.mhdolatabadi.atid.notification.DailyNotificationHelper
 import ir.mhdolatabadi.atid.ui.AtidApp
 import ir.mhdolatabadi.atid.ui.theme.AtidTheme
@@ -36,6 +37,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Draw behind the system bars so the sky fills the whole screen; screens pad for the insets.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             AtidTheme {

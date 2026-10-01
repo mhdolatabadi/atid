@@ -8,7 +8,9 @@ import {
   useQadaCounts,
   type QadaPrayer,
 } from '../store/qadaStore';
+import { toPersianDigits } from '../lib/persianDate';
 import './HomePage.css';
+import { ClientOnly } from '../components/ClientOnly';
 
 const prayerLabels: Record<QadaPrayer, string> = {
   FAJR: 'نماز صبح',
@@ -51,29 +53,32 @@ function QadaRow({
   onDecrement: () => void;
 }) {
   return (
-    <div className="qada-row">
+    <div className="qada-row glass">
       <span className="qada-row__label">{label}</span>
       <div className="qada-row__controls">
         <RoundButton symbol="−" onClick={onDecrement} />
-        <span className="qada-row__count">{count}</span>
+        <span key={count} className="qada-row__count" aria-live="polite">
+          {toPersianDigits(count)}
+        </span>
         <RoundButton symbol="+" filled onClick={onIncrement} />
       </div>
     </div>
   );
 }
 
-export function HomePage() {
+function HomePageView() {
   const counts = useQadaCounts();
   const fastCount = useFastCount();
   const total = QADA_PRAYERS.reduce((sum, prayer) => sum + counts[prayer], 0) + fastCount;
 
   return (
-    <div className="home-page">
-      <h1 className="home-page__title">قضا</h1>
+    <div>
 
-      <div className="home-page__total">
+      <div className="home-page__total glass">
         <div className="home-page__total-label">مجموع نماز و روزه قضای باقی‌مانده</div>
-        <div className="home-page__total-value">{total}</div>
+        <div key={total} className="home-page__total-value">
+          {toPersianDigits(total)}
+        </div>
       </div>
 
       <div className="home-page__section-title">نماز‌های قضا</div>
@@ -94,6 +99,17 @@ export function HomePage() {
         onIncrement={incrementFast}
         onDecrement={decrementFast}
       />
+    </div>
+  );
+}
+
+export function HomePage() {
+  return (
+    <div className="home-page">
+      <h1 className="home-page__title">قضا</h1>
+      <ClientOnly fallback={<div className="glass page-placeholder page-placeholder--qada" aria-hidden="true" />}>
+        <HomePageView />
+      </ClientOnly>
     </div>
   );
 }

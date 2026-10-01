@@ -1,36 +1,51 @@
 .texts-page {
-  padding: 20px;
+  padding: 24px 16px;
 }
 
 .texts-page__title {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0 0 4px;
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 4px 4px;
 }
 
 .texts-page__subtitle {
   font-size: 14px;
-  color: var(--on-surface-muted);
-  margin-bottom: 16px;
+  color: var(--muted);
+  margin: 0 4px 16px;
 }
 
 .text-card {
   display: block;
   text-decoration: none;
-  background: var(--surface);
-  border-radius: 18px;
-  padding: 18px;
+  padding: 18px 18px 16px;
   margin-bottom: 12px;
+  border-radius: 18px;
+  transition: transform 220ms var(--ease-out), background-color 200ms ease-out;
+}
+
+.text-card:hover {
+  transform: translateY(-2px);
+  background: var(--glass-strong);
+}
+
+.text-card:active {
+  transform: scale(0.98);
 }
 
 .text-card__title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--on-surface);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
 }
 
 .text-card__subtitle {
   font-size: 14px;
-  color: var(--on-surface-muted);
+  color: var(--muted);
   margin-top: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-card:hover {
+    transform: none;
+  }
 }

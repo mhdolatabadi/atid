@@ -3,6 +3,24 @@ package ir.mhdolatabadi.atid.ui.notifications
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.graphics.graphicsLayer
+import ir.mhdolatabadi.atid.ui.BottomBarClearance
+import ir.mhdolatabadi.atid.ui.components.glass
+import ir.mhdolatabadi.atid.ui.components.rememberReducedMotion
+import ir.mhdolatabadi.atid.ui.theme.Atid
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +28,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -52,30 +69,35 @@ fun PrayerTimesScreen(viewModel: NotificationsViewModel = viewModel()) {
     }
 
     val current = state ?: return
+    val colors = Atid.colors
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = BottomBarClearance)
     ) {
         Text(
             text = stringResource(R.string.label_prayer_times),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onBackground
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = colors.text,
+            modifier = Modifier.padding(horizontal = 4.dp)
         )
         Text(
             text = current.locationLabel,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
+            color = colors.muted,
+            modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp)
         )
 
         Text(
             text = stringResource(R.string.label_use_my_location),
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.SemiBold,
+            color = colors.accent,
             modifier = Modifier
+                .heightIn(min = 48.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .clickable {
                     requestLocationPermission.launch(
@@ -85,60 +107,82 @@ fun PrayerTimesScreen(viewModel: NotificationsViewModel = viewModel()) {
                         )
                     )
                 }
-                .padding(vertical = 10.dp)
+                .wrapContentHeight()
+                .padding(horizontal = 4.dp)
         )
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(MaterialTheme.colorScheme.surface)
+                .padding(top = 4.dp)
+                .glass()
+                .padding(6.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            prayerRowSpecs.forEachIndexed { index, spec ->
-                val isNext = spec.key == current.nextPrayerKey
+            prayerRowSpecs.forEach { spec ->
                 PrayerRow(
                     label = stringResource(spec.labelRes),
-                    time = toPersianTime(spec.timeSelector(current.times)),
-                    highlighted = isNext
+                    time = PersianDateUtils.toPersianDigits(spec.timeSelector(current.times)),
+                    highlighted = spec.key == current.nextPrayerKey
                 )
-                if (index != prayerRowSpecs.lastIndex) {
-                    androidx.compose.foundation.layout.Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .height(1.dp)
-                            .background(MaterialTheme.colorScheme.outline)
-                    )
-                }
             }
         }
+
+        Text(
+            text = "محاسبه‌ی تقریبی؛ ممکن است حدود یک دقیقه با جدول رسمی تفاوت داشته باشد.",
+            style = MaterialTheme.typography.bodySmall,
+            color = colors.muted,
+            modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 12.dp)
+        )
     }
 }
 
 @Composable
 private fun PrayerRow(label: String, time: String, highlighted: Boolean) {
+    val colors = Atid.colors
+    val shape = RoundedCornerShape(12.dp)
+    val color = if (highlighted) colors.accent else colors.text
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .then(
+                if (highlighted) Modifier.background(colors.accentSoft, shape).border(1.dp, colors.accent, shape)
+                else Modifier
+            )
+            .padding(horizontal = 14.dp, vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = if (highlighted) FontWeight.Bold else FontWeight.Normal,
-            color = if (highlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (highlighted) {
+                // A slow pulse marks the prayer that comes next.
+                val pulse = rememberInfiniteTransition(label = "nextPulse")
+                val alpha by pulse.animateFloat(
+                    initialValue = 1f,
+                    targetValue = if (rememberReducedMotion()) 1f else 0.3f,
+                    animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
+                    label = "nextPulseAlpha"
+                )
+                Box(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(7.dp)
+                        .graphicsLayer { this.alpha = alpha }
+                        .background(color, CircleShape)
+                )
+            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = if (highlighted) FontWeight.Bold else FontWeight.Normal,
+                color = color
+            )
+        }
         Text(
             text = time,
             style = MaterialTheme.typography.bodyLarge,
-            fontWeight = if (highlighted) FontWeight.Bold else FontWeight.Normal,
-            color = if (highlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+            fontWeight = if (highlighted) FontWeight.Bold else FontWeight.SemiBold,
+            color = color
         )
     }
 }
-
-private fun toPersianTime(hhmm: String): String =
-    hhmm.split(":").joinToString(":") { PersianDateUtils.toPersianDigits(it.toInt()) }

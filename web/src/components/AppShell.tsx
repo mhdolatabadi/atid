@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import type { CSSProperties } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { QadaIcon, CalendarIcon, ClockIcon, BookIcon } from './icons';
 import './AppShell.css';
 
@@ -10,12 +11,16 @@ const tabs = [
 ];
 
 export function AppShell() {
+  const { pathname } = useLocation();
+  const active = Math.max(0, tabs.findIndex((tab) => pathname.startsWith(tab.to)));
+  // Keyed by path so every navigation, including texts → a text, plays the page entrance.
   return (
     <div className="app-shell">
-      <main className="app-shell__content">
+      <main key={pathname} className="app-shell__content page-enter">
         <Outlet />
       </main>
-      <nav className="app-shell__nav">
+      <nav className="app-shell__nav glass" aria-label="بخش‌ها" style={{ '--active': active } as CSSProperties}>
+        <span className="app-shell__indicator" aria-hidden="true" />
         {tabs.map(({ to, label, Icon }) => (
           <NavLink
             key={to}

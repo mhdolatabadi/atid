@@ -15,6 +15,8 @@ const prefsKeys: Record<QadaPrayer, string> = {
 const FAST_KEY = 'qada_fast';
 
 function readCount(key: string): number {
+  // The pre-renderer runs in Node, which has no storage; the page shows counts only in the browser.
+  if (typeof localStorage === 'undefined') return 0;
   const raw = localStorage.getItem(key);
   const parsed = raw === null ? 0 : Number.parseInt(raw, 10);
   return Number.isFinite(parsed) ? parsed : 0;
