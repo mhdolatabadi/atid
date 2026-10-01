@@ -47,14 +47,14 @@ main() {
   local domain
   domain="$(grep -E '^ATID_DOMAIN=' .env | cut -d= -f2-)"
   for attempt in $(seq 1 30); do
-    if curl -fsS -o /dev/null "https://${domain}/"; then
-      echo "Deployed $(git rev-parse --short HEAD) to https://${domain}"
+    if curl -fsSI "https://${domain}/" | tr -d '\r' | grep -Fqx "X-Atid-Revision: ${ATID_IMAGE_TAG}"; then
+      echo "Deployed ${ATID_IMAGE_TAG:0:7} to https://${domain}"
       exit 0
     fi
     sleep 5
   done
 
-  echo "Health check failed for https://${domain}/ (is the proxy's site block for ${domain} in place?)" >&2
+  echo "Revision health check failed for https://${domain}/: expected X-Atid-Revision: ${ATID_IMAGE_TAG}" >&2
   docker compose ps
   docker compose logs --tail=100 atid-web
   exit 1
