@@ -43,7 +43,8 @@ jobs:
       - name: Validate nginx configuration
         run: >-
           docker run --rm
-          -v "$PWD/deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+          -e ATID_REVISION=ci-test
+          -v "$PWD/deploy/nginx.conf:/etc/nginx/templates/default.conf.template:ro"
           nginx:1.27-alpine nginx -t
       - name: Validate Compose file
         working-directory: deploy
@@ -55,5 +56,10 @@ jobs:
           grep -qx 'name: atid' <<< "$config"
           test "$(docker compose config --services)" = "atid-web"
           if grep -q 'published:' <<< "$config"; then echo "atid must not publish ports" >&2; exit 1; fi
-      - name: Build web image
-        run: docker build -f deploy/Dockerfile.web -t atid-web .
+      - name: Build and verify the web image revision header
+        run: |
+          set -euo pipefail
+          docker build --build-arg ATID_REVISION=ci-test -f deploy/Dockerfile.web -t atid-web .
+          container_id="$(docker run -d -p 8080:80 atid-web)"
+          trap 'docker rm -f "$container_id"' EXIT
+          curl --fail --silent --show-error --head http://127.0.0.1:8080/ | tr -d '\r' | grep -Fqx 'X-Atid-Revision: ci-test'
