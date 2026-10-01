@@ -55,6 +55,7 @@ This file defines the standing rules for every contributor and coding agent work
 - The web version is deployed to the owner's server through the repository workflow after CI succeeds; avoid undocumented manual server mutations. See `deploy/README.md`.
 - Keep secrets in GitHub Actions secrets or the server environment. Never commit them.
 - Validate Docker Compose and Caddy changes before deployment.
+- The server is shared with other stacks (nafir). `deploy/compose.yaml` must keep `name: atid` and a uniquely named service (`atid-web`) with no published ports; atid is served through the existing reverse proxy. Never run a deploy that could stop, recreate or remove containers outside the `atid` project. Check what owns ports 80/443 before adding anything that binds them.
 - Android releases are built by `.github/workflows/release.yml` from a `v*` tag.
 
 ## Safe collaboration

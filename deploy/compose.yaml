@@ -1,31 +1,21 @@
+# A fixed project name keeps atid's containers, networks and orphans apart from any other
+# stack on the server. Without it Compose names the project after this directory ("deploy"),
+# which nafir's stack also uses, and `up --remove-orphans` then removes nafir's containers.
+name: atid
+
 services:
-  web:
+  # Unique name: it is also the DNS alias on the shared proxy network, where nafir already
+  # answers to "web".
+  atid-web:
     image: ${ATID_IMAGE_REPO:-ghcr.io/mhdolatabadi/atid}/web:${ATID_IMAGE_TAG:-latest}
     build:
       context: ..
       dockerfile: deploy/Dockerfile.web
     restart: unless-stopped
-    networks: [edge]
-
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      ATID_DOMAIN: ${ATID_DOMAIN:?set ATID_DOMAIN in .env}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
-    depends_on:
-      - web
-    networks: [edge]
+    # No published ports: the Caddy that already owns 80/443 on the server proxies to atid-web:80.
+    networks: [proxy]
 
 networks:
-  edge:
-
-volumes:
-  caddy-data:
-  caddy-config:
+  proxy:
+    external: true
+    name: ${ATID_PROXY_NETWORK:-deploy_edge}
