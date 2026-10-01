@@ -9,6 +9,7 @@ export interface PageMeta {
   noindex?: boolean;
   /** schema.org type for the page's JSON-LD. */
   type: 'WebSite' | 'WebPage' | 'Article' | 'CollectionPage';
+  faq?: { question: string; answer: string }[];
 }
 
 const home: PageMeta = {
@@ -20,6 +21,18 @@ const home: PageMeta = {
 
 const pages: Record<string, PageMeta> = {
   '/': home,
+  '/calendar': {
+    title: 'تقویم شمسی؛ تاریخ امروز، مناسبت‌ها و تعطیلات | عتید',
+    description: 'راهنمای تقویم شمسی ایران: تاریخ امروز، تقویم ماه جاری، مناسبت‌ها، تعطیلات و نمایش هم‌زمان تاریخ میلادی و قمری.',
+    type: 'WebPage',
+    faq: [{ question: 'تقویم شمسی چیست؟', answer: 'تقویم هجری شمسی، تقویم رسمی ایران است و سال آن با نوروز آغاز می‌شود.' }],
+  },
+  '/date-converter': {
+    title: 'تبدیل تاریخ شمسی به میلادی و قمری | عتید',
+    description: 'راهنمای تبدیل آنلاین تاریخ شمسی، میلادی و قمری و مشاهدهٔ روز هفته در عتید.',
+    type: 'WebPage',
+    faq: [{ question: 'چطور تاریخ شمسی را به میلادی تبدیل کنم؟', answer: 'در صفحهٔ اصلی عتید از بخش تبدیل تاریخ استفاده کنید.' }],
+  },
   '/app/home': {
     title: 'شمارنده‌ی نماز و روزه‌ی قضا | عتید',
     description: 'شمارنده‌ی ساده برای نمازها و روزه‌های قضا؛ اطلاعات فقط در مرورگر خود شما ذخیره می‌شود.',
