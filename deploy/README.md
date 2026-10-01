@@ -47,7 +47,7 @@
 
 ورک‌فلوی **Images** با هر push به `master` ایمیج را می‌سازد و با تگ commit و `latest` در `ghcr.io/mhdolatabadi/atid/web` منتشر می‌کند. پکیج باید public باشد، یا سرور با توکن `read:packages` روی `ghcr.io` لاگین کرده باشد.
 
-پیش از اولین build، در **Settings → Secrets and variables → Actions → Variables** متغیر `ATID_SITE_URL` را برابر نشانی عمومی سایت (مثلاً `https://atid.example.com`) بگذارید تا آدرس‌های canonical و `sitemap.xml` ساخته شوند.
+پیش از اولین build، در **Settings → Secrets and variables → Actions → Variables** متغیر `ATID_SITE_URL` را دقیقاً برابر نشانی عمومی HTTPS سایت (برای production: `https://atid.mhdolatabadi.ir`) بگذارید. image بدون آن ساخته نمی‌شود تا canonical URL و `sitemap.xml` هرگز ناقص deploy نشوند.
 
 ## به‌روزرسانی
 

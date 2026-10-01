@@ -34,6 +34,9 @@ jobs:
           grep -q 'name="robots" content="noindex"' dist/app/home/index.html
           if grep -q 'noindex' dist/index.html; then echo "home page must be indexable" >&2; exit 1; fi
           grep -q '<loc>https://atid.example.com/app/prayer-times</loc>' dist/sitemap.xml
+          grep -q '<loc>https://atid.example.com/app/calendar</loc>' dist/sitemap.xml
+          grep -q 'rel="canonical" href="https://atid.example.com/"' dist/index.html
+          grep -q 'Sitemap: https://atid.example.com/sitemap.xml' dist/robots.txt
           test -f dist/404.html
 
   deployment-config:
@@ -56,4 +59,4 @@ jobs:
           test "$(docker compose config --services)" = "atid-web"
           if grep -q 'published:' <<< "$config"; then echo "atid must not publish ports" >&2; exit 1; fi
       - name: Build web image
-        run: docker build -f deploy/Dockerfile.web -t atid-web .
+        run: docker build --build-arg SITE_URL=https://atid.example.com -f deploy/Dockerfile.web -t atid-web .
