@@ -59,4 +59,4 @@ jobs:
           test "$(docker compose config --services)" = "atid-web"
           if grep -q 'published:' <<< "$config"; then echo "atid must not publish ports" >&2; exit 1; fi
       - name: Build web image
-        run: docker build -f deploy/Dockerfile.web -t atid-web .
+        run: docker build --build-arg SITE_URL=https://atid.example.com -f deploy/Dockerfile.web -t atid-web .
