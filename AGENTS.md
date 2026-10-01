@@ -27,6 +27,7 @@ This file defines the standing rules for every contributor and coding agent work
 - Desktop content must use a centered maximum width and must not stick to the viewport edges.
 - Support both light and dark color schemes; colors come from the tokens in `web/src/styles/theme.css`, not raw hex in components.
 - Preserve accessibility semantics, visible focus, useful labels, and adequate contrast.
+- The web version must stay search-engine friendly: clean URLs, every public route pre-rendered by `web/scripts/prerender.mjs`, per-page metadata in `web/src/seo.ts`. Content that depends on the current time or browser storage renders client-only (`ClientOnly`) so static HTML never carries a stale date. Do not move the web client to a framework that renders without HTML (such as Flutter web).
 - Before making substantial UI changes, inspect and follow the relevant guidance stored under `.skills/`.
 
 ## Dates, calendars and religious data

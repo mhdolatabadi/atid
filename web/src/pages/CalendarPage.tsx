@@ -10,11 +10,12 @@ import {
 } from '../lib/persianDate';
 import { ChevronIcon } from '../components/icons';
 import './CalendarPage.css';
+import { ClientOnly } from '../components/ClientOnly';
 
 const weekdayLabels = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 const FRIDAY_INDEX = 6;
 
-export function CalendarPage() {
+function CalendarPageView() {
   const currentDate = useMemo(() => today(), []);
   const [displayedYear, setDisplayedYear] = useState(currentDate.year);
   const [displayedMonth, setDisplayedMonth] = useState(currentDate.month);
@@ -57,7 +58,7 @@ export function CalendarPage() {
     toPersianDigits(currentDate.year);
 
   return (
-    <div className="calendar-page">
+    <div>
       <div className="calendar-page__today">{todayLabel}</div>
 
       <div className="calendar-page__card glass">
@@ -109,6 +110,17 @@ export function CalendarPage() {
           })}
         </div>
       </div>
+    </div>
+  );
+}
+
+export function CalendarPage() {
+  return (
+    <div className="calendar-page">
+      <h1 className="calendar-page__title">تقویم</h1>
+      <ClientOnly fallback={<div className="glass page-placeholder page-placeholder--calendar" aria-hidden="true" />}>
+        <CalendarPageView />
+      </ClientOnly>
     </div>
   );
 }

@@ -1,24 +1,24 @@
 @font-face {
   font-family: 'Vazirmatn';
-  src: url('../assets/fonts/vazirmatn_regular.ttf') format('truetype');
+  src: url('../assets/fonts/vazirmatn_regular.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
   font-family: 'Vazirmatn';
-  src: url('../assets/fonts/vazirmatn_medium.ttf') format('truetype');
+  src: url('../assets/fonts/vazirmatn_medium.woff2') format('woff2');
   font-weight: 500;
   font-display: swap;
 }
 @font-face {
   font-family: 'Vazirmatn';
-  src: url('../assets/fonts/vazirmatn_semibold.ttf') format('truetype');
+  src: url('../assets/fonts/vazirmatn_semibold.woff2') format('woff2');
   font-weight: 600;
   font-display: swap;
 }
 @font-face {
   font-family: 'Vazirmatn';
-  src: url('../assets/fonts/vazirmatn_bold.ttf') format('truetype');
+  src: url('../assets/fonts/vazirmatn_bold.woff2') format('woff2');
   font-weight: 700;
   font-display: swap;
 }
@@ -212,6 +212,19 @@ a {
   }
 }
 
+/* Text for screen readers and crawlers that the visual layout already conveys. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Shared motion -------------------------------------------------------------------------------- */
 
 @keyframes rise-in {
@@ -243,3 +256,11 @@ a {
     transition-duration: 1ms !important;
   }
 }
+
+/* Stand-ins for content that only exists in the browser, sized to avoid layout shift. */
+.page-placeholder {
+  opacity: 0.6;
+}
+.page-placeholder--calendar { min-height: 420px; margin-top: 12px; }
+.page-placeholder--prayer { min-height: 520px; margin-top: 12px; }
+.page-placeholder--qada { min-height: 560px; }

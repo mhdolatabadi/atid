@@ -4,7 +4,9 @@ WORKDIR /app
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web ./
-RUN npm run build
+# Public address of the site, for canonical URLs and sitemap.xml (e.g. https://atid.example.com).
+ARG SITE_URL=
+RUN SITE_URL="$SITE_URL" npm run build
 
 FROM nginx:1.27-alpine
 COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf

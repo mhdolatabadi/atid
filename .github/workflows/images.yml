@@ -31,6 +31,8 @@ jobs:
           context: .
           file: deploy/Dockerfile.web
           push: true
+          build-args: |
+            SITE_URL=${{ vars.ATID_SITE_URL }}
           tags: |
             ${{ steps.image.outputs.name }}:${{ github.sha }}
             ${{ steps.image.outputs.name }}:latest

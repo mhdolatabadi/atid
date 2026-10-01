@@ -17,6 +17,7 @@ import { calculateForToday, type PrayerTimes } from '../lib/prayerTimes';
 import { requestDeviceLocation, TEHRAN, type Coordinates } from '../lib/location';
 import { isHoliday, occasionsOn, type Occasion } from '../data/occasions';
 import { ChevronIcon, LocationIcon } from '../components/icons';
+import { ClientOnly } from '../components/ClientOnly';
 import './LandingPage.css';
 
 const weekdayHeaders = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
@@ -423,8 +424,43 @@ function DateConverterCard() {
 
 // --- Page ---------------------------------------------------------------------------------------
 
-export function LandingPage() {
+/** Everything that depends on the current moment; rendered only in the browser. */
+function LiveHome() {
   const now = useNow();
+  return (
+    <>
+      <TodayPanel now={now} />
+      <div className="ti-layout">
+        <div className="ti-layout__primary">
+          <CalendarSection now={now} />
+        </div>
+        <aside className="ti-layout__aside">
+          <PrayerTimesCard now={now} />
+          <DateConverterCard />
+        </aside>
+      </div>
+    </>
+  );
+}
+
+/** Same footprint as LiveHome, so nothing jumps when the live content replaces it. */
+function HomePlaceholder() {
+  return (
+    <div aria-hidden="true">
+      <div className="ti-today glass ti-placeholder ti-placeholder--today" />
+      <div className="ti-layout">
+        <div className="ti-layout__primary">
+          <div className="ti-card glass ti-placeholder ti-placeholder--calendar" />
+        </div>
+        <div className="ti-layout__aside">
+          <div className="ti-card glass ti-placeholder ti-placeholder--prayer" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function LandingPage() {
   return (
     <div className="ti">
       <header className="ti-header glass">
@@ -443,16 +479,28 @@ export function LandingPage() {
       </header>
 
       <main className="ti-main">
-        <TodayPanel now={now} />
-        <div className="ti-layout">
-          <div className="ti-layout__primary">
-            <CalendarSection now={now} />
-          </div>
-          <aside className="ti-layout__aside">
-            <PrayerTimesCard now={now} />
-            <DateConverterCard />
-          </aside>
-        </div>
+        <h1 className="sr-only">تقویم شمسی، قمری و میلادی، اوقات شرعی و مناسبت‌های امروز</h1>
+        <ClientOnly fallback={<HomePlaceholder />}>
+          <LiveHome />
+        </ClientOnly>
+
+        <section className="ti-about glass" aria-labelledby="ti-about-title">
+          <h2 id="ti-about-title" className="ti-card__title">درباره‌ی عتید</h2>
+          <p>
+            عتید تقویم کامل شمسی را همراه با تاریخ قمری و میلادی هر روز نشان می‌دهد؛ جمعه‌ها و تعطیلات رسمی
+            به رنگ قرمزند و مناسبت‌های هر ماه زیر تقویم آمده است. اوقات شرعی امروز (اذان صبح، طلوع آفتاب، اذان
+            ظهر، غروب آفتاب، اذان مغرب و نیمه‌شب شرعی) به افق تهران یا موقعیت شما محاسبه می‌شود و با مبدل تاریخ
+            می‌توانید تاریخ شمسی و میلادی را به هم تبدیل کنید.
+          </p>
+          <ul className="ti-about__links">
+            <li><Link to="/app/prayer-times">اوقات شرعی امروز</Link></li>
+            <li><Link to="/app/calendar">تقویم ماه جاری</Link></li>
+            <li><Link to="/app/texts/ziyarat_ashura">متن کامل زیارت عاشورا</Link></li>
+            <li><Link to="/app/texts/sahifa_dua_7">دعای هفتم صحیفه سجادیه</Link></li>
+            <li><Link to="/app/texts/hadith_kisa">حدیث کساء</Link></li>
+            <li><Link to="/app/home">شمارنده‌ی نماز و روزه‌ی قضا</Link></li>
+          </ul>
+        </section>
       </main>
 
       <footer className="ti-footer">اطلاعات شما فقط در همین مرورگر ذخیره می‌شود.</footer>

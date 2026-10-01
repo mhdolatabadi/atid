@@ -21,6 +21,20 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+        env:
+          SITE_URL: https://atid.example.com
+      - name: Check pre-rendered pages
+        run: |
+          set -e
+          page=dist/app/texts/ziyarat_ashura/index.html
+          grep -q '<title>متن کامل زیارت عاشورا' "$page"
+          grep -q 'rel="canonical" href="https://atid.example.com/app/texts/ziyarat_ashura"' "$page"
+          grep -q 'application/ld+json' "$page"
+          grep -q 'السَّلامُ' "$page"   # the text itself is in the HTML
+          grep -q 'name="robots" content="noindex"' dist/app/home/index.html
+          ! grep -q 'noindex' dist/index.html
+          grep -q '<loc>https://atid.example.com/app/prayer-times</loc>' dist/sitemap.xml
+          test -f dist/404.html
 
   deployment-config:
     runs-on: ubuntu-latest
@@ -32,6 +46,11 @@ jobs:
           -e ATID_DOMAIN=atid.example.com
           -v "$PWD/deploy/Caddyfile:/etc/caddy/Caddyfile:ro"
           caddy:2-alpine caddy validate --config /etc/caddy/Caddyfile
+      - name: Validate nginx configuration
+        run: >-
+          docker run --rm
+          -v "$PWD/deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+          nginx:1.27-alpine nginx -t
       - name: Validate Compose file
         working-directory: deploy
         run: ATID_DOMAIN=atid.example.com docker compose config --quiet

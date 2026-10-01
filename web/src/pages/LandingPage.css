@@ -746,6 +746,66 @@
   text-align: left;
 }
 
+/* Before the live content arrives ------------------------------------------------------------ */
+
+.ti-placeholder {
+  opacity: 0.6;
+}
+
+.ti-placeholder--today {
+  min-height: 140px;
+}
+
+.ti-placeholder--calendar {
+  min-height: 680px;
+}
+
+.ti-placeholder--prayer {
+  min-height: 460px;
+}
+
+/* About ---------------------------------------------------------------------------------------- */
+
+.ti-about {
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.ti-about p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 2;
+  color: var(--muted);
+  max-width: 75ch;
+}
+
+.ti-about__links {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ti-about__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-weak);
+  color: var(--text);
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color 180ms ease-out;
+}
+
+.ti-about__links a:hover {
+  background: var(--accent-soft);
+}
+
 /* Footer --------------------------------------------------------------------------------------- */
 
 .ti-footer {

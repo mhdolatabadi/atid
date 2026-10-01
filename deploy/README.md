@@ -28,6 +28,8 @@
 
 ## ایمیج‌ها
 
+پیش از اولین build، در **Settings → Secrets and variables → Actions → Variables** متغیر `ATID_SITE_URL` را برابر نشانی عمومی سایت (مثلاً `https://atid.example.com`) بگذارید تا آدرس‌های canonical و `sitemap.xml` ساخته شوند.
+
 ورک‌فلوی **Images** با هر push به `master` ایمیج `web` را می‌سازد و با تگ commit و `latest` در `ghcr.io/mhdolatabadi/atid/web` منتشر می‌کند. سرور فقط ایمیج را pull می‌کند و نیازی به Node ندارد.
 
 اگر `docker compose pull` خطای `unauthorized` داد، در بخش **Packages** مخزن visibility پکیج را public کنید، یا روی سرور با توکنی که `read:packages` دارد `docker login ghcr.io` بزنید.

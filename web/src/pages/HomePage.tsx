@@ -10,6 +10,7 @@ import {
 } from '../store/qadaStore';
 import { toPersianDigits } from '../lib/persianDate';
 import './HomePage.css';
+import { ClientOnly } from '../components/ClientOnly';
 
 const prayerLabels: Record<QadaPrayer, string> = {
   FAJR: 'نماز صبح',
@@ -65,14 +66,13 @@ function QadaRow({
   );
 }
 
-export function HomePage() {
+function HomePageView() {
   const counts = useQadaCounts();
   const fastCount = useFastCount();
   const total = QADA_PRAYERS.reduce((sum, prayer) => sum + counts[prayer], 0) + fastCount;
 
   return (
-    <div className="home-page">
-      <h1 className="home-page__title">قضا</h1>
+    <div>
 
       <div className="home-page__total glass">
         <div className="home-page__total-label">مجموع نماز و روزه قضای باقی‌مانده</div>
@@ -99,6 +99,17 @@ export function HomePage() {
         onIncrement={incrementFast}
         onDecrement={decrementFast}
       />
+    </div>
+  );
+}
+
+export function HomePage() {
+  return (
+    <div className="home-page">
+      <h1 className="home-page__title">قضا</h1>
+      <ClientOnly fallback={<div className="glass page-placeholder page-placeholder--qada" aria-hidden="true" />}>
+        <HomePageView />
+      </ClientOnly>
     </div>
   );
 }

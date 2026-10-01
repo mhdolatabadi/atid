@@ -4,6 +4,7 @@ import { toPersianDigits } from '../lib/persianDate';
 import { requestDeviceLocation, TEHRAN, type Coordinates } from '../lib/location';
 import { LocationIcon } from '../components/icons';
 import './PrayerTimesPage.css';
+import { ClientOnly } from '../components/ClientOnly';
 
 const rows: { key: keyof PrayerTimes; label: string }[] = [
   { key: 'fajr', label: 'اذان صبح' },
@@ -31,7 +32,7 @@ function computeNextPrayerKey(times: PrayerTimes): keyof PrayerTimes {
   return (found ?? rows[0]).key;
 }
 
-export function PrayerTimesPage() {
+function PrayerTimesPageView() {
   const [coordinates, setCoordinates] = useState<Coordinates>(TEHRAN);
   const [locationError, setLocationError] = useState(false);
 
@@ -60,8 +61,7 @@ export function PrayerTimesPage() {
     : 'تهران (پیش‌فرض؛ دسترسی به موقعیت مکانی فعال نیست)';
 
   return (
-    <div className="prayer-times-page">
-      <h1 className="prayer-times-page__title">اوقات شرعی امروز</h1>
+    <div>
       <div className="prayer-times-page__location">
         {locationLabel}
         {locationError && ' — دسترسی به موقعیت مکانی رد شد'}
@@ -83,6 +83,17 @@ export function PrayerTimesPage() {
       <p className="prayer-times-page__note">
         محاسبه‌ی تقریبی؛ ممکن است حدود یک دقیقه با جدول رسمی تفاوت داشته باشد.
       </p>
+    </div>
+  );
+}
+
+export function PrayerTimesPage() {
+  return (
+    <div className="prayer-times-page">
+      <h1 className="prayer-times-page__title">اوقات شرعی امروز</h1>
+      <ClientOnly fallback={<div className="glass page-placeholder page-placeholder--prayer" aria-hidden="true" />}>
+        <PrayerTimesPageView />
+      </ClientOnly>
     </div>
   );
 }
