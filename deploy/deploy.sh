@@ -46,15 +46,21 @@ main() {
 
   local domain
   domain="$(grep -E '^ATID_DOMAIN=' .env | cut -d= -f2-)"
+  local origin="https://${domain}"
   for attempt in $(seq 1 30); do
-    if curl -fsS -o /dev/null "https://${domain}/"; then
-      echo "Deployed $(git rev-parse --short HEAD) to https://${domain}"
+    homepage="$(curl -fsS "${origin}/" || true)"
+    robots="$(curl -fsS "${origin}/robots.txt" || true)"
+    sitemap="$(curl -fsS "${origin}/sitemap.xml" || true)"
+    if grep -Fq "rel=\"canonical\" href=\"${origin}/\"" <<< "$homepage" \
+      && grep -Fqx "Sitemap: ${origin}/sitemap.xml" <<< "$robots" \
+      && grep -Fq "<loc>${origin}/app/calendar</loc>" <<< "$sitemap"; then
+      echo "Deployed $(git rev-parse --short HEAD) with verified canonical URLs and sitemap to ${origin}"
       exit 0
     fi
     sleep 5
   done
 
-  echo "Health check failed for https://${domain}/ (is the proxy's site block for ${domain} in place?)" >&2
+  echo "SEO health check failed for ${origin}: expected canonical URL, robots sitemap declaration and calendar sitemap entry." >&2
   docker compose ps
   docker compose logs --tail=100 atid-web
   exit 1
