@@ -9,7 +9,8 @@ export interface Occasion {
 
 type Entry = [month: number, day: number, title: string, holiday: boolean];
 
-// Official public holidays of Iran plus a few widely marked occasions.
+// Official public holidays of Iran plus a few widely marked occasions. Mirrored 1:1 in
+// app/src/main/java/ir/mhdolatabadi/atid/data/Occasions.kt: change both, and both test suites.
 const solar: Entry[] = [
   [1, 1, 'جشن نوروز', true],
   [1, 2, 'عید نوروز', true],
