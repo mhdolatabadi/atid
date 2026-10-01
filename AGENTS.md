@@ -45,8 +45,9 @@ This file defines the standing rules for every contributor and coding agent work
 ## Testing and quality gates
 
 - Add or update tests for every behavior change and regression fix.
-- For web changes, run at minimum `npm run lint` and `npm run build` in `web/`.
-- For Android changes, run `./gradlew assembleDebug`.
+- For web changes, run at minimum `npm run lint`, `npm test` and `npm run build` in `web/`.
+- For Android changes, run `./gradlew testDebugUnitTest assembleDebug`.
+- Calendar and prayer-time logic is covered on both platforms with the same reference values (`web/src/**/__tests__`, `app/src/test`). A change to that logic must update both tests and both ports together.
 - UI changes must include a narrow-screen (≈360px) check and must verify that controls do not obscure content.
 - Do not merge while required CI checks are failing.
 
