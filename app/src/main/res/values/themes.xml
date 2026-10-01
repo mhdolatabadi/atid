@@ -16,8 +16,8 @@
         <!-- Typography. -->
         <item name="android:fontFamily">@font/vazirmatn</item>
         <item name="fontFamily">@font/vazirmatn</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/brand_primary_dark</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+        <!-- The app draws its own sky behind transparent system bars. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>

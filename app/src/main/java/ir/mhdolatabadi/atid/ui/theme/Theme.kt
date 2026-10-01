@@ -5,56 +5,44 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 
-private val LightColors = lightColorScheme(
-    primary = BrandPrimary,
-    onPrimary = White,
-    primaryContainer = BrandPrimaryLight,
-    onPrimaryContainer = OnSurfaceLight,
-    secondary = BrandAccent,
-    onSecondary = White,
-    secondaryContainer = BrandAccent,
-    onSecondaryContainer = White,
-    background = BackgroundLight,
-    onBackground = OnSurfaceLight,
-    surface = SurfaceLight,
-    onSurface = OnSurfaceLight,
-    surfaceVariant = BackgroundLight,
-    onSurfaceVariant = OnSurfaceMutedLight,
-    outline = DividerLight,
-    error = FridayText,
-    onError = White
-)
-
-private val DarkColors = darkColorScheme(
-    primary = BrandPrimaryLight,
-    onPrimary = OnSurfaceDark,
-    primaryContainer = BrandPrimaryDark,
-    onPrimaryContainer = OnSurfaceDark,
-    secondary = BrandAccent,
-    onSecondary = OnSurfaceDark,
-    secondaryContainer = BrandAccentDark,
-    onSecondaryContainer = OnSurfaceDark,
-    background = BackgroundDark,
-    onBackground = OnSurfaceDark,
-    surface = SurfaceDark,
-    onSurface = OnSurfaceDark,
-    surfaceVariant = SurfaceDark,
-    onSurfaceVariant = OnSurfaceMutedDark,
-    outline = DividerDark,
-    error = FridayText,
-    onError = White
-)
+private fun materialColors(c: AtidColors) = if (c.isDark) {
+    darkColorScheme(
+        primary = c.accent, onPrimary = c.onAccent, primaryContainer = c.accentSoft, onPrimaryContainer = c.text,
+        secondary = c.accent, onSecondary = c.onAccent,
+        background = Color.Transparent, onBackground = c.text,
+        surface = c.glass, onSurface = c.text, surfaceVariant = c.glassWeak, onSurfaceVariant = c.muted,
+        outline = c.glassLine, error = c.holiday, onError = c.onAccent
+    )
+} else {
+    lightColorScheme(
+        primary = c.accent, onPrimary = c.onAccent, primaryContainer = c.accentSoft, onPrimaryContainer = c.text,
+        secondary = c.accent, onSecondary = c.onAccent,
+        background = Color.Transparent, onBackground = c.text,
+        surface = c.glass, onSurface = c.text, surfaceVariant = c.glassWeak, onSurfaceVariant = c.muted,
+        outline = c.glassLine, error = c.holiday, onError = c.onAccent
+    )
+}
 
 @Composable
 fun AtidTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColors else LightColors
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AtidTypography,
-        content = content
-    )
+    val colors = if (darkTheme) DarkAtidColors else LightAtidColors
+    CompositionLocalProvider(LocalAtidColors provides colors) {
+        MaterialTheme(
+            colorScheme = materialColors(colors),
+            typography = AtidTypography,
+            content = content
+        )
+    }
+}
+
+/** Shorthand for the glass palette inside composables. */
+object Atid {
+    val colors: AtidColors
+        @Composable get() = LocalAtidColors.current
 }
