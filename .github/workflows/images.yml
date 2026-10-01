@@ -33,6 +33,7 @@ jobs:
           push: true
           build-args: |
             SITE_URL=${{ vars.ATID_SITE_URL }}
+            ATID_REVISION=${{ github.sha }}
           tags: |
             ${{ steps.image.outputs.name }}:${{ github.sha }}
             ${{ steps.image.outputs.name }}:latest
