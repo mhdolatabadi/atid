@@ -10,7 +10,6 @@ import {
   toGregorianDate,
   toPersianDigits,
   weekdayIndexSaturdayFirst,
-  weekdayName,
 } from '../lib/persianDate';
 import { hijriMonthName, toHijri } from '../lib/hijriDate';
 import { calculateForToday, type PrayerTimes } from '../lib/prayerTimes';
@@ -18,26 +17,14 @@ import { requestDeviceLocation, TEHRAN, type Coordinates } from '../lib/location
 import { isHoliday, occasionsOn, type Occasion } from '../data/occasions';
 import { ChevronIcon, LocationIcon } from '../components/icons';
 import { ClientOnly } from '../components/ClientOnly';
+import { DateConverter } from '../components/DateConverter';
+import { gregorianLabel, hijriLabel, solarLabel } from '../lib/dateLabels';
 import './LandingPage.css';
 
 const weekdayHeaders = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
 
 function sameDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
-
-function solarLabel(date: Date): string {
-  const p = fromDate(date);
-  return `${weekdayName(p.dayOfWeek)} ${toPersianDigits(p.day)} ${monthName(p.month)} ${toPersianDigits(p.year)}`;
-}
-
-function hijriLabel(date: Date): string {
-  const h = toHijri(date);
-  return `${toPersianDigits(h.day)} ${hijriMonthName(h.month)} ${toPersianDigits(h.year)}`;
-}
-
-function gregorianLabel(date: Date): string {
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function useNow(): Date {
@@ -351,77 +338,6 @@ function PrayerTimesCard({ now }: { now: Date }) {
   );
 }
 
-// --- Date converter -----------------------------------------------------------------------------
-
-function DateConverterCard() {
-  const today = fromDate(new Date());
-  const [mode, setMode] = useState<'solar' | 'gregorian'>('solar');
-  const [fields, setFields] = useState({ year: String(today.year), month: String(today.month), day: String(today.day) });
-
-  const switchMode = (next: 'solar' | 'gregorian') => {
-    const now = new Date();
-    setMode(next);
-    setFields(
-      next === 'solar'
-        ? { year: String(today.year), month: String(today.month), day: String(today.day) }
-        : { year: String(now.getFullYear()), month: String(now.getMonth() + 1), day: String(now.getDate()) },
-    );
-  };
-
-  const result = useMemo(() => {
-    const y = Number(fields.year);
-    const m = Number(fields.month);
-    const d = Number(fields.day);
-    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d) || m < 1 || m > 12 || d < 1) return null;
-    if (mode === 'solar') {
-      if (y < 1300 || y > 1500 || d > daysInMonth(y, m)) return null;
-      return toGregorianDate(y, m, d);
-    }
-    if (y < 1921 || y > 2121) return null;
-    const date = new Date(y, m - 1, d, 12);
-    return date.getMonth() === m - 1 ? date : null;
-  }, [fields, mode]);
-
-  const field = (name: 'year' | 'month' | 'day', label: string) => (
-    <label className="ti-converter__field">
-      <span>{label}</span>
-      <input
-        inputMode="numeric"
-        value={fields[name]}
-        onChange={(e) => setFields((f) => ({ ...f, [name]: e.target.value.replace(/[۰-۹]/g, (c) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))) }))}
-      />
-    </label>
-  );
-
-  return (
-    <section className="ti-card ti-converter glass enter" style={{ animationDelay: '200ms' }} aria-label="تبدیل تاریخ">
-      <h2 className="ti-card__title">تبدیل تاریخ</h2>
-      <div className="ti-segmented" role="tablist">
-        <button type="button" role="tab" aria-selected={mode === 'solar'} onClick={() => switchMode('solar')}>
-          از شمسی
-        </button>
-        <button type="button" role="tab" aria-selected={mode === 'gregorian'} onClick={() => switchMode('gregorian')}>
-          از میلادی
-        </button>
-      </div>
-      <div className="ti-converter__fields">
-        {field('day', 'روز')}
-        {field('month', 'ماه')}
-        {field('year', 'سال')}
-      </div>
-      {result ? (
-        <dl key={result.toDateString()} className="ti-converter__result">
-          <div><dt>شمسی</dt><dd>{solarLabel(result)}</dd></div>
-          <div><dt>قمری</dt><dd>{hijriLabel(result)}</dd></div>
-          <div><dt>میلادی</dt><dd dir="ltr">{gregorianLabel(result)}</dd></div>
-        </dl>
-      ) : (
-        <p className="ti-note ti-note--error">تاریخ واردشده معتبر نیست.</p>
-      )}
-    </section>
-  );
-}
-
 // --- Page ---------------------------------------------------------------------------------------
 
 /** Everything that depends on the current moment; rendered only in the browser. */
@@ -436,7 +352,7 @@ function LiveHome() {
         </div>
         <aside className="ti-layout__aside">
           <PrayerTimesCard now={now} />
-          <DateConverterCard />
+          <DateConverter style={{ animationDelay: '200ms' }} />
         </aside>
       </div>
     </>
