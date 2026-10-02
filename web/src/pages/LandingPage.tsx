@@ -17,6 +17,7 @@ import { requestDeviceLocation, TEHRAN, type Coordinates } from '../lib/location
 import { isHoliday, occasionsOn, type Occasion } from '../data/occasions';
 import { ChevronIcon, LocationIcon } from '../components/icons';
 import { ClientOnly } from '../components/ClientOnly';
+import { PublicLayout } from '../components/SiteChrome';
 import { DateConverter } from '../components/DateConverter';
 import { gregorianLabel, hijriLabel, solarLabel } from '../lib/dateLabels';
 import './LandingPage.css';
@@ -378,22 +379,7 @@ function HomePlaceholder() {
 
 export function LandingPage() {
   return (
-    <div className="ti">
-      <header className="ti-header glass">
-        <div className="ti-header__inner">
-          <Link to="/" className="ti-brand">عتید</Link>
-          <nav className="ti-nav" aria-label="بخش‌ها">
-            <Link to="/app/calendar">تقویم</Link>
-            <Link to="/app/prayer-times">اوقات شرعی</Link>
-            <Link to="/app/home">نماز و روزه قضا</Link>
-            <Link to="/app/texts">متون مذهبی</Link>
-            <a href="https://github.com/mhdolatabadi/atid/releases/latest" target="_blank" rel="noreferrer">
-              نسخه اندروید
-            </a>
-          </nav>
-        </div>
-      </header>
-
+    <PublicLayout>
       <main className="ti-main">
         <h1 className="sr-only">تقویم شمسی، قمری و میلادی، اوقات شرعی و مناسبت‌های امروز</h1>
         <ClientOnly fallback={<HomePlaceholder />}>
@@ -419,7 +405,6 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer className="ti-footer">اطلاعات شما فقط در همین مرورگر ذخیره می‌شود.</footer>
-    </div>
+    </PublicLayout>
   );
 }
