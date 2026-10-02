@@ -1,5 +1,6 @@
 // Turns a day/month/year typed into the converter into a civil date. Each function returns a Date
 // at local noon, or null when the input is not a real day in that calendar's supported range.
+// Mirrored 1:1 in app/src/main/java/ir/mhdolatabadi/atid/util/DateConverter.kt; change both together.
 
 import { daysInMonth, toGregorianDate } from './persianDate';
 import { toHijri } from './hijriDate';

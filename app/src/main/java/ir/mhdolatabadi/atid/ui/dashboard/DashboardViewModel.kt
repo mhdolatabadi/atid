@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ir.mhdolatabadi.atid.data.Occasion
 import ir.mhdolatabadi.atid.data.Occasions
+import ir.mhdolatabadi.atid.util.DateLabels
 import ir.mhdolatabadi.atid.util.HijriDates
 import ir.mhdolatabadi.atid.util.PersianDateUtils
 import java.util.Calendar
@@ -83,23 +84,6 @@ class DashboardViewModel : ViewModel() {
         refresh()
     }
 
-    private fun solarLabel(date: Date): String {
-        val p = PersianDateUtils.fromDate(date)
-        return "${PersianDateUtils.weekdayName(p.dayOfWeek)} ${PersianDateUtils.toPersianDigits(p.day)} " +
-            "${PersianDateUtils.monthName(p.month)} ${PersianDateUtils.toPersianDigits(p.year)}"
-    }
-
-    private fun hijriLabel(date: Date): String {
-        val h = HijriDates.of(date)
-        return "${PersianDateUtils.toPersianDigits(h.day)} ${HijriDates.monthName(h.month)} ${PersianDateUtils.toPersianDigits(h.year)}"
-    }
-
-    private fun gregorianLabel(date: Date): String {
-        val c = Calendar.getInstance().apply { time = date }
-        return "${PersianDateUtils.toPersianDigits(c.get(Calendar.DAY_OF_MONTH))} " +
-            "${PersianDateUtils.gregorianMonthNames[c.get(Calendar.MONTH)]} ${PersianDateUtils.toPersianDigits(c.get(Calendar.YEAR))}"
-    }
-
     private fun sameDay(a: Date, b: Date): Boolean {
         val ca = Calendar.getInstance().apply { time = a }
         val cb = Calendar.getInstance().apply { time = b }
@@ -157,13 +141,13 @@ class DashboardViewModel : ViewModel() {
             monthLabel = "${PersianDateUtils.monthName(displayedMonth)} ${PersianDateUtils.toPersianDigits(displayedYear)}",
             hijriRange = hijriRange,
             gregorianRange = gregorianRange,
-            todayLabel = "امروز: ${solarLabel(todayDate)}",
+            todayLabel = "امروز: ${DateLabels.solar(todayDate)}",
             days = cells,
             selectedDate = selectedDate,
             selected = DayDetails(
-                solarLabel = solarLabel(selectedDate),
-                hijriLabel = hijriLabel(selectedDate),
-                gregorianLabel = gregorianLabel(selectedDate),
+                solarLabel = DateLabels.solar(selectedDate),
+                hijriLabel = DateLabels.hijri(selectedDate),
+                gregorianLabel = DateLabels.gregorian(selectedDate),
                 occasions = Occasions.on(selectedDate)
             ),
             monthOccasions = monthOccasions,

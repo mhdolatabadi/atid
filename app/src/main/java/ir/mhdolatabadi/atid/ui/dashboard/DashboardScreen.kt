@@ -147,6 +147,7 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
 
         SelectedDayCard(current.selected)
         MonthOccasionsCard(current)
+        DateConverterCard(modifier = Modifier.padding(top = 16.dp))
     }
 }
 
