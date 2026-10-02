@@ -106,6 +106,17 @@
   padding: 20px;
 }
 
+.ti-main--narrow {
+  max-width: 720px;
+}
+
+.ti-page-title {
+  margin: 4px 4px 16px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
 .ti-card__title {
   font-size: 17px;
   font-weight: 700;
@@ -661,7 +672,7 @@
 
 .ti-segmented {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   padding: 4px;
   border-radius: 12px;
   background: var(--glass-weak);
@@ -670,7 +681,7 @@
 }
 
 .ti-segmented button {
-  min-height: 40px;
+  min-height: 44px;
   border-radius: 9px;
   font-size: 14px;
   font-weight: 600;
@@ -678,7 +689,7 @@
   transition: background-color 220ms ease-out, color 220ms ease-out;
 }
 
-.ti-segmented button[aria-selected='true'] {
+.ti-segmented button[aria-pressed='true'] {
   background: var(--glass-strong);
   color: var(--text);
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
@@ -764,11 +775,19 @@
   min-height: 460px;
 }
 
+.ti-placeholder--converter {
+  min-height: 420px;
+}
+
 /* About ---------------------------------------------------------------------------------------- */
 
 .ti-about {
   margin-top: 20px;
   padding: 20px;
+}
+
+.ti-about > :first-child {
+  margin-top: 0;
 }
 
 .ti-about p {
