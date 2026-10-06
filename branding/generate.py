@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Builds every Saatbashi logo file from one geometry, so web and Android never drift apart.
 
-The mark: a plain golden clock, a ring and two hands at ten past ten, on a night-sky tile. The
-sa'at-bashi was the person who kept the hours and announced the times of prayer.
+The mark: a solid golden disc with navy hands at ten past ten, on a night-sky tile. The sa'at-bashi
+was the person who kept the hours and announced the times of prayer.
 
 Run from the repository root:  python3 branding/generate.py
 Vector outputs are written directly. PNGs are rasterised from the SVG with Chromium; see
@@ -13,43 +13,64 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Geometry in a 100x100 box.
-CX, CY = 50, 50
-RING_R, RING_W = 29, 7
-HANDS = [(-60, 14), (60, 20)]  # (angle from twelve in degrees, length): ten past ten
-HAND_W = 7
-
 SKY = ("#1a1446", "#20307e", "#2448c9")
-GOLD = ("#ffe7ad", "#ffc45c")
+GOLD = ("#ffe2a0", "#f7b84b")
+NAVY = "#1b2160"
+
+# Geometry in a 100x100 box.
+CX, CY, R = 50, 50, 28  # the disc
+HANDS = [(-60, 11), (60, 17)]  # (angle from twelve in degrees, length): ten past ten
+HAND_W, HUB_R = 6, 4
+MONO_RING_W = 5  # themed (monochrome) icons can't cut the hands out of the disc, so they use a ring
 
 
 def _n(v):
     return f"{v:.2f}".rstrip("0").rstrip(".")
 
 
-def T(x, y, s, ox, oy):
-    return x * s + ox, y * s + oy
+def _p(x, y, s, ox, oy):
+    return f"{_n(x * s + ox)},{_n(y * s + oy)}"
 
 
-def ring(s=1.0, ox=0.0, oy=0.0):
-    """The dial as a closed stroke path (two half arcs)."""
-    r = RING_R * s
-    x, y = T(CX, CY, s, ox, oy)
-    return f"M{_n(x - r)},{_n(y)} A{_n(r)},{_n(r)} 0 1,1 {_n(x + r)},{_n(y)} A{_n(r)},{_n(r)} 0 1,1 {_n(x - r)},{_n(y)} Z"
+def circle(cx, cy, r, s=1.0, ox=0.0, oy=0.0):
+    a, b = _p(cx - r, cy, s, ox, oy), _p(cx + r, cy, s, ox, oy)
+    rr = _n(r * s)
+    return f"M{a} A{rr},{rr} 0 1,1 {b} A{rr},{rr} 0 1,1 {a} Z"
 
 
 def hands(s=1.0, ox=0.0, oy=0.0):
-    x0, y0 = T(CX, CY, s, ox, oy)
     out = []
     for angle, length in HANDS:
         a = math.radians(angle)
-        x1, y1 = T(CX + length * math.sin(a), CY - length * math.cos(a), s, ox, oy)
-        out.append(f"M{_n(x0)},{_n(y0)} L{_n(x1)},{_n(y1)}")
+        out.append(f"M{_p(CX, CY, s, ox, oy)} L{_p(CX + length * math.sin(a), CY - length * math.cos(a), s, ox, oy)}")
     return " ".join(out)
+
+
+def layers(s=1.0, ox=0.0, oy=0.0, monochrome=False):
+    """(kind, path, width, paint): paint is "gold" (the gradient), "navy" or "mono"."""
+    if monochrome:
+        return [
+            ("stroke", circle(CX, CY, R - MONO_RING_W / 2, s, ox, oy), MONO_RING_W * s, "mono"),
+            ("stroke", hands(s, ox, oy), HAND_W * s, "mono"),
+            ("fill", circle(CX, CY, HUB_R, s, ox, oy), 0, "mono"),
+        ]
+    return [
+        ("fill", circle(CX, CY, R, s, ox, oy), 0, "gold"),
+        ("stroke", hands(s, ox, oy), HAND_W * s, "navy"),
+        ("fill", circle(CX, CY, HUB_R, s, ox, oy), 0, "navy"),
+    ]
 
 
 def tile_svg(size=512, radius=116):
     s = size / 100
+    shapes = []
+    for kind, path, width, paint in layers(s):
+        colour = "url(#gold)" if paint == "gold" else NAVY
+        if kind == "stroke":
+            shapes.append(f'  <path d="{path}" fill="none" stroke="{colour}" stroke-width="{_n(width)}" stroke-linecap="round"/>')
+        else:
+            shapes.append(f'  <path d="{path}" fill="{colour}"/>')
+    body = "\n".join(shapes)
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}">
   <title>ساعت‌باشی</title>
   <defs>
@@ -58,20 +79,19 @@ def tile_svg(size=512, radius=116):
       <stop offset="0.55" stop-color="{SKY[1]}"/>
       <stop offset="1" stop-color="{SKY[2]}"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="0.4" y2="1">
+    <linearGradient id="gold" x1="0" y1="0" x2="0.5" y2="1">
       <stop offset="0" stop-color="{GOLD[0]}"/>
       <stop offset="1" stop-color="{GOLD[1]}"/>
     </linearGradient>
   </defs>
   <rect width="{size}" height="{size}" rx="{radius}" fill="url(#sky)"/>
-  <path d="{ring(s)}" fill="none" stroke="url(#gold)" stroke-width="{_n(RING_W * s)}"/>
-  <path d="{hands(s)}" fill="none" stroke="{GOLD[0]}" stroke-width="{_n(HAND_W * s)}" stroke-linecap="round"/>
+{body}
 </svg>
 '''
 
 
 # Android adaptive icon: a 108dp canvas whose inner 66dp circle is always visible.
-ANDROID_SCALE = 0.95
+ANDROID_SCALE = 1.0
 CONTENT_CENTRE = (CX, CY)
 OX = 54 - CONTENT_CENTRE[0] * ANDROID_SCALE
 OY = 54 - CONTENT_CENTRE[1] * ANDROID_SCALE
@@ -109,19 +129,35 @@ def android_background():
 
 
 def android_foreground(monochrome=False):
-    sc, ox, oy = ANDROID_SCALE, OX, OY
-    light = "#FFFFFFFF" if monochrome else GOLD[0].upper()
-    ring_colour = light if monochrome else "#FFD27A"
-    body = f'''    <path
-        android:strokeColor="{ring_colour}"
-        android:strokeWidth="{_n(RING_W * sc)}"
-        android:pathData="{ring(sc, ox, oy)}" />
-    <path
-        android:strokeColor="{light}"
-        android:strokeWidth="{_n(HAND_W * sc)}"
+    parts = []
+    for kind, path, width, paint in layers(ANDROID_SCALE, OX, OY, monochrome):
+        if kind == "stroke":
+            colour = "#FFFFFFFF" if paint == "mono" else NAVY.upper()
+            parts.append(f'''    <path
+        android:strokeColor="{colour}"
+        android:strokeWidth="{_n(width)}"
         android:strokeLineCap="round"
-        android:pathData="{hands(sc, ox, oy)}" />'''
-    return _vector(body)
+        android:pathData="{path}" />''')
+        elif paint == "gold":
+            parts.append(f'''    <path android:pathData="{path}">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="{_n(OX + (CX - R * 0.5) * ANDROID_SCALE)}"
+                android:startY="{_n(OY + (CY - R) * ANDROID_SCALE)}"
+                android:endX="{_n(OX + (CX + R * 0.5) * ANDROID_SCALE)}"
+                android:endY="{_n(OY + (CY + R) * ANDROID_SCALE)}">
+                <item android:offset="0" android:color="{GOLD[0].upper()}" />
+                <item android:offset="1" android:color="{GOLD[1].upper()}" />
+            </gradient>
+        </aapt:attr>
+    </path>''')
+        else:
+            colour = "#FFFFFFFF" if paint == "mono" else NAVY.upper()
+            parts.append(f'''    <path
+        android:fillColor="{colour}"
+        android:pathData="{path}" />''')
+    return _vector("\n".join(parts), extra_ns=not monochrome)
 
 
 def main():

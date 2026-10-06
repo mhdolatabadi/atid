@@ -6,12 +6,13 @@
       <stop offset="0.55" stop-color="#20307e"/>
       <stop offset="1" stop-color="#2448c9"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="0.4" y2="1">
-      <stop offset="0" stop-color="#ffe7ad"/>
-      <stop offset="1" stop-color="#ffc45c"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#ffe2a0"/>
+      <stop offset="1" stop-color="#f7b84b"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="116" fill="url(#sky)"/>
-  <path d="M107.52,256 A148.48,148.48 0 1,1 404.48,256 A148.48,148.48 0 1,1 107.52,256 Z" fill="none" stroke="url(#gold)" stroke-width="35.84"/>
-  <path d="M256,256 L193.92,220.16 M256,256 L344.68,204.8" fill="none" stroke="#ffe7ad" stroke-width="35.84" stroke-linecap="round"/>
+  <path d="M112.64,256 A143.36,143.36 0 1,1 399.36,256 A143.36,143.36 0 1,1 112.64,256 Z" fill="url(#gold)"/>
+  <path d="M256,256 L207.23,227.84 M256,256 L331.38,212.48" fill="none" stroke="#1b2160" stroke-width="30.72" stroke-linecap="round"/>
+  <path d="M235.52,256 A20.48,20.48 0 1,1 276.48,256 A20.48,20.48 0 1,1 235.52,256 Z" fill="#1b2160"/>
 </svg>
