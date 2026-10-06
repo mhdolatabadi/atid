@@ -1,4 +1,4 @@
-# انتشار نسخه‌ی اندروید عتید
+# انتشار نسخه‌ی اندروید ساعت‌باشی
 
 ورک‌فلوی `.github/workflows/release.yml` با push کردن هر تگ `v*` یک APK **release** امضاشده می‌سازد و در GitHub Releases منتشر می‌کند. کلید امضا هرگز در مخزن نیست؛ فقط به‌صورت Secret در GitHub نگه داشته می‌شود.
 
@@ -34,7 +34,7 @@ base64 -w0 atid-release.jks > atid-release.jks.b64
    git tag v1.2.0 && git push origin v1.2.0
    ```
 
-3. ورک‌فلو APK را می‌سازد، امضا را با `apksigner verify` بررسی می‌کند و `Atid-v1.2.0.apk` را در Releases می‌گذارد.
+3. ورک‌فلو APK را می‌سازد، امضا را با `apksigner verify` بررسی می‌کند و `Saatbashi-v1.2.0.apk` را در Releases می‌گذارد.
 
 ## نکته‌ی مهم برای کاربران فعلی
 

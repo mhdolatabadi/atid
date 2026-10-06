@@ -30,7 +30,7 @@ function jsonLd(route, meta) {
   const url = siteUrl ? `${siteUrl}${route === '/' ? '/' : route}` : undefined;
   const base = { '@context': 'https://schema.org', inLanguage: 'fa', name: meta.title, description: meta.description, url };
   if (meta.type === 'WebSite') {
-    return { ...base, '@type': 'WebSite', name: SITE_NAME, alternateName: 'Atid' };
+    return { ...base, '@type': 'WebSite', name: SITE_NAME, alternateName: 'Saatbashi' };
   }
   if (meta.type === 'Article') {
     const text = getReligiousTextById(route.split('/').pop());
@@ -55,7 +55,10 @@ function headTags(route, meta) {
     `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
     url ? `<meta property="og:url" content="${url}" />` : null,
-    '<meta name="twitter:card" content="summary" />',
+    siteUrl ? `<meta property="og:image" content="${siteUrl}/og-image.png" />` : null,
+    siteUrl ? '<meta property="og:image:width" content="1200" />' : null,
+    siteUrl ? '<meta property="og:image:height" content="630" />' : null,
+    `<meta name="twitter:card" content="${siteUrl ? 'summary_large_image' : 'summary'}" />`,
     regularFont
       ? `<link rel="preload" href="/assets/${regularFont}" as="font" type="font/woff2" crossorigin />`
       : null,

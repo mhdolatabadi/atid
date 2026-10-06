@@ -25,6 +25,10 @@
 }
 
 .ti-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
   font-size: 22px;
   font-weight: 700;
   text-decoration: none;

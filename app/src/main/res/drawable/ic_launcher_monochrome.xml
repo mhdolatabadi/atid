@@ -6,11 +6,11 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
-        android:strokeColor="#FFD27A"
+        android:strokeColor="#FFFFFFFF"
         android:strokeWidth="6.65"
         android:pathData="M26.45,54 A27.55,27.55 0 1,1 81.55,54 A27.55,27.55 0 1,1 26.45,54 Z" />
     <path
-        android:strokeColor="#FFE7AD"
+        android:strokeColor="#FFFFFFFF"
         android:strokeWidth="6.65"
         android:strokeLineCap="round"
         android:pathData="M54,54 L42.48,47.35 M54,54 L70.45,44.5" />

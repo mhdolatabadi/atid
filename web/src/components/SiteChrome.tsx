@@ -17,7 +17,10 @@ export function SiteHeader() {
   return (
     <header className="ti-header glass">
       <div className="ti-header__inner">
-        <Link to="/" className="ti-brand">عتید</Link>
+        <Link to="/" className="ti-brand">
+          <img src="/favicon.svg" width="32" height="32" alt="" />
+          ساعت‌باشی
+        </Link>
         <nav className="ti-nav" aria-label="بخش‌ها">
           {navLinks.map(({ to, label }) => (
             <NavLink key={to} to={to} end>
@@ -55,7 +58,7 @@ export function SiteFooter() {
           </ul>
         </section>
         <section aria-labelledby="footer-more">
-          <h2 id="footer-more">عتید</h2>
+          <h2 id="footer-more">ساعت‌باشی</h2>
           <ul>
             <li><Link to="/app/home">شمارنده‌ی نماز و روزه‌ی قضا</Link></li>
             <li><a href={ANDROID_RELEASE} target="_blank" rel="noreferrer">دریافت نسخه اندروید</a></li>
