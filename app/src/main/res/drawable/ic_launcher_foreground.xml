@@ -6,12 +6,41 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
+        android:strokeColor="#FFE7AD"
+        android:strokeAlpha="0.9"
+        android:strokeWidth="1.89"
+        android:strokeLineCap="round"
+        android:pathData="M56.24,28.63 C66.04,25.62 78.08,32.5 78.94,44.54" />
+    <path
         android:strokeColor="#FFD27A"
-        android:strokeWidth="6.65"
-        android:pathData="M26.45,54 A27.55,27.55 0 1,1 81.55,54 A27.55,27.55 0 1,1 26.45,54 Z" />
+        android:strokeAlpha="1"
+        android:strokeWidth="2.58"
+        android:strokeLineCap="round"
+        android:pathData="M48.32,28.63 A3.96,3.96 0 1,1 56.24,28.63 A3.96,3.96 0 1,1 48.32,28.63 Z" />
+    <path
+        android:fillColor="#FFD27A"
+        android:fillAlpha="1"
+        android:pathData="M50.39,32.33 H54.17 A1.2,1.2 0 0,1 55.38,33.53 V35.77 A1.2,1.2 0 0,1 54.17,36.97 H50.39 A1.2,1.2 0 0,1 49.18,35.77 V33.53 A1.2,1.2 0 0,1 50.39,32.33 Z" />
+    <path
+        android:strokeColor="#FFD27A"
+        android:strokeAlpha="1"
+        android:strokeWidth="4.3"
+        android:strokeLineCap="round"
+        android:pathData="M29.92,60.02 A22.36,22.36 0 1,1 74.64,60.02 A22.36,22.36 0 1,1 29.92,60.02 Z" />
     <path
         android:strokeColor="#FFE7AD"
-        android:strokeWidth="6.65"
+        android:strokeAlpha="1"
+        android:strokeWidth="2.75"
         android:strokeLineCap="round"
-        android:pathData="M54,54 L42.48,47.35 M54,54 L70.45,44.5" />
+        android:pathData="M52.28,42.56 L52.28,46.17 M69.74,60.02 L66.13,60.02 M52.28,77.48 L52.28,73.87 M34.82,60.02 L38.43,60.02" />
+    <path
+        android:strokeColor="#FFE7AD"
+        android:strokeAlpha="1"
+        android:strokeWidth="4.3"
+        android:strokeLineCap="round"
+        android:pathData="M52.28,60.02 L44.15,55.32 M52.28,60.02 L64.29,53.09" />
+    <path
+        android:fillColor="#FFE7AD"
+        android:fillAlpha="1"
+        android:pathData="M49.53,60.02 A2.75,2.75 0 1,1 55.03,60.02 A2.75,2.75 0 1,1 49.53,60.02 Z" />
 </vector>
