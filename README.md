@@ -1,8 +1,8 @@
-# Atid (عتید)
+# Saatbashi (ساعت‌باشی)
 
-Atid is the angel on the left who records a person's evil deeds (Qur'an 50:18: «مَا يَلْفِظُ مِن قَوْلٍ إِلَّا لَدَيْهِ رَقِيبٌ عَتِيدٌ»).
+The *sa'at-bashi* was the court official who kept the hours and the calendar and announced the times of prayer. This app does the same job: it shows the solar, lunar and Gregorian calendars with occasions and holidays, today's prayer times and a date converter, and tracks missed (qada) prayers and fasts.
 
-The app keeps that account for you: it tracks missed (qada) prayers and fasts, and shows the Persian calendar and prayer times.
+The project was called Atid (عتید) at first. The repository, the Android application ID (`ir.mhdolatabadi.atid`), the Docker/Compose names and the domain keep that identifier so existing installs and links keep working.
 
 - `app/`: Android app (Kotlin + Jetpack Compose)
 - `web/`: web version (Vite + React + TypeScript); see [`web/README.md`](web/README.md)
