@@ -37,7 +37,7 @@ class OccasionsTest {
 
     @Test
     fun marksNowruz() {
-        assertTrue(titles(noon(2025, 3, 21)).contains("جشن نوروز"))
+        assertTrue(titles(noon(2025, 3, 21)).contains("آغاز نوروز"))
         assertTrue(Occasions.isHoliday(noon(2025, 3, 21), hijriOf))
     }
 
@@ -49,7 +49,7 @@ class OccasionsTest {
 
     @Test
     fun listsNonHolidayOccasionsWithoutMakingTheDayAHoliday() {
-        assertEquals(listOf("روز بزرگداشت مولوی"), titles(noon(2026, 9, 30)))
+        assertEquals(listOf("روز بزرگداشت مولوی", "روز جهانی دریانوردی", "روز جهانی ناشنوایان"), titles(noon(2026, 9, 30)))
         assertFalse(Occasions.isHoliday(noon(2026, 9, 30), hijriOf))
     }
 
@@ -59,7 +59,7 @@ class OccasionsTest {
         val end = noon(2028, 1, 1)
         var found = 0
         while (day.time.before(end)) {
-            if (titles(day.time).contains("شهادت امام رضا")) {
+            if (titles(day.time).any { it.startsWith("شهادت حضرت امام رضا") }) {
                 found++
                 val next = Calendar.getInstance().apply { time = day.time; add(Calendar.DAY_OF_MONTH, 1) }.time
                 assertEquals(2, hijriOf(day.time).month)
@@ -69,5 +69,48 @@ class OccasionsTest {
             day.add(Calendar.DAY_OF_MONTH, 1)
         }
         assertEquals(3, found)
+    }
+
+    @Test
+    fun marksQudsDayOnTheLastFridayOfRamadan() {
+        // Ramadan 1447 runs to 19 March 2026; its last Friday is 13 March.
+        val title = "روز جهانی قدس (آخرین جمعهٔ رمضان)"
+        assertTrue(titles(noon(2026, 3, 13)).contains(title))
+        assertFalse(titles(noon(2026, 3, 6)).contains(title))
+    }
+
+    @Test
+    fun marksTheEveOfTheLastWednesdayOfTheYear() {
+        // The last Wednesday of Esfand 1404 is 27 Esfand (18 March 2026).
+        val title = "روز تکریم همسایگان (شب آخرین چهارشنبهٔ سال)"
+        assertTrue(titles(noon(2026, 3, 17)).contains(title))
+        assertFalse(titles(noon(2026, 3, 10)).contains(title))
+    }
+
+    @Test
+    fun marksTheSecondFridayOfMehr() {
+        // 10 Mehr 1405 (2 October 2026).
+        val title = "آیین مذهبی قالیشویان اردهال (دومین جمعهٔ مهر)"
+        assertTrue(titles(noon(2026, 10, 2)).contains(title))
+        assertFalse(titles(noon(2026, 9, 25)).contains(title))
+    }
+
+    @Test
+    fun keepsTheOfficialHolidaySet() {
+        // Every non-Friday holiday in solar year 1405; same list in occasions.test.ts.
+        val expected = listOf(
+            "2026-3-21", "2026-3-22", "2026-3-23", "2026-3-24", "2026-4-1", "2026-4-2", "2026-4-13", "2026-5-27",
+            "2026-6-4", "2026-6-24", "2026-6-25", "2026-8-3", "2026-8-11", "2026-8-13", "2026-8-30", "2026-12-22",
+            "2027-1-5", "2027-1-23", "2027-2-11", "2027-2-28", "2027-3-9", "2027-3-10", "2027-3-20",
+        )
+        val day = Calendar.getInstance().apply { time = noon(2026, 3, 21) }
+        val holidays = mutableListOf<String>()
+        while (!day.time.after(noon(2027, 3, 20))) {
+            if (day.get(Calendar.DAY_OF_WEEK) != Calendar.FRIDAY && Occasions.isHoliday(day.time, hijriOf)) {
+                holidays += "${day.get(Calendar.YEAR)}-${day.get(Calendar.MONTH) + 1}-${day.get(Calendar.DAY_OF_MONTH)}"
+            }
+            day.add(Calendar.DAY_OF_MONTH, 1)
+        }
+        assertEquals(expected, holidays)
     }
 }
