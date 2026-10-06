@@ -6,17 +6,13 @@
       <stop offset="0.55" stop-color="#20307e"/>
       <stop offset="1" stop-color="#2448c9"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="0.4" y2="1">
-      <stop offset="0" stop-color="#ffe7ad"/>
-      <stop offset="1" stop-color="#ffc45c"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#ffe2a0"/>
+      <stop offset="1" stop-color="#f7b84b"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="116" fill="url(#sky)"/>
-  <path d="M269.31,104.96 C327.68,87.04 399.36,128 404.48,199.68" fill="none" stroke="#ffe7ad" stroke-width="11.26" stroke-linecap="round" opacity="0.9"/>
-  <path d="M222.21,104.96 A23.55,23.55 0 1,1 269.31,104.96 A23.55,23.55 0 1,1 222.21,104.96 Z" fill="none" stroke="url(#gold)" stroke-width="15.36" stroke-linecap="round"/>
-  <path d="M234.5,126.98 H257.02 A7.17,7.17 0 0,1 264.19,134.14 V147.46 A7.17,7.17 0 0,1 257.02,154.62 H234.5 A7.17,7.17 0 0,1 227.33,147.46 V134.14 A7.17,7.17 0 0,1 234.5,126.98 Z" fill="url(#gold)"/>
-  <path d="M112.64,291.84 A133.12,133.12 0 1,1 378.88,291.84 A133.12,133.12 0 1,1 112.64,291.84 Z" fill="none" stroke="url(#gold)" stroke-width="25.6" stroke-linecap="round"/>
-  <path d="M245.76,187.9 L245.76,209.41 M349.7,291.84 L328.19,291.84 M245.76,395.78 L245.76,374.27 M141.82,291.84 L163.33,291.84" fill="none" stroke="#ffe7ad" stroke-width="16.38" stroke-linecap="round"/>
-  <path d="M245.76,291.84 L197.34,263.88 M245.76,291.84 L317.24,250.57" fill="none" stroke="#ffe7ad" stroke-width="25.6" stroke-linecap="round"/>
-  <path d="M229.38,291.84 A16.38,16.38 0 1,1 262.14,291.84 A16.38,16.38 0 1,1 229.38,291.84 Z" fill="#ffe7ad"/>
+  <path d="M112.64,256 A143.36,143.36 0 1,1 399.36,256 A143.36,143.36 0 1,1 112.64,256 Z" fill="url(#gold)"/>
+  <path d="M256,256 L207.23,227.84 M256,256 L331.38,212.48" fill="none" stroke="#1b2160" stroke-width="30.72" stroke-linecap="round"/>
+  <path d="M235.52,256 A20.48,20.48 0 1,1 276.48,256 A20.48,20.48 0 1,1 235.52,256 Z" fill="#1b2160"/>
 </svg>
