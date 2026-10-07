@@ -46,15 +46,23 @@ main() {
 
   local domain
   domain="$(grep -E '^ATID_DOMAIN=' .env | cut -d= -f2-)"
+  local origin="https://${domain}"
   for attempt in $(seq 1 30); do
-    if curl -fsSI "https://${domain}/" | tr -d '\r' | grep -Fqx "X-Atid-Revision: ${ATID_IMAGE_TAG}"; then
-      echo "Deployed ${ATID_IMAGE_TAG:0:7} to https://${domain}"
+    headers="$(curl --connect-timeout 5 --max-time 15 -fsSI "${origin}/" | tr -d '\r' || true)"
+    homepage="$(curl --connect-timeout 5 --max-time 15 -fsS "${origin}/" || true)"
+    robots="$(curl --connect-timeout 5 --max-time 15 -fsS "${origin}/robots.txt" || true)"
+    sitemap="$(curl --connect-timeout 5 --max-time 15 -fsS "${origin}/sitemap.xml" || true)"
+    if grep -Fiqx "X-Atid-Revision: ${ATID_IMAGE_TAG}" <<< "$headers" \
+      && grep -Fq "rel=\"canonical\" href=\"${origin}/\"" <<< "$homepage" \
+      && grep -Fqx "Sitemap: ${origin}/sitemap.xml" <<< "$robots" \
+      && grep -Fq "<loc>${origin}/app/calendar</loc>" <<< "$sitemap"; then
+      echo "Deployed $(git rev-parse --short HEAD) with verified canonical URLs and sitemap to ${origin}"
       exit 0
     fi
     sleep 5
   done
 
-  echo "Revision health check failed for https://${domain}/: expected X-Atid-Revision: ${ATID_IMAGE_TAG}" >&2
+  echo "Deployment health check failed for ${origin}: expected X-Atid-Revision: ${ATID_IMAGE_TAG}, canonical URL, robots sitemap declaration and calendar sitemap entry." >&2
   docker compose ps
   docker compose logs --tail=100 atid-web
   exit 1

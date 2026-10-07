@@ -11,14 +11,38 @@ android {
         applicationId = "ir.mhdolatabadi.atid"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Release signing comes only from the environment (CI secrets); nothing is committed. Without
+    // all four values the release build stays unsigned, and the release workflow refuses to ship it.
+    val releaseKeystore = System.getenv("ATID_KEYSTORE_FILE")
+    val releaseSigningReady = listOf(
+        releaseKeystore,
+        System.getenv("ATID_KEYSTORE_PASSWORD"),
+        System.getenv("ATID_KEY_ALIAS"),
+        System.getenv("ATID_KEY_PASSWORD")
+    ).all { !it.isNullOrBlank() }
+
+    signingConfigs {
+        if (releaseSigningReady) {
+            create("release") {
+                storeFile = file(releaseKeystore!!)
+                storePassword = System.getenv("ATID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ATID_KEY_ALIAS")
+                keyPassword = System.getenv("ATID_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (releaseSigningReady) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }

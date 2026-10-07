@@ -3,14 +3,45 @@ package ir.mhdolatabadi.atid.ui.dashboard
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import ir.mhdolatabadi.atid.data.Occasion
+import ir.mhdolatabadi.atid.data.Occasions
+import ir.mhdolatabadi.atid.util.DateLabels
+import ir.mhdolatabadi.atid.util.HijriDates
 import ir.mhdolatabadi.atid.util.PersianDateUtils
+import java.util.Calendar
+import java.util.Date
+
+/** One cell of the month grid. */
+data class DayCellState(
+    val date: Date,
+    val solarDay: Int,
+    val hijriDay: Int,
+    val gregorianDay: Int,
+    val isToday: Boolean,
+    val isHoliday: Boolean,
+    val isFriday: Boolean
+)
+
+data class DayDetails(
+    val solarLabel: String,
+    val hijriLabel: String,
+    val gregorianLabel: String,
+    val occasions: List<Occasion>
+)
+
+data class MonthOccasion(val dayLabel: String, val occasion: Occasion)
 
 data class CalendarMonthUiState(
     val monthLabel: String,
+    /** Lunar and Gregorian months the solar month spans, e.g. "ربیع‌الثانی – جمادی‌الاول ۱۴۴۸". */
+    val hijriRange: String,
+    val gregorianRange: String,
     val todayLabel: String,
     /** One entry per grid cell; null renders as a blank leading cell. */
-    val days: List<Int?>,
-    val todayDay: Int?,
+    val days: List<DayCellState?>,
+    val selectedDate: Date,
+    val selected: DayDetails,
+    val monthOccasions: List<MonthOccasion>,
     /** year * 12 + month, so the screen can tell which way the month moved. */
     val monthIndex: Int
 )
@@ -18,8 +49,10 @@ data class CalendarMonthUiState(
 class DashboardViewModel : ViewModel() {
 
     private val today = PersianDateUtils.today()
+    private val todayDate = PersianDateUtils.toGregorianDate(today.year, today.month, today.day)
     private var displayedYear = today.year
     private var displayedMonth = today.month
+    private var selectedDate = todayDate
 
     private val _uiState = MutableLiveData<CalendarMonthUiState>()
     val uiState: LiveData<CalendarMonthUiState> = _uiState
@@ -46,24 +79,78 @@ class DashboardViewModel : ViewModel() {
         refresh()
     }
 
+    fun select(date: Date) {
+        selectedDate = date
+        refresh()
+    }
+
+    private fun sameDay(a: Date, b: Date): Boolean {
+        val ca = Calendar.getInstance().apply { time = a }
+        val cb = Calendar.getInstance().apply { time = b }
+        return ca.get(Calendar.YEAR) == cb.get(Calendar.YEAR) && ca.get(Calendar.DAY_OF_YEAR) == cb.get(Calendar.DAY_OF_YEAR)
+    }
+
     private fun refresh() {
-        val daysInMonth = PersianDateUtils.daysInMonth(displayedYear, displayedMonth)
-        val firstWeekday = PersianDateUtils.firstDayOfWeek(displayedYear, displayedMonth)
-        val leadingBlanks = PersianDateUtils.weekdayIndexSaturdayFirst(firstWeekday)
+        val count = PersianDateUtils.daysInMonth(displayedYear, displayedMonth)
+        val leadingBlanks = PersianDateUtils.weekdayIndexSaturdayFirst(
+            PersianDateUtils.firstDayOfWeek(displayedYear, displayedMonth)
+        )
 
-        val days = mutableListOf<Int?>()
-        repeat(leadingBlanks) { days.add(null) }
-        for (day in 1..daysInMonth) days.add(day)
+        val cells = mutableListOf<DayCellState?>()
+        repeat(leadingBlanks) { cells.add(null) }
+        val monthOccasions = mutableListOf<MonthOccasion>()
+        for (day in 1..count) {
+            val date = PersianDateUtils.toGregorianDate(displayedYear, displayedMonth, day)
+            val calendar = Calendar.getInstance().apply { time = date }
+            val occasions = Occasions.on(date)
+            val friday = calendar.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY
+            cells.add(
+                DayCellState(
+                    date = date,
+                    solarDay = day,
+                    hijriDay = HijriDates.of(date).day,
+                    gregorianDay = calendar.get(Calendar.DAY_OF_MONTH),
+                    isToday = sameDay(date, todayDate),
+                    isHoliday = friday || occasions.any { it.holiday },
+                    isFriday = friday
+                )
+            )
+            val dayLabel = "${PersianDateUtils.toPersianDigits(day)} ${PersianDateUtils.monthName(displayedMonth)}"
+            occasions.forEach { monthOccasions.add(MonthOccasion(dayLabel, it)) }
+        }
 
-        val isDisplayingCurrentMonth = displayedYear == today.year && displayedMonth == today.month
+        val first = PersianDateUtils.toGregorianDate(displayedYear, displayedMonth, 1)
+        val last = PersianDateUtils.toGregorianDate(displayedYear, displayedMonth, count)
+        val h1 = HijriDates.of(first)
+        val h2 = HijriDates.of(last)
+        val hijriRange = if (h1.month == h2.month) {
+            "${HijriDates.monthName(h1.month)} ${PersianDateUtils.toPersianDigits(h1.year)}"
+        } else {
+            "${HijriDates.monthName(h1.month)} – ${HijriDates.monthName(h2.month)} ${PersianDateUtils.toPersianDigits(h2.year)}"
+        }
+        val g1 = Calendar.getInstance().apply { time = first }
+        val g2 = Calendar.getInstance().apply { time = last }
+        val gregorianRange = if (g1.get(Calendar.MONTH) == g2.get(Calendar.MONTH)) {
+            "${PersianDateUtils.gregorianMonthNames[g1.get(Calendar.MONTH)]} ${PersianDateUtils.toPersianDigits(g1.get(Calendar.YEAR))}"
+        } else {
+            "${PersianDateUtils.gregorianMonthNames[g1.get(Calendar.MONTH)]} – " +
+                "${PersianDateUtils.gregorianMonthNames[g2.get(Calendar.MONTH)]} ${PersianDateUtils.toPersianDigits(g2.get(Calendar.YEAR))}"
+        }
 
         _uiState.value = CalendarMonthUiState(
             monthLabel = "${PersianDateUtils.monthName(displayedMonth)} ${PersianDateUtils.toPersianDigits(displayedYear)}",
-            todayLabel = "امروز: ${PersianDateUtils.weekdayName(today.dayOfWeek)} " +
-                "${PersianDateUtils.toPersianDigits(today.day)} ${PersianDateUtils.monthName(today.month)} " +
-                PersianDateUtils.toPersianDigits(today.year),
-            days = days,
-            todayDay = if (isDisplayingCurrentMonth) today.day else null,
+            hijriRange = hijriRange,
+            gregorianRange = gregorianRange,
+            todayLabel = "امروز: ${DateLabels.solar(todayDate)}",
+            days = cells,
+            selectedDate = selectedDate,
+            selected = DayDetails(
+                solarLabel = DateLabels.solar(selectedDate),
+                hijriLabel = DateLabels.hijri(selectedDate),
+                gregorianLabel = DateLabels.gregorian(selectedDate),
+                occasions = Occasions.on(selectedDate)
+            ),
+            monthOccasions = monthOccasions,
             monthIndex = displayedYear * 12 + displayedMonth
         )
     }

@@ -1,6 +1,12 @@
 package ir.mhdolatabadi.atid.ui.dashboard
 
 import androidx.compose.animation.AnimatedContent
+import java.util.Date
+import ir.mhdolatabadi.atid.data.Occasion
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -34,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -87,16 +92,26 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
                 // Next sits first (on the right in RTL) and points left, the direction time runs in Persian.
                 MonthNavButton(description = "ماه بعد", mirrored = true, onClick = { viewModel.goToNextMonth() })
                 AnimatedContent(
-                    targetState = current.monthLabel,
+                    targetState = current,
+                    contentKey = { it.monthIndex },
                     transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(120)) },
-                    label = "monthLabel"
-                ) { label ->
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = colors.text
-                    )
+                    label = "monthLabel",
+                    modifier = Modifier.weight(1f)
+                ) { month ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = month.monthLabel,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.text
+                        )
+                        Text(
+                            text = "${month.hijriRange} • ${month.gregorianRange}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.muted,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
                 MonthNavButton(description = "ماه قبل", mirrored = false, onClick = { viewModel.goToPreviousMonth() })
             }
@@ -115,8 +130,10 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
             }
 
             // The next month slides in from the right, where its button is; offsets here are absolute.
+            // Keyed by month, so selecting a day does not replay the slide.
             AnimatedContent(
                 targetState = current,
+                contentKey = { it.monthIndex },
                 transitionSpec = {
                     val forward = targetState.monthIndex > initialState.monthIndex
                     (slideInHorizontally(tween(420)) { if (forward) it / 5 else -it / 5 } + fadeIn(tween(320))) togetherWith
@@ -124,25 +141,29 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
                 },
                 label = "month"
             ) { month ->
-                MonthGrid(month)
+                MonthGrid(month = month, selected = current.selectedDate, onSelect = viewModel::select)
             }
         }
+
+        SelectedDayCard(current.selected)
+        MonthOccasionsCard(current)
+        DateConverterCard(modifier = Modifier.padding(top = 16.dp))
     }
 }
 
 @Composable
-private fun MonthGrid(month: CalendarMonthUiState) {
+private fun MonthGrid(month: CalendarMonthUiState, selected: Date, onSelect: (Date) -> Unit) {
     Column(modifier = Modifier.padding(top = 4.dp)) {
         month.days.chunked(7).forEach { week ->
             Row(modifier = Modifier.fillMaxWidth()) {
                 for (indexInWeek in 0 until 7) {
-                    val day = week.getOrNull(indexInWeek)
+                    val cell = week.getOrNull(indexInWeek)
                     Box(modifier = Modifier.weight(1f)) {
-                        DayCell(
-                            day = day,
-                            isToday = day != null && day == month.todayDay,
-                            isFriday = indexInWeek == FRIDAY_INDEX
-                        )
+                        if (cell != null) {
+                            DayCell(cell = cell, isSelected = cell.date == selected, onClick = { onSelect(cell.date) })
+                        } else {
+                            Box(modifier = Modifier.aspectRatio(0.8f))
+                        }
                     }
                 }
             }
@@ -174,34 +195,143 @@ private fun MonthNavButton(description: String, mirrored: Boolean, onClick: () -
 }
 
 @Composable
-private fun DayCell(day: Int?, isToday: Boolean, isFriday: Boolean) {
+private fun DayCell(cell: DayCellState, isSelected: Boolean, onClick: () -> Unit) {
     val colors = Atid.colors
-    Box(
+    val shape = RoundedCornerShape(10.dp)
+    val interaction = remember { MutableInteractionSource() }
+    val background = when {
+        cell.isToday -> colors.accent
+        cell.isHoliday -> colors.holidaySoft
+        else -> colors.glassWeak
+    }
+    val main = when {
+        cell.isToday -> colors.onAccent
+        cell.isHoliday -> colors.holiday
+        else -> colors.text
+    }
+    val sub = if (cell.isToday) colors.onAccent else colors.muted
+    Column(
         modifier = Modifier
-            .aspectRatio(1f)
-            .padding(3.dp),
-        contentAlignment = Alignment.Center
+            .aspectRatio(0.8f)
+            .padding(2.dp)
+            .pressScale(interaction, pressed = 0.94f)
+            .then(if (cell.isToday) Modifier.shadow(8.dp, shape, ambientColor = colors.accent, spotColor = colors.accent) else Modifier)
+            .clip(shape)
+            .background(background)
+            .then(if (isSelected && !cell.isToday) Modifier.border(1.5.dp, colors.accent, shape) else Modifier)
+            .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        if (day != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .then(if (isToday) Modifier.shadow(10.dp, CircleShape, ambientColor = colors.accent, spotColor = colors.accent) else Modifier)
-                    .clip(CircleShape)
-                    .background(if (isToday) colors.accent else Color.Transparent),
-                contentAlignment = Alignment.Center
-            ) {
+        Text(
+            text = PersianDateUtils.toPersianDigits(cell.solarDay),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = main
+        )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(text = PersianDateUtils.toArabicDigits(cell.hijriDay), fontSize = 10.sp, color = sub)
+            Text(text = cell.gregorianDay.toString(), fontSize = 10.sp, color = sub)
+        }
+    }
+}
+
+@Composable
+private fun SelectedDayCard(details: DayDetails) {
+    val colors = Atid.colors
+    Column(
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .fillMaxWidth()
+            .glass()
+            .padding(16.dp)
+    ) {
+        AnimatedContent(
+            targetState = details,
+            transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(120)) },
+            label = "selectedDay"
+        ) { day ->
+            Column {
+                Text(text = day.solarLabel, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = colors.text)
                 Text(
-                    text = PersianDateUtils.toPersianDigits(day),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = if (isToday) FontWeight.Bold else FontWeight.Medium,
-                    color = when {
-                        isToday -> colors.onAccent
-                        isFriday -> colors.holiday
-                        else -> colors.text
-                    }
+                    text = "${day.hijriLabel} • ${day.gregorianLabel}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.muted,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
                 )
+                if (day.occasions.isEmpty()) {
+                    Text(text = "مناسبتی ثبت نشده است.", style = MaterialTheme.typography.bodyMedium, color = colors.muted)
+                } else {
+                    day.occasions.forEach { OccasionLine(dayLabel = null, occasion = it) }
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun MonthOccasionsCard(month: CalendarMonthUiState) {
+    val colors = Atid.colors
+    Column(
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .fillMaxWidth()
+            .glass()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "مناسبت‌های ${month.monthLabel}",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = colors.text,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        if (month.monthOccasions.isEmpty()) {
+            Text(text = "مناسبتی ثبت نشده است.", style = MaterialTheme.typography.bodyMedium, color = colors.muted)
+        } else {
+            month.monthOccasions.forEach { OccasionLine(dayLabel = it.dayLabel, occasion = it.occasion) }
+        }
+        Text(
+            text = "تاریخ‌های قمری محاسبه‌ای‌اند و ممکن است با تقویم رسمی کشور یک روز اختلاف داشته باشند.",
+            style = MaterialTheme.typography.bodySmall,
+            color = colors.muted,
+            modifier = Modifier.padding(top = 12.dp)
+        )
+    }
+}
+
+@Composable
+private fun OccasionLine(dayLabel: String?, occasion: Occasion) {
+    val colors = Atid.colors
+    val color = if (occasion.holiday) colors.holiday else colors.text
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (dayLabel != null) {
+            Text(
+                text = dayLabel,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = if (occasion.holiday) colors.holiday else colors.muted,
+                modifier = Modifier.width(76.dp)
+            )
+        }
+        Text(text = occasion.title, style = MaterialTheme.typography.bodyMedium, color = color, modifier = Modifier.weight(1f))
+        if (occasion.holiday) {
+            Text(
+                text = "تعطیل",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = colors.holiday,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .background(colors.holidaySoft, RoundedCornerShape(6.dp))
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            )
         }
     }
 }

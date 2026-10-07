@@ -20,6 +20,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
         env:
           SITE_URL: https://atid.example.com
@@ -34,12 +35,30 @@ jobs:
           grep -q 'name="robots" content="noindex"' dist/app/home/index.html
           if grep -q 'noindex' dist/index.html; then echo "home page must be indexable" >&2; exit 1; fi
           grep -q '<loc>https://atid.example.com/app/prayer-times</loc>' dist/sitemap.xml
+          grep -q '<loc>https://atid.example.com/app/calendar</loc>' dist/sitemap.xml
+          grep -q 'rel="canonical" href="https://atid.example.com/"' dist/index.html
+          grep -q 'Sitemap: https://atid.example.com/sitemap.xml' dist/robots.txt
           test -f dist/404.html
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+      - run: chmod +x gradlew
+      # Unit tests share reference values with the web tests, so the two ports cannot drift.
+      - run: ./gradlew testDebugUnitTest assembleDebug
 
   deployment-config:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Test deployment revision checks
+        run: python3 deploy/test_revision.py
       - name: Validate nginx configuration
         run: >-
           docker run --rm
@@ -59,7 +78,14 @@ jobs:
       - name: Build and verify the web image revision header
         run: |
           set -euo pipefail
-          docker build --build-arg ATID_REVISION=ci-test -f deploy/Dockerfile.web -t atid-web .
-          container_id="$(docker run -d -p 8080:80 atid-web)"
+          docker build --build-arg SITE_URL=https://atid.example.com --build-arg ATID_REVISION=ci-test -f deploy/Dockerfile.web -t atid-web .
+          container_id="$(docker run -d -p 127.0.0.1:8080:80 atid-web)"
           trap 'docker rm -f "$container_id"' EXIT
-          curl --fail --silent --show-error --head http://127.0.0.1:8080/ | tr -d '\r' | grep -Fqx 'X-Atid-Revision: ci-test'
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error --head http://127.0.0.1:8080/ | tr -d '\r' | grep -Fqx 'X-Atid-Revision: ci-test'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "$container_id"
+          exit 1

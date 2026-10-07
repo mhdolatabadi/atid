@@ -71,12 +71,32 @@ object PersianDateUtils {
     }
 
     /** Converts a Calendar weekday constant to a 0..6 index with Saturday first (Iranian week). */
+    /** The local [Date] at noon (so DST shifts never move it to another day) for a Jalali date. */
+    fun toGregorianDate(year: Int, month: Int, day: Int): Date {
+        val (gy, gm, gd) = jalaliToGregorian(year, month, day)
+        return Calendar.getInstance().apply {
+            clear()
+            set(gy, gm - 1, gd, 12, 0)
+        }.time
+    }
+
     fun weekdayIndexSaturdayFirst(dayOfWeek: Int): Int =
         if (dayOfWeek == Calendar.SATURDAY) 0 else dayOfWeek
 
     private val persianDigits = charArrayOf('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹')
 
     fun toPersianDigits(number: Int): String = toPersianDigits(number.toString())
+
+    private val arabicDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
+
+    /** Arabic-Indic digits, used for lunar day numbers the way printed Iranian calendars show them. */
+    fun toArabicDigits(number: Int): String =
+        number.toString().map { c -> if (c in '0'..'9') arabicDigits[c - '0'] else c }.joinToString("")
+
+    val gregorianMonthNames = listOf(
+        "ژانویه", "فوریه", "مارس", "آوریل", "مه", "ژوئن",
+        "ژوئیه", "اوت", "سپتامبر", "اکتبر", "نوامبر", "دسامبر"
+    )
 
     /** Replaces ASCII digits and keeps everything else, so "06:05" stays "۰۶:۰۵" with its zeros. */
     fun toPersianDigits(text: String): String =

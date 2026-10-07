@@ -6,6 +6,7 @@ RUN npm ci
 COPY web ./
 # Public address of the site, for canonical URLs and sitemap.xml (e.g. https://atid.example.com).
 ARG SITE_URL=
+RUN test -n "$SITE_URL" || (echo "SITE_URL must be set to the public HTTPS origin." >&2; exit 1)
 RUN SITE_URL="$SITE_URL" npm run build
 
 FROM nginx:1.27-alpine

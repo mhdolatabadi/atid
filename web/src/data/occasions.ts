@@ -1,86 +1,79 @@
 import { fromDate } from '../lib/persianDate';
 import { toHijri } from '../lib/hijriDate';
+import { occasionRules } from './occasionsData';
+
+export type OccasionCalendar = 'solar' | 'lunar' | 'gregorian';
 
 export interface Occasion {
   title: string;
   holiday: boolean;
-  calendar: 'solar' | 'lunar' | 'gregorian';
+  calendar: OccasionCalendar;
 }
 
-type Entry = [month: number, day: number, title: string, holiday: boolean];
-
-// Official public holidays of Iran plus a few widely marked occasions.
-const solar: Entry[] = [
-  [1, 1, 'جشن نوروز', true],
-  [1, 2, 'عید نوروز', true],
-  [1, 3, 'عید نوروز', true],
-  [1, 4, 'عید نوروز', true],
-  [1, 12, 'روز جمهوری اسلامی', true],
-  [1, 13, 'روز طبیعت', true],
-  [2, 12, 'روز معلم', false],
-  [2, 25, 'روز بزرگداشت فردوسی', false],
-  [3, 14, 'رحلت امام خمینی', true],
-  [3, 15, 'قیام ۱۵ خرداد', true],
-  [5, 14, 'صدور فرمان مشروطیت', false],
-  [7, 1, 'آغاز سال تحصیلی', false],
-  [7, 8, 'روز بزرگداشت مولوی', false],
-  [8, 13, 'روز دانش‌آموز', false],
-  [9, 16, 'روز دانشجو', false],
-  [9, 30, 'شب یلدا', false],
-  [11, 22, 'پیروزی انقلاب اسلامی', true],
-  [12, 15, 'روز درختکاری', false],
-  [12, 29, 'روز ملی شدن صنعت نفت', true],
+/**
+ * One row of the official calendar (data/occasions/iran.json, generated into occasionsData.ts):
+ * calendar, rule, month, day, weekday (Saturday = 0 .. Friday = 6), nth, offset in days, holiday, title.
+ * The engine is mirrored 1:1 in app/src/main/java/ir/mhdolatabadi/atid/data/Occasions.kt.
+ */
+export type OccasionRule = [
+  calendar: OccasionCalendar,
+  rule: 'date' | 'monthEnd' | 'lastWeekday' | 'nthWeekday',
+  month: number,
+  day: number,
+  weekday: number,
+  nth: number,
+  offset: number,
+  holiday: boolean,
+  title: string,
 ];
 
-const lunar: Entry[] = [
-  [1, 1, 'آغاز سال هجری قمری', false],
-  [1, 9, 'تاسوعای حسینی', true],
-  [1, 10, 'عاشورای حسینی', true],
-  [2, 20, 'اربعین حسینی', true],
-  [2, 28, 'رحلت حضرت رسول اکرم و شهادت امام حسن مجتبی', true],
-  [3, 8, 'شهادت امام حسن عسکری', true],
-  [3, 17, 'میلاد حضرت رسول اکرم و امام جعفر صادق', true],
-  [6, 3, 'شهادت حضرت فاطمه زهرا', true],
-  [6, 20, 'ولادت حضرت فاطمه زهرا و روز مادر', false],
-  [7, 13, 'ولادت امام علی و روز پدر', true],
-  [7, 27, 'مبعث حضرت رسول اکرم', true],
-  [8, 3, 'ولادت امام حسین', false],
-  [8, 15, 'ولادت حضرت قائم', true],
-  [9, 21, 'شهادت امام علی', true],
-  [10, 1, 'عید سعید فطر', true],
-  [10, 2, 'تعطیل به مناسبت عید سعید فطر', true],
-  [10, 25, 'شهادت امام جعفر صادق', true],
-  [11, 11, 'ولادت امام رضا', false],
-  [12, 9, 'روز عرفه', false],
-  [12, 10, 'عید سعید قربان', true],
-  [12, 18, 'عید سعید غدیر خم', true],
-];
+const calendarOrder: Record<OccasionCalendar, number> = { solar: 0, lunar: 1, gregorian: 2 };
+const rules = [...occasionRules].sort((a, b) => calendarOrder[a[0]] - calendarOrder[b[0]]);
 
-const gregorian: Entry[] = [
-  [1, 1, 'آغاز سال نو میلادی', false],
-  [12, 25, 'میلاد حضرت عیسی مسیح', false],
-];
-
-function match(entries: Entry[], month: number, day: number, calendar: Occasion['calendar']): Occasion[] {
-  return entries
-    .filter(([m, d]) => m === month && d === day)
-    .map(([, , title, holiday]) => ({ title, holiday, calendar }));
+function addDays(date: Date, days: number): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days, 12);
 }
 
-export function occasionsOn(date: Date): Occasion[] {
-  const solarDate = fromDate(date);
-  const hijri = toHijri(date);
-  const result = [
-    ...match(solar, solarDate.month, solarDate.day, 'solar'),
-    ...match(lunar, hijri.month, hijri.day, 'lunar'),
-  ];
-  // Imam Reza's martyrdom is marked on the last day of Safar, whether it has 29 or 30 days.
-  const tomorrow = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, 12);
-  if (hijri.month === 2 && toHijri(tomorrow).month === 3) {
-    result.push({ title: 'شهادت امام رضا', holiday: true, calendar: 'lunar' });
+function partsOf(date: Date, calendar: OccasionCalendar): { month: number; day: number } {
+  if (calendar === 'solar') return fromDate(date);
+  if (calendar === 'lunar') return toHijri(date);
+  return { month: date.getMonth() + 1, day: date.getDate() };
+}
+
+/** Saturday-first weekday (the data's convention) to Date.getDay(). */
+function jsWeekday(saturdayFirst: number): number {
+  return (saturdayFirst + 6) % 7;
+}
+
+function applies([calendar, rule, month, day, weekday, nth, offset]: OccasionRule, date: Date): boolean {
+  switch (rule) {
+    case 'date': {
+      const p = partsOf(date, calendar);
+      return p.month === month && p.day === day;
+    }
+    case 'monthEnd':
+      // The month's last day, whether it has 29 or 30 days.
+      return partsOf(date, calendar).month === month && partsOf(addDays(date, 1), calendar).month !== month;
+    case 'lastWeekday': {
+      // e.g. Quds day (last Friday of Ramadan); offset -1 marks the eve of that weekday.
+      const target = addDays(date, -offset);
+      return (
+        target.getDay() === jsWeekday(weekday) &&
+        partsOf(target, calendar).month === month &&
+        partsOf(addDays(target, 7), calendar).month !== month
+      );
+    }
+    case 'nthWeekday': {
+      const p = partsOf(date, calendar);
+      return p.month === month && date.getDay() === jsWeekday(weekday) && Math.ceil(p.day / 7) === nth;
+    }
   }
-  result.push(...match(gregorian, date.getMonth() + 1, date.getDate(), 'gregorian'));
-  return result;
+}
+
+/** Every official occasion on this day: solar first, then lunar, then Gregorian. */
+export function occasionsOn(date: Date): Occasion[] {
+  const noon = addDays(date, 0);
+  return rules.filter((rule) => applies(rule, noon)).map(([calendar, , , , , , , holiday, title]) => ({ title, holiday, calendar }));
 }
 
 /** Fridays and official holidays. */

@@ -1,10 +1,10 @@
 # AGENTS.md
 
-This file defines the standing rules for every contributor and coding agent working on Atid.
+This file defines the standing rules for every contributor and coding agent working on Saatbashi.
 
 ## Product identity and scope
 
-- The product name is **Atid** (عتید).
+- The product name is **Saatbashi** (ساعت‌باشی). The project was first called Atid; the repository, the Android application ID, the Docker/Compose names (`atid`, `atid-web`) and the domain keep the `atid` identifier on purpose. Do not rename them.
 - The supported clients are **Android** (`app/`, Kotlin + Jetpack Compose) and **Web** (`web/`, Vite + React + TypeScript). Do not add iOS-specific code or workflows unless the owner explicitly changes this rule.
 - The Android application ID is `ir.mhdolatabadi.atid`.
 - Keep Web and Android behavior consistent where platform capabilities allow it. Shared logic (Jalali calendar conversion, prayer-time calculation) is ported 1:1 between the two; a fix in one must be mirrored in the other.
@@ -45,8 +45,9 @@ This file defines the standing rules for every contributor and coding agent work
 ## Testing and quality gates
 
 - Add or update tests for every behavior change and regression fix.
-- For web changes, run at minimum `npm run lint` and `npm run build` in `web/`.
-- For Android changes, run `./gradlew assembleDebug`.
+- For web changes, run at minimum `npm run lint`, `npm test` and `npm run build` in `web/`.
+- For Android changes, run `./gradlew testDebugUnitTest assembleDebug`.
+- Calendar and prayer-time logic is covered on both platforms with the same reference values (`web/src/**/__tests__`, `app/src/test`). A change to that logic must update both tests and both ports together.
 - UI changes must include a narrow-screen (≈360px) check and must verify that controls do not obscure content.
 - Do not merge while required CI checks are failing.
 
