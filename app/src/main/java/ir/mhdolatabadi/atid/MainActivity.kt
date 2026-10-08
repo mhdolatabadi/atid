@@ -13,7 +13,6 @@ import ir.mhdolatabadi.atid.notification.DailyNotificationHelper
 import ir.mhdolatabadi.atid.ui.AtidApp
 import ir.mhdolatabadi.atid.ui.theme.AtidTheme
 import ir.mhdolatabadi.atid.util.LocationUtils
-import ir.mhdolatabadi.atid.util.PrayerTimesCalculator
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -55,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun postDailyNotification() {
         val coordinates = LocationUtils.resolve(this)
-        val times = PrayerTimesCalculator.calculateForToday(coordinates.latitude, coordinates.longitude)
+        val times = LocationUtils.timesForToday(coordinates)
         DailyNotificationHelper.show(this, times)
     }
 }

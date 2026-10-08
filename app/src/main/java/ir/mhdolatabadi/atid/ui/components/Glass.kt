@@ -36,7 +36,6 @@ import ir.mhdolatabadi.atid.ui.theme.Atid
 import ir.mhdolatabadi.atid.ui.theme.SkyPeriod
 import ir.mhdolatabadi.atid.ui.theme.skyPalette
 import ir.mhdolatabadi.atid.util.LocationUtils
-import ir.mhdolatabadi.atid.util.PrayerTimesCalculator
 import ir.mhdolatabadi.atid.util.SkyPeriods
 import kotlinx.coroutines.delay
 import java.util.Calendar
@@ -72,7 +71,7 @@ private fun rememberSkyPeriod(): SkyPeriod {
     val context = LocalContext.current
     fun compute(): SkyPeriod {
         val coordinates = LocationUtils.resolve(context)
-        val times = PrayerTimesCalculator.calculateForToday(coordinates.latitude, coordinates.longitude)
+        val times = LocationUtils.timesForToday(coordinates)
         return SkyPeriods.at(Calendar.getInstance(), times)
     }
     var period by remember { mutableStateOf(compute()) }
