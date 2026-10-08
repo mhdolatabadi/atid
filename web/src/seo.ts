@@ -1,4 +1,5 @@
 import { religiousTexts } from './data/religiousTexts';
+import { cities } from './data/cities';
 
 export const SITE_NAME = 'ساعت‌باشی';
 
@@ -62,6 +63,20 @@ for (const text of religiousTexts) {
     title: `متن کامل ${text.title} | ساعت‌باشی`,
     description: `${text.title}: ${text.subtitle}. متن کامل برای خواندن در موبایل و رایانه.`,
     type: 'Article',
+  };
+}
+
+pages['/prayer-times'] = {
+  title: 'اوقات شرعی شهرهای ایران؛ اذان صبح، ظهر و مغرب امروز | ساعت‌باشی',
+  description: 'اوقات شرعی امروز مراکز استان‌های ایران: اذان صبح، طلوع آفتاب، اذان ظهر، غروب آفتاب، اذان مغرب و نیمه‌شب شرعی.',
+  type: 'CollectionPage',
+};
+
+for (const city of cities) {
+  pages[`/prayer-times/${city.slug}`] = {
+    title: `اوقات شرعی ${city.name} امروز؛ اذان صبح، ظهر و مغرب | ساعت‌باشی`,
+    description: `اوقات شرعی امروز به افق ${city.name}: اذان صبح، طلوع آفتاب، اذان ظهر، غروب آفتاب، اذان مغرب و نیمه‌شب شرعی؛ محاسبه‌ی تقریبی به روش تهران.`,
+    type: 'WebPage',
   };
 }
 

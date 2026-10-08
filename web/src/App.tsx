@@ -10,6 +10,7 @@ import { TextsPage } from './pages/TextsPage';
 import { TextDetailPage } from './pages/TextDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { CalendarGuidePage, DateConverterGuidePage } from './pages/SeoGuidePages';
+import { CityPrayerTimesPage, PrayerTimesIndexPage } from './pages/CityPrayerTimesPage';
 import { metaFor } from './seo';
 
 /** Keeps the title and description right when navigating without a page load. */
@@ -33,6 +34,8 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/calendar" element={<CalendarGuidePage />} />
         <Route path="/date-converter" element={<DateConverterGuidePage />} />
+        <Route path="/prayer-times" element={<PrayerTimesIndexPage />} />
+        <Route path="/prayer-times/:city" element={<CityPrayerTimesPage />} />
         <Route path="/app" element={<AppShell />}>
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<HomePage />} />

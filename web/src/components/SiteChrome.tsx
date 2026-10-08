@@ -47,6 +47,7 @@ export function SiteFooter() {
             <li><Link to="/calendar">راهنمای تقویم شمسی</Link></li>
             <li><Link to="/date-converter">تبدیل تاریخ شمسی، قمری و میلادی</Link></li>
             <li><Link to="/app/prayer-times">اوقات شرعی امروز</Link></li>
+            <li><Link to="/prayer-times">اوقات شرعی شهرهای ایران</Link></li>
           </ul>
         </section>
         <section aria-labelledby="footer-texts">

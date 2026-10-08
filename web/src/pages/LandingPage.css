@@ -521,6 +521,67 @@
   margin: -6px 0 8px;
 }
 
+.ti-prayer__label {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ti-city-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ti-city-picker select {
+  min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-weak);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+}
+
+.ti-city-picker select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.ti-city-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.ti-city-grid a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: var(--glass-weak);
+  border: 1px solid var(--glass-line);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.ti-city-grid a:hover,
+.ti-city-grid a[aria-current='page'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .ti-link-button {
   display: inline-flex;
   align-items: center;
@@ -700,6 +761,10 @@
 
 .ti-placeholder--prayer {
   min-height: 460px;
+}
+
+.ti-placeholder--table {
+  min-height: 300px;
 }
 
 .ti-placeholder--converter {

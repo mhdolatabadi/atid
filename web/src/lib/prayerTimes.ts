@@ -41,6 +41,40 @@ export function calculateForToday(latitude: number, longitude: number): PrayerTi
   );
 }
 
+export const APPROXIMATE_NOTE = 'محاسبه‌ی تقریبی به روش تهران؛ ممکن است حدود یک دقیقه با جدول رسمی تفاوت داشته باشد.';
+
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function fromMinutes(total: number): string {
+  const t = ((Math.round(total) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+}
+
+/** Shar'i midnight (Jafari): halfway between sunset and the next dawn. */
+export function midnight(times: PrayerTimes): string {
+  const sunset = toMinutes(times.sunset);
+  const nextFajr = toMinutes(times.fajr) + 1440;
+  return fromMinutes(sunset + (nextFajr - sunset) / 2);
+}
+
+/** Iran's offset from UTC: +3:30 all year (daylight saving was abolished in 2022). */
+export const IRAN_UTC_OFFSET = 3.5;
+
+/** The wall-clock date and minute of the day in Iran at an instant, wherever the browser is. */
+export function iranClock(now: Date = new Date()): { year: number; month: number; day: number; minutes: number } {
+  const t = new Date(now.getTime() + IRAN_UTC_OFFSET * 3_600_000);
+  return { year: t.getUTCFullYear(), month: t.getUTCMonth() + 1, day: t.getUTCDate(), minutes: t.getUTCHours() * 60 + t.getUTCMinutes() };
+}
+
+/** Today's times for a place in Iran, on Iran time, so a visitor abroad still sees local times. */
+export function calculateForTodayInIran(latitude: number, longitude: number, now: Date = new Date()): PrayerTimes {
+  const { year, month, day } = iranClock(now);
+  return calculate(year, month, day, latitude, longitude, IRAN_UTC_OFFSET);
+}
+
 export function calculate(
   year: number,
   month: number,

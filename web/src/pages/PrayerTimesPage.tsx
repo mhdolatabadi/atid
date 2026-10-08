@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import { calculateForToday, type PrayerTimes } from '../lib/prayerTimes';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { APPROXIMATE_NOTE, type PrayerTimes } from '../lib/prayerTimes';
 import { toPersianDigits } from '../lib/persianDate';
-import { requestDeviceLocation, TEHRAN, type Coordinates } from '../lib/location';
+import { minutesAt, placeLabel, timesFor, usePlace } from '../lib/place';
+import { CityPicker } from '../components/PrayerTimes';
 import { LocationIcon } from '../components/icons';
+import './LandingPage.css';
 import './PrayerTimesPage.css';
 import { ClientOnly } from '../components/ClientOnly';
 
@@ -16,72 +19,52 @@ const rows: { key: keyof PrayerTimes; label: string }[] = [
   { key: 'isha', label: 'اذان عشا' },
 ];
 
-function toPersianTime(hhmm: string): string {
-  return toPersianDigits(hhmm);
-}
-
 function toMinutesOfDay(hhmm: string): number {
   const [hour, minute] = hhmm.split(':').map(Number);
   return hour * 60 + minute;
 }
 
-function computeNextPrayerKey(times: PrayerTimes): keyof PrayerTimes {
-  const now = new Date();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+function computeNextPrayerKey(times: PrayerTimes, nowMinutes: number): keyof PrayerTimes {
   const found = rows.find((row) => toMinutesOfDay(times[row.key]) > nowMinutes);
   return (found ?? rows[0]).key;
 }
 
 function PrayerTimesPageView() {
-  const [coordinates, setCoordinates] = useState<Coordinates>(TEHRAN);
-  const [locationError, setLocationError] = useState(false);
-
-  const times = useMemo(
-    () => calculateForToday(coordinates.latitude, coordinates.longitude),
-    [coordinates],
-  );
-
-  const [nextKey, setNextKey] = useState<keyof PrayerTimes>(() => computeNextPrayerKey(times));
+  const { place, selectCity, useMyLocation, locationError, cities } = usePlace();
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    setNextKey(computeNextPrayerKey(times));
-    const interval = setInterval(() => setNextKey(computeNextPrayerKey(times)), 60_000);
+    const interval = setInterval(() => setNow(new Date()), 60_000);
     return () => clearInterval(interval);
-  }, [times]);
+  }, []);
 
-  const useMyLocation = () => {
-    setLocationError(false);
-    requestDeviceLocation()
-      .then(setCoordinates)
-      .catch(() => setLocationError(true));
-  };
-
-  const locationLabel = coordinates.isDeviceLocation
-    ? 'بر اساس موقعیت مکانی شما'
-    : 'تهران (پیش‌فرض؛ دسترسی به موقعیت مکانی فعال نیست)';
+  const times = timesFor(place, now);
+  const nextKey = computeNextPrayerKey(times, minutesAt(place, now));
 
   return (
     <div>
-      <div className="prayer-times-page__location">
-        {locationLabel}
-        {locationError && ' — دسترسی به موقعیت مکانی رد شد'}
+      <div className="prayer-times-page__controls">
+        <CityPicker cities={cities} value={place.kind === 'city' ? place.city.slug : ''} onChange={selectCity} />
+        <button type="button" className="prayer-times-page__location-button" onClick={useMyLocation}>
+          <LocationIcon />
+          موقعیت مکانی من
+        </button>
       </div>
-
-      <button type="button" className="prayer-times-page__location-button" onClick={useMyLocation}>
-        <LocationIcon />
-        استفاده از موقعیت مکانی من
-      </button>
+      <div className="prayer-times-page__location">
+        {placeLabel(place)}
+        {locationError && ' — دسترسی به موقعیت مکانی داده نشد'}
+      </div>
 
       <div className="prayer-times-list glass">
         {rows.map(({ key, label }) => (
           <div key={key} className={'prayer-times-row' + (key === nextKey ? ' prayer-times-row--next' : '')}>
             <span>{label}</span>
-            <span>{toPersianTime(times[key])}</span>
+            <span>{toPersianDigits(times[key])}</span>
           </div>
         ))}
       </div>
       <p className="prayer-times-page__note">
-        محاسبه‌ی تقریبی؛ ممکن است حدود یک دقیقه با جدول رسمی تفاوت داشته باشد.
+        {APPROXIMATE_NOTE} اوقات شهرهای دیگر را در <Link to="/prayer-times">اوقات شرعی شهرهای ایران</Link> ببینید.
       </p>
     </div>
   );
