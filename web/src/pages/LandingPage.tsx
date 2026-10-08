@@ -12,8 +12,9 @@ import {
   weekdayIndexSaturdayFirst,
 } from '../lib/persianDate';
 import { hijriMonthName, toHijri } from '../lib/hijriDate';
-import { calculateForToday, type PrayerTimes } from '../lib/prayerTimes';
-import { requestDeviceLocation, TEHRAN, type Coordinates } from '../lib/location';
+import { minutesAt, placeLabel, timesFor, usePlace } from '../lib/place';
+import { CityPicker, PrayerTimesTable } from '../components/PrayerTimes';
+import { APPROXIMATE_NOTE } from '../lib/prayerTimes';
 import { isHoliday, occasionsOn, type Occasion } from '../data/occasions';
 import { ChevronIcon, LocationIcon } from '../components/icons';
 import { ClientOnly } from '../components/ClientOnly';
@@ -273,65 +274,24 @@ function CalendarSection({ now }: { now: Date }) {
 
 // --- Prayer times -------------------------------------------------------------------------------
 
-const prayerRows: { key: keyof PrayerTimes | 'midnight'; label: string }[] = [
-  { key: 'fajr', label: 'اذان صبح' },
-  { key: 'sunrise', label: 'طلوع آفتاب' },
-  { key: 'dhuhr', label: 'اذان ظهر' },
-  { key: 'sunset', label: 'غروب آفتاب' },
-  { key: 'maghrib', label: 'اذان مغرب' },
-  { key: 'midnight', label: 'نیمه‌شب شرعی' },
-];
-
-function toMinutes(hhmm: string): number {
-  const [h, m] = hhmm.split(':').map(Number);
-  return h * 60 + m;
-}
-
-function fromMinutes(total: number): string {
-  const t = ((Math.round(total) % 1440) + 1440) % 1440;
-  return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
-}
-
-/** Shar'i midnight (Jafari): halfway between sunset and the next dawn. */
-function midnight(times: PrayerTimes): string {
-  const sunset = toMinutes(times.sunset);
-  const nextFajr = toMinutes(times.fajr) + 1440;
-  return fromMinutes(sunset + (nextFajr - sunset) / 2);
-}
-
 function PrayerTimesCard({ now }: { now: Date }) {
-  const [coordinates, setCoordinates] = useState<Coordinates>(TEHRAN);
-  const [locationError, setLocationError] = useState(false);
+  const { place, selectCity, useMyLocation, locationError, cities } = usePlace();
   // A handful of trig calls; cheap enough to redo on every tick and it rolls over at midnight.
-  const times = calculateForToday(coordinates.latitude, coordinates.longitude);
-  const values = { ...times, midnight: midnight(times) };
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const next = prayerRows.find((row) => row.key !== 'midnight' && toMinutes(values[row.key]) > nowMinutes)?.key;
-
-  const useMyLocation = () => {
-    setLocationError(false);
-    requestDeviceLocation().then(setCoordinates).catch(() => setLocationError(true));
-  };
+  const times = timesFor(place, now);
 
   return (
     <section className="ti-card ti-prayer glass enter" style={{ animationDelay: '120ms' }} aria-label="اوقات شرعی">
       <h2 className="ti-card__title">اوقات شرعی</h2>
       <div className="ti-prayer__place">
-        {coordinates.isDeviceLocation ? 'موقعیت فعلی شما' : 'به افق تهران'}
+        <CityPicker cities={cities} value={place.kind === 'city' ? place.city.slug : ''} onChange={selectCity} />
         <button type="button" className="ti-link-button" onClick={useMyLocation}>
           <LocationIcon /> موقعیت من
         </button>
       </div>
-      {locationError && <p className="ti-note ti-note--error">دسترسی به موقعیت مکانی داده نشد؛ اوقات به افق تهران است.</p>}
-      <dl className="ti-prayer__list">
-        {prayerRows.map(({ key, label }) => (
-          <div key={key} className={'ti-prayer__row' + (key === next ? ' is-next' : '')}>
-            <dt>{label}</dt>
-            <dd>{toPersianDigits(values[key])}</dd>
-          </div>
-        ))}
-      </dl>
-      <p className="ti-note">محاسبه‌ی تقریبی؛ ممکن است حدود یک دقیقه با جدول رسمی تفاوت داشته باشد.</p>
+      <p className="ti-prayer__label">{placeLabel(place)}</p>
+      {locationError && <p className="ti-note ti-note--error">دسترسی به موقعیت مکانی داده نشد؛ اوقات به افق شهر انتخاب‌شده است.</p>}
+      <PrayerTimesTable times={times} nowMinutes={minutesAt(place, now)} />
+      <p className="ti-note">{APPROXIMATE_NOTE}</p>
       <Link to="/app/prayer-times" className="ti-more">
         جزئیات بیشتر
       </Link>
@@ -396,6 +356,7 @@ export function LandingPage() {
           </p>
           <ul className="ti-about__links">
             <li><Link to="/app/prayer-times">اوقات شرعی امروز</Link></li>
+            <li><Link to="/prayer-times">اوقات شرعی شهرهای ایران</Link></li>
             <li><Link to="/app/calendar">تقویم ماه جاری</Link></li>
             <li><Link to="/app/texts/ziyarat_ashura">متن کامل زیارت عاشورا</Link></li>
             <li><Link to="/app/texts/sahifa_dua_7">دعای هفتم صحیفه سجادیه</Link></li>
