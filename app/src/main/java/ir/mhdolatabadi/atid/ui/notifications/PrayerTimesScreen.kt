@@ -43,6 +43,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ir.mhdolatabadi.atid.R
+import ir.mhdolatabadi.atid.data.Cities
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import ir.mhdolatabadi.atid.util.PersianDateUtils
 import ir.mhdolatabadi.atid.util.PrayerTimes
 
@@ -65,7 +71,7 @@ fun PrayerTimesScreen(viewModel: NotificationsViewModel = viewModel()) {
     val requestLocationPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
-        viewModel.refresh()
+        viewModel.useDeviceLocation()
     }
 
     val current = state ?: return
@@ -91,25 +97,32 @@ fun PrayerTimesScreen(viewModel: NotificationsViewModel = viewModel()) {
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp)
         )
 
-        Text(
-            text = stringResource(R.string.label_use_my_location),
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = colors.accent,
-            modifier = Modifier
-                .heightIn(min = 48.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .clickable {
-                    requestLocationPermission.launch(
-                        arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            CityPicker(selectedSlug = current.citySlug, onSelect = viewModel::selectCity)
+            Text(
+                text = stringResource(R.string.label_use_my_location),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = colors.accent,
+                modifier = Modifier
+                    .heightIn(min = 48.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable {
+                        requestLocationPermission.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
                         )
-                    )
-                }
-                .wrapContentHeight()
-                .padding(horizontal = 4.dp)
-        )
+                    }
+                    .wrapContentHeight()
+                    .padding(horizontal = 8.dp)
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -129,11 +142,44 @@ fun PrayerTimesScreen(viewModel: NotificationsViewModel = viewModel()) {
         }
 
         Text(
-            text = "محاسبه‌ی تقریبی؛ ممکن است حدود یک دقیقه با جدول رسمی تفاوت داشته باشد.",
+            text = "محاسبه‌ی تقریبی به روش تهران؛ ممکن است حدود یک دقیقه با جدول رسمی تفاوت داشته باشد.",
             style = MaterialTheme.typography.bodySmall,
             color = colors.muted,
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 12.dp)
         )
+    }
+}
+
+@Composable
+private fun CityPicker(selectedSlug: String?, onSelect: (String) -> Unit) {
+    val colors = Atid.colors
+    var expanded by remember { mutableStateOf(false) }
+    val label = Cities.bySlug(selectedSlug)?.name ?: "موقعیت فعلی"
+    Box {
+        Text(
+            text = "شهر: $label ▾",
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = colors.text,
+            modifier = Modifier
+                .heightIn(min = 48.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .glass(RoundedCornerShape(12.dp))
+                .clickable { expanded = true }
+                .wrapContentHeight()
+                .padding(horizontal = 14.dp)
+        )
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            Cities.all.forEach { city ->
+                DropdownMenuItem(
+                    text = { Text(city.name) },
+                    onClick = {
+                        expanded = false
+                        onSelect(city.slug)
+                    }
+                )
+            }
+        }
     }
 }
 

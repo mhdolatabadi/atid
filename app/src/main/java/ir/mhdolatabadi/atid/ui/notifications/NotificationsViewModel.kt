@@ -7,12 +7,13 @@ import androidx.lifecycle.MutableLiveData
 import ir.mhdolatabadi.atid.notification.DailyNotificationHelper
 import ir.mhdolatabadi.atid.util.LocationUtils
 import ir.mhdolatabadi.atid.util.PrayerTimes
-import ir.mhdolatabadi.atid.util.PrayerTimesCalculator
 import java.util.Calendar
 
 data class PrayerTimesUiState(
     val times: PrayerTimes,
     val locationLabel: String,
+    /** Slug of the city the times are for, or null for the device location. */
+    val citySlug: String?,
     /** Key of the next upcoming prayer (fajr/sunrise/dhuhr/asr/sunset/maghrib/isha), for highlighting. */
     val nextPrayerKey: String
 )
@@ -30,19 +31,28 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
     fun refresh() {
         val context = getApplication<Application>()
         val coordinates = LocationUtils.resolve(context)
-        val locationLabel = if (coordinates.isDeviceLocation) {
-            "بر اساس موقعیت مکانی شما"
-        } else {
-            "تهران (پیش‌فرض؛ دسترسی به موقعیت مکانی فعال نیست)"
-        }
+        val locationLabel = coordinates.city?.let { "به افق ${it.name}" } ?: "بر اساس موقعیت مکانی شما"
 
-        val times = PrayerTimesCalculator.calculateForToday(coordinates.latitude, coordinates.longitude)
+        val times = LocationUtils.timesForToday(coordinates)
         _uiState.value = PrayerTimesUiState(
             times = times,
             locationLabel = locationLabel,
+            citySlug = coordinates.city?.slug,
             nextPrayerKey = computeNextPrayerKey(times)
         )
         DailyNotificationHelper.show(context, times)
+    }
+
+    /** Picks a city (remembered on this device) and recomputes. */
+    fun selectCity(slug: String) {
+        LocationUtils.saveCity(getApplication(), slug)
+        refresh()
+    }
+
+    /** Goes back to the device location; the screen asks for the permission first. */
+    fun useDeviceLocation() {
+        LocationUtils.saveCity(getApplication(), null)
+        refresh()
     }
 
     private fun computeNextPrayerKey(times: PrayerTimes): String {

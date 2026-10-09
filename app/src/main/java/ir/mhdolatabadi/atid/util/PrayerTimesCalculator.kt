@@ -50,6 +50,24 @@ object PrayerTimesCalculator {
         )
     }
 
+    /** Iran's offset from UTC: +3:30 all year (daylight saving was abolished in 2022). */
+    const val IRAN_UTC_OFFSET = 3.5
+
+    /** Today's times for a place in Iran on Iran time, whatever the device's time zone (mirrors the web). */
+    fun calculateForTodayInIran(latitude: Double, longitude: Double, nowMillis: Long = System.currentTimeMillis()): PrayerTimes {
+        val iran = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply {
+            timeInMillis = nowMillis + (IRAN_UTC_OFFSET * 3_600_000).toLong()
+        }
+        return calculate(
+            year = iran.get(Calendar.YEAR),
+            month = iran.get(Calendar.MONTH) + 1,
+            day = iran.get(Calendar.DAY_OF_MONTH),
+            latitude = latitude,
+            longitude = longitude,
+            timeZoneOffsetHours = IRAN_UTC_OFFSET
+        )
+    }
+
     fun calculate(
         year: Int,
         month: Int,
