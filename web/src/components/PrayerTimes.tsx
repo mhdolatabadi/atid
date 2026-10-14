@@ -1,4 +1,4 @@
-import { midnight, type PrayerTimes } from '../lib/prayerTimes';
+import { formatDuration, midnight, type PrayerTimes } from '../lib/prayerTimes';
 import { toPersianDigits } from '../lib/persianDate';
 import type { City } from '../data/cities';
 
@@ -21,8 +21,15 @@ function toMinutes(hhmm: string): number {
 /** Today's times with the next one highlighted; [nowMinutes] is the minute of the day at the place. */
 export function PrayerTimesTable({ times, nowMinutes }: { times: PrayerTimes; nowMinutes: number }) {
   const values: Record<RowKey, string> = { ...times, midnight: midnight(times) };
-  const next = rows.find((row) => row.key !== 'midnight' && toMinutes(values[row.key]) > nowMinutes)?.key;
+  const nextRow = rows.find((row) => row.key !== 'midnight' && toMinutes(values[row.key]) > nowMinutes);
+  const next = nextRow?.key;
   return (
+    <>
+    {nextRow && (
+      <p className="ti-prayer__countdown" aria-live="polite">
+        {formatDuration(toMinutes(values[nextRow.key]) - nowMinutes)} تا {nextRow.label}
+      </p>
+    )}
     <dl className="ti-prayer__list">
       {rows.map(({ key, label }) => (
         <div key={key} className={'ti-prayer__row' + (key === next ? ' is-next' : '')}>
@@ -31,6 +38,7 @@ export function PrayerTimesTable({ times, nowMinutes }: { times: PrayerTimes; no
         </div>
       ))}
     </dl>
+    </>
   );
 }
 

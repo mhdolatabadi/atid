@@ -32,4 +32,11 @@ class PrayerTimesCalculatorTest {
             assertEquals("month $month", order.sorted(), order)
         }
     }
+
+    @Test
+    fun formatsTheCountdown() {
+        org.junit.Assert.assertEquals("۵ دقیقه", PrayerTimesCalculator.formatDuration(5))
+        org.junit.Assert.assertEquals("۲ ساعت", PrayerTimesCalculator.formatDuration(120))
+        org.junit.Assert.assertEquals("۱ ساعت و ۲۰ دقیقه", PrayerTimesCalculator.formatDuration(80))
+    }
 }

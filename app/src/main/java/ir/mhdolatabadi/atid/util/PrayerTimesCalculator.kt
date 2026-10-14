@@ -50,6 +50,18 @@ object PrayerTimesCalculator {
         )
     }
 
+    /** "۱ ساعت و ۵ دقیقه" for a positive number of minutes; mirrors formatDuration in web/src/lib/prayerTimes.ts. */
+    fun formatDuration(minutes: Int): String {
+        val h = minutes / 60
+        val m = minutes % 60
+        fun digits(n: Int) = PersianDateUtils.toPersianDigits(n)
+        return when {
+            h == 0 -> "${digits(m)} دقیقه"
+            m == 0 -> "${digits(h)} ساعت"
+            else -> "${digits(h)} ساعت و ${digits(m)} دقیقه"
+        }
+    }
+
     /** Iran's offset from UTC: +3:30 all year (daylight saving was abolished in 2022). */
     const val IRAN_UTC_OFFSET = 3.5
 

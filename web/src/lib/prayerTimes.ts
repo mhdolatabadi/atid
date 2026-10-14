@@ -60,6 +60,16 @@ export function midnight(times: PrayerTimes): string {
   return fromMinutes(sunset + (nextFajr - sunset) / 2);
 }
 
+/** "۱ ساعت و ۵ دقیقه" for a positive number of minutes; mirrored in PrayerTimesCalculator.kt. */
+export function formatDuration(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  const digits = (n: number) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
+  if (h === 0) return `${digits(m)} دقیقه`;
+  if (m === 0) return `${digits(h)} ساعت`;
+  return `${digits(h)} ساعت و ${digits(m)} دقیقه`;
+}
+
 /** Iran's offset from UTC: +3:30 all year (daylight saving was abolished in 2022). */
 export const IRAN_UTC_OFFSET = 3.5;
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import ir.mhdolatabadi.atid.notification.DailyNotificationHelper
 import ir.mhdolatabadi.atid.util.LocationUtils
 import ir.mhdolatabadi.atid.util.PrayerTimes
+import ir.mhdolatabadi.atid.util.PrayerTimesCalculator
 import java.util.Calendar
 
 data class PrayerTimesUiState(
@@ -15,7 +16,9 @@ data class PrayerTimesUiState(
     /** Slug of the city the times are for, or null for the device location. */
     val citySlug: String?,
     /** Key of the next upcoming prayer (fajr/sunrise/dhuhr/asr/sunset/maghrib/isha), for highlighting. */
-    val nextPrayerKey: String
+    val nextPrayerKey: String,
+    /** e.g. "۱ ساعت و ۲۰ دقیقه تا اذان ظهر"; null after the last prayer of the day. */
+    val countdown: String? = null
 )
 
 class NotificationsViewModel(application: Application) : AndroidViewModel(application) {
@@ -38,7 +41,8 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
             times = times,
             locationLabel = locationLabel,
             citySlug = coordinates.city?.slug,
-            nextPrayerKey = computeNextPrayerKey(times)
+            nextPrayerKey = computeNextPrayerKey(times),
+            countdown = countdown(times, if (coordinates.city != null) iranMinutesNow() else localMinutesNow())
         )
         DailyNotificationHelper.show(context, times)
     }
@@ -70,6 +74,23 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
         return ordered.firstOrNull { (_, time) -> toMinutesOfDay(time) > nowMinutes }?.first
             ?: ordered.first().first
     }
+
+    private val labels = listOf(
+        "اذان صبح", "طلوع آفتاب", "اذان ظهر", "اذان عصر", "غروب آفتاب", "اذان مغرب", "اذان عشا"
+    )
+
+    private fun countdown(times: PrayerTimes, nowMinutes: Int): String? {
+        val values = listOf(times.fajr, times.sunrise, times.dhuhr, times.asr, times.sunset, times.maghrib, times.isha)
+        val index = values.indexOfFirst { toMinutesOfDay(it) > nowMinutes }
+        if (index < 0) return null
+        return "${PrayerTimesCalculator.formatDuration(toMinutesOfDay(values[index]) - nowMinutes)} تا ${labels[index]}"
+    }
+
+    private fun localMinutesNow(): Int = Calendar.getInstance().let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
+
+    private fun iranMinutesNow(): Int = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply {
+        timeInMillis = System.currentTimeMillis() + (PrayerTimesCalculator.IRAN_UTC_OFFSET * 3_600_000).toLong()
+    }.let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
 
     private fun toMinutesOfDay(hhmm: String): Int {
         val (hour, minute) = hhmm.split(":").map { it.toInt() }

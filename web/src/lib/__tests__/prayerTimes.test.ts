@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculate, calculateForTodayInIran, iranClock, midnight } from '../prayerTimes';
+import { calculate, calculateForTodayInIran, formatDuration, iranClock, midnight } from '../prayerTimes';
 
 const TEHRAN = { latitude: 35.6892, longitude: 51.389, utcOffset: 3.5 };
 
@@ -36,5 +36,11 @@ describe('prayer times', () => {
 
   it('puts shar\'i midnight halfway between sunset and the next dawn', () => {
     expect(midnight(references[0][1])).toBe('23:13'); // 17:50 → 04:35: midpoint 23:12:30, rounded
+  });
+
+  it('formats the countdown to the next prayer', () => {
+    expect(formatDuration(5)).toBe('۵ دقیقه');
+    expect(formatDuration(120)).toBe('۲ ساعت');
+    expect(formatDuration(80)).toBe('۱ ساعت و ۲۰ دقیقه');
   });
 });

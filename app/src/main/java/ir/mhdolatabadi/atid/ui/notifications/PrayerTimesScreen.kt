@@ -124,6 +124,16 @@ fun PrayerTimesScreen(viewModel: NotificationsViewModel = viewModel()) {
             )
         }
 
+        current.countdown?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = colors.accent,
+                modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp)
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
