@@ -66,8 +66,8 @@ private sealed class AtidDestination(val route: String, val labelRes: Int, val i
 }
 
 private val bottomBarDestinations = listOf(
-    AtidDestination.Home,
     AtidDestination.Dashboard,
+    AtidDestination.Home,
     AtidDestination.PrayerTimes,
     AtidDestination.Texts
 )
@@ -97,7 +97,7 @@ fun AtidApp() {
 
         NavHost(
             navController = navController,
-            startDestination = AtidDestination.Home.route,
+            startDestination = AtidDestination.Dashboard.route,
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding(),
