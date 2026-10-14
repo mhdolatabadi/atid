@@ -46,10 +46,10 @@ data class CalendarMonthUiState(
     val monthIndex: Int
 )
 
-class DashboardViewModel : ViewModel() {
+class DashboardViewModel(private val now: () -> Date = { Date() }) : ViewModel() {
 
-    private val today = PersianDateUtils.today()
-    private val todayDate = PersianDateUtils.toGregorianDate(today.year, today.month, today.day)
+    private var today = PersianDateUtils.fromDate(now())
+    private var todayDate = PersianDateUtils.toGregorianDate(today.year, today.month, today.day)
     private var displayedYear = today.year
     private var displayedMonth = today.month
     private var selectedDate = todayDate
@@ -67,6 +67,7 @@ class DashboardViewModel : ViewModel() {
             displayedMonth = 12
             displayedYear--
         }
+        selectedDate = PersianDateUtils.toGregorianDate(displayedYear, displayedMonth, 1)
         refresh()
     }
 
@@ -76,6 +77,16 @@ class DashboardViewModel : ViewModel() {
             displayedMonth = 1
             displayedYear++
         }
+        selectedDate = PersianDateUtils.toGregorianDate(displayedYear, displayedMonth, 1)
+        refresh()
+    }
+
+    fun goToToday() {
+        today = PersianDateUtils.fromDate(now())
+        todayDate = PersianDateUtils.toGregorianDate(today.year, today.month, today.day)
+        displayedYear = today.year
+        displayedMonth = today.month
+        selectedDate = todayDate
         refresh()
     }
 

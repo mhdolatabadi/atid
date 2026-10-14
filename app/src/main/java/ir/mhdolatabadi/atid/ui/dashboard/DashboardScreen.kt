@@ -32,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -145,6 +146,9 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
             }
         }
 
+        TextButton(onClick = viewModel::goToToday, modifier = Modifier.align(Alignment.End)) {
+            Text("برو به امروز")
+        }
         SelectedDayCard(current.selected)
         MonthOccasionsCard(current)
         DateConverterCard(modifier = Modifier.padding(top = 16.dp))
