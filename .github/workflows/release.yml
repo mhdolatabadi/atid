@@ -1,6 +1,9 @@
 name: Build and release APK
 
 on:
+  workflow_run:
+    workflows: ["Quality checks"]
+    types: [completed]
   push:
     tags:
       - 'v*'
@@ -15,20 +18,43 @@ permissions:
 
 jobs:
   build-and-release:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'master')
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.ref }}
 
-      - name: Determine release tag
+      - name: Determine immutable release version
         id: release_tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+          BUILD_NUMBER: ${{ github.run_number }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "name=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          # A rerun keeps its number; parallel merges cannot allocate the same version.
+          code=$((BUILD_NUMBER + 2))
+          if [ "$EVENT_NAME" = "workflow_run" ]; then
+            tag="v1.2.${code}"
+          elif [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            tag="$INPUT_TAG"
           else
-            echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            tag="$REF_NAME"
           fi
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid release tag" >&2; exit 1; }
+          echo "name=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Check signing secrets
         env:
@@ -68,16 +94,27 @@ jobs:
           ATID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ATID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ATID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
+        run: >-
+          ./gradlew testDebugUnitTest assembleRelease
+          -PreleaseVersionName=${{ steps.release_tag.outputs.version }}
+          -PreleaseVersionCode=${{ steps.release_tag.outputs.code }}
 
       - name: Verify signature and name the APK
+        env:
+          RELEASE_TAG: ${{ steps.release_tag.outputs.name }}
+          RELEASE_VERSION: ${{ steps.release_tag.outputs.version }}
+          RELEASE_CODE: ${{ steps.release_tag.outputs.code }}
         run: |
           apk=app/build/outputs/apk/release/app-release.apk
           test -f "$apk" || { echo "::error::Signed release APK was not produced" >&2; exit 1; }
           apksigner="$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)"
           "$apksigner" verify --print-certs "$apk"
+          aapt="$(dirname "$apksigner")/aapt"
+          metadata="$("$aapt" dump badging "$apk")"
+          grep -Fq "versionCode='$RELEASE_CODE'" <<< "$metadata"
+          grep -Fq "versionName='$RELEASE_VERSION'" <<< "$metadata"
           mkdir -p release
-          cp "$apk" "release/Saatbashi-${{ steps.release_tag.outputs.name }}.apk"
+          cp "$apk" "release/Saatbashi-${RELEASE_TAG}.apk"
 
       - name: Remove keystore
         if: always()
@@ -87,5 +124,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.release_tag.outputs.name }}
+          target_commitish: ${{ steps.release_tag.outputs.sha }}
+          make_latest: legacy
           files: release/Saatbashi-${{ steps.release_tag.outputs.name }}.apk
           generate_release_notes: true

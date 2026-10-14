@@ -11,8 +11,8 @@ android {
         applicationId = "ir.mhdolatabadi.atid"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.2.0"
+        versionCode = providers.gradleProperty("releaseVersionCode").orNull?.toInt() ?: 2
+        versionName = providers.gradleProperty("releaseVersionName").orNull ?: "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
