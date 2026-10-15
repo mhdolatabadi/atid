@@ -54,7 +54,9 @@ class EventReminderTest {
     @Test fun restoreRebuildsFutureAlarmsWithoutDuplicatesAndIgnoresBadDay() {
         val repo = PersonalEventsRepository(context)
         repo.add(tomorrow, "فردا", 600, true)
-        alarms.scheduledAlarms.toList().forEach { (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(it.operation) }
+        alarms.scheduledAlarms.toList().forEach { alarm ->
+            alarm.operation?.let { (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(it) }
+        }
         context.getSharedPreferences("personal_events", Context.MODE_PRIVATE).edit().putString("1400-1-1", "broken").commit()
         EventReminderScheduler.restore(context)
         EventReminderScheduler.restore(context)
