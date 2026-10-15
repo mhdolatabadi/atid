@@ -36,3 +36,10 @@ esac''',
                                 env=environment, capture_output=True, text=True)
         assert result.returncode == expected, result.stdout + result.stderr
         print(f"Revision {revision!r}: expected exit {expected}, passed")
+
+# The image the server pulls must be the one the Images workflow publishes.
+repository = Path(__file__).resolve().parent.parent
+published = "ghcr.io/mhdolatabadi/atid/web"
+assert f'echo "name={published}"' in (repository / ".github/workflows/images.yml").read_text()
+assert "${ATID_IMAGE_REPO:-ghcr.io/mhdolatabadi/atid}/web" in (repository / "deploy/compose.yaml").read_text()
+print(f"Images workflow and compose agree on {published}")

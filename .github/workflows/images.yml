@@ -25,7 +25,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Resolve image name
         id: image
-        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}/web" >> "$GITHUB_OUTPUT"
+        # Pinned, not derived from the repository name: the server pulls ghcr.io/mhdolatabadi/atid/web
+        # (deploy/compose.yaml), and the repository was renamed to saatbashi.
+        run: echo "name=ghcr.io/mhdolatabadi/atid/web" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v6
         with:
           context: .
