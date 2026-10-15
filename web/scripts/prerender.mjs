@@ -3,18 +3,25 @@
 // `vite build` (client, into dist/) and `vite build --ssr` (renderer, into dist-server/).
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+import { checkSeo } from './check-seo.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
 const serverDir = join(root, 'dist-server');
 
-const { render, metaFor, prerenderRoutes, notFoundMeta, SITE_NAME, getReligiousTextById } = await import(
+const { render, metaFor, prerenderRoutes, notFoundMeta, SITE_NAME, structuredDataFor } = await import(
   pathToFileURL(join(serverDir, 'entry-server.js')).href
 );
 
 // Absolute URLs need the public address; without it canonical/og:url and the sitemap are skipped.
 const siteUrl = (process.env.SITE_URL ?? '').replace(/\/+$/, '');
+if (siteUrl) {
+  const parsed = new URL(siteUrl);
+  if (parsed.protocol !== 'https:' || parsed.origin !== siteUrl) {
+    throw new Error('SITE_URL must be a public HTTPS origin without path, query, fragment or credentials.');
+  }
+}
 if (!siteUrl) {
   console.warn('prerender: SITE_URL is not set; skipping canonical URLs, og:url and sitemap.xml');
 }
@@ -25,24 +32,6 @@ const regularFont = assets.find((name) => /^vazirmatn_regular-.*\.woff2$/.test(n
 
 const escapeHtml = (value) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-function jsonLd(route, meta) {
-  const url = siteUrl ? `${siteUrl}${route === '/' ? '/' : route}` : undefined;
-  const base = { '@context': 'https://schema.org', inLanguage: 'fa', name: meta.title, description: meta.description, url };
-  if (meta.type === 'WebSite') {
-    return { ...base, '@type': 'WebSite', name: SITE_NAME, alternateName: 'Saatbashi' };
-  }
-  if (meta.type === 'Article') {
-    const text = getReligiousTextById(route.split('/').pop());
-    return {
-      ...base,
-      '@type': 'Article',
-      headline: text?.title ?? meta.title,
-      isPartOf: siteUrl ? { '@type': 'WebSite', name: SITE_NAME, url: `${siteUrl}/` } : undefined,
-    };
-  }
-  return { ...base, '@type': meta.type };
-}
 
 function headTags(route, meta) {
   const url = siteUrl ? `${siteUrl}${route === '/' ? '/' : route}` : null;
@@ -59,10 +48,14 @@ function headTags(route, meta) {
     siteUrl ? '<meta property="og:image:width" content="1200" />' : null,
     siteUrl ? '<meta property="og:image:height" content="630" />' : null,
     `<meta name="twitter:card" content="${siteUrl ? 'summary_large_image' : 'summary'}" />`,
+    `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
+    siteUrl ? `<meta name="twitter:image" content="${siteUrl}/og-image.png" />` : null,
+    '<meta property="og:image:alt" content="نشان ساعت‌باشی؛ همراه روزها و وقت‌ها" />',
     regularFont
       ? `<link rel="preload" href="/assets/${regularFont}" as="font" type="font/woff2" crossorigin />`
       : null,
-    `<script type="application/ld+json">${JSON.stringify(jsonLd(route, meta)).replace(/</g, '\\u003c')}</script>`,
+    siteUrl ? `<script type="application/ld+json">${JSON.stringify(structuredDataFor(route, siteUrl)).replace(/</g, '\\u003c')}</script>` : null,
   ];
   return tags.filter(Boolean).join('\n    ');
 }
@@ -99,6 +92,8 @@ if (siteUrl) {
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
   );
 }
+
+await checkSeo({ metaFor, prerenderRoutes, origin: siteUrl });
 
 await rm(serverDir, { recursive: true, force: true });
 console.log(`prerender: ${prerenderRoutes.length} pages + 404${siteUrl ? ' + sitemap.xml' : ''}`);

@@ -94,3 +94,36 @@ export function metaFor(pathname: string): PageMeta {
 
 /** Every route that is pre-rendered; indexable ones also go into the sitemap. */
 export const prerenderRoutes = Object.keys(pages);
+
+/** One canonical path for SSR and in-app navigation; query parameters never become canonicals. */
+export function canonicalPath(pathname: string): string {
+  const path = pathname.split(/[?#]/, 1)[0];
+  return path.replace(/\/+$/, '') || '/';
+}
+
+export function structuredDataFor(pathname: string, origin: string) {
+  const path = canonicalPath(pathname);
+  const meta = metaFor(path);
+  const site = `${origin}/`;
+  const url = `${origin}${path}`;
+  const page: Record<string, unknown> = {
+    '@type': meta.type, '@id': `${url}#page`, url,
+    name: meta.title, description: meta.description, inLanguage: 'fa',
+    ...(path === '/' ? { name: SITE_NAME, alternateName: 'Saatbashi' } :
+      { isPartOf: { '@id': `${site}#page` } }),
+    ...(meta.type === 'Article' ? { headline: religiousTexts.find(t => path.endsWith(`/${t.id}`))?.title ?? meta.title } : {}),
+  };
+  const graph: Record<string, unknown>[] = [page];
+  if (path !== '/' && !meta.noindex) {
+    const paths = ['/'];
+    if (path.startsWith('/prayer-times/')) paths.push('/prayer-times');
+    if (path.startsWith('/app/texts/')) paths.push('/app/texts');
+    paths.push(path);
+    const breadcrumbId = `${url}#breadcrumb`;
+    page.breadcrumb = { '@id': breadcrumbId };
+    graph.push({ '@type': 'BreadcrumbList', '@id': breadcrumbId,
+      itemListElement: paths.map((p, i) => ({ '@type': 'ListItem', position: i + 1,
+        name: p === '/' ? SITE_NAME : metaFor(p).title.split('|')[0].trim(), item: `${origin}${p}` })) });
+  }
+  return { '@context': 'https://schema.org', '@graph': graph };
+}
