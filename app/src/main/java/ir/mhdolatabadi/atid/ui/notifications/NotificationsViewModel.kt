@@ -42,7 +42,7 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
             locationLabel = locationLabel,
             citySlug = coordinates.city?.slug,
             nextPrayerKey = computeNextPrayerKey(times),
-            countdown = countdown(times, if (coordinates.city != null) iranMinutesNow() else localMinutesNow())
+            countdown = prayerCountdown(times, if (coordinates.city != null) iranMinutesNow() else localMinutesNow())
         )
         DailyNotificationHelper.show(context, times)
     }
@@ -75,26 +75,27 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
             ?: ordered.first().first
     }
 
-    private val labels = listOf(
-        "اذان صبح", "طلوع آفتاب", "اذان ظهر", "اذان عصر", "غروب آفتاب", "اذان مغرب", "اذان عشا"
-    )
-
-    private fun countdown(times: PrayerTimes, nowMinutes: Int): String? {
-        val values = listOf(times.fajr, times.sunrise, times.dhuhr, times.asr, times.sunset, times.maghrib, times.isha)
-        val index = values.indexOfFirst { toMinutesOfDay(it) > nowMinutes }
-        // After the last prayer, count down to tomorrow's dawn (today's time is within a minute or two).
-        if (index < 0) return "${PrayerTimesCalculator.formatDuration(toMinutesOfDay(times.fajr) + 1440 - nowMinutes)} تا اذان صبح فردا"
-        return "${PrayerTimesCalculator.formatDuration(toMinutesOfDay(values[index]) - nowMinutes)} تا ${labels[index]}"
-    }
-
     private fun localMinutesNow(): Int = Calendar.getInstance().let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
 
     private fun iranMinutesNow(): Int = Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")).apply {
         timeInMillis = System.currentTimeMillis() + (PrayerTimesCalculator.IRAN_UTC_OFFSET * 3_600_000).toLong()
     }.let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
+}
 
-    private fun toMinutesOfDay(hhmm: String): Int {
-        val (hour, minute) = hhmm.split(":").map { it.toInt() }
-        return hour * 60 + minute
-    }
+private val prayerLabels = listOf(
+    "اذان صبح", "طلوع آفتاب", "اذان ظهر", "اذان عصر", "غروب آفتاب", "اذان مغرب", "اذان عشا"
+)
+
+/** Time left to the next prayer after [nowMinutes] (minute of the day at the place). */
+internal fun prayerCountdown(times: PrayerTimes, nowMinutes: Int): String {
+    val values = listOf(times.fajr, times.sunrise, times.dhuhr, times.asr, times.sunset, times.maghrib, times.isha)
+    val index = values.indexOfFirst { toMinutesOfDay(it) > nowMinutes }
+    // After the last prayer, count down to tomorrow's dawn (today's time is within a minute or two).
+    if (index < 0) return "${PrayerTimesCalculator.formatDuration(toMinutesOfDay(times.fajr) + 1440 - nowMinutes)} تا اذان صبح فردا"
+    return "${PrayerTimesCalculator.formatDuration(toMinutesOfDay(values[index]) - nowMinutes)} تا ${prayerLabels[index]}"
+}
+
+private fun toMinutesOfDay(hhmm: String): Int {
+    val (hour, minute) = hhmm.split(":").map { it.toInt() }
+    return hour * 60 + minute
 }
