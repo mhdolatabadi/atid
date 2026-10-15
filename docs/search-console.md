@@ -26,9 +26,7 @@ https://atid.mhdolatabadi.ir/sitemap.xml
 
 - `https://atid.mhdolatabadi.ir/` (تقویم و اوقات شرعی امروز)
 - `https://atid.mhdolatabadi.ir/app/prayer-times`
-- `https://atid.mhdolatabadi.ir/app/texts/ziyarat_ashura`
-- `https://atid.mhdolatabadi.ir/app/texts/sahifa_dua_7`
-- `https://atid.mhdolatabadi.ir/app/texts/hadith_kisa`
+- `https://atid.mhdolatabadi.ir/prayer-times/tehran`
 - `https://atid.mhdolatabadi.ir/app/calendar`
 
 در همین ابزار، **View crawled page** نشان می‌دهد گوگل چه HTMLای دیده است؛ متن کامل صفحه باید آنجا باشد (صفحه‌ها موقع build از قبل ساخته می‌شوند).
@@ -49,7 +47,7 @@ https://atid.mhdolatabadi.ir/sitemap.xml
 
 هر چند هفته یک بار:
 
-1. در **Performance → Queries** ببینید کاربران با چه عبارت‌هایی سایت را پیدا می‌کنند (مثلاً «اوقات شرعی تهران»، «متن زیارت عاشورا»، «تقویم مهر ۱۴۰۵»).
+1. در **Performance → Queries** ببینید کاربران با چه عبارت‌هایی سایت را پیدا می‌کنند (مثلاً «اوقات شرعی تهران»، «تقویم مهر ۱۴۰۵»).
 2. عبارت‌هایی که نمایش دارند ولی کلیک کم، نشانه‌ی عنوان یا توضیح ضعیف‌اند؛ آن‌ها را در `web/src/seo.ts` اصلاح کنید.
 3. عبارت‌های پرجست‌وجویی که صفحه‌ای برایشان نداریم، ایده‌ی محتوای جدید هستند؛ برایشان issue بسازید.
 4. بعد از هر تغییر مهم، صفحه‌ی مربوط را در URL Inspection دوباره بررسی و درخواست ایندکس کنید.

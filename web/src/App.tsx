@@ -6,8 +6,6 @@ import { LandingPage } from './pages/LandingPage';
 import { HomePage } from './pages/HomePage';
 import { CalendarPage } from './pages/CalendarPage';
 import { PrayerTimesPage } from './pages/PrayerTimesPage';
-import { TextsPage } from './pages/TextsPage';
-import { TextDetailPage } from './pages/TextDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { CalendarGuidePage, DateConverterGuidePage } from './pages/SeoGuidePages';
 import { CityPrayerTimesPage, PrayerTimesIndexPage } from './pages/CityPrayerTimesPage';
@@ -39,8 +37,6 @@ export default function App() {
           <Route path="home" element={<HomePage />} />
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="prayer-times" element={<PrayerTimesPage />} />
-          <Route path="texts" element={<TextsPage />} />
-          <Route path="texts/:textId" element={<TextDetailPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

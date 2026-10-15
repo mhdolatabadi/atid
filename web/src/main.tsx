@@ -5,7 +5,7 @@ import './styles/theme.css';
 import App from './App.tsx';
 import { skyAt } from './lib/sky';
 
-// Links from before clean URLs looked like /#/app/texts/...; send them to the real page.
+// Links from before clean URLs looked like /#/app/calendar; send them to the real page.
 if (window.location.hash.startsWith('#/')) {
   window.location.replace(window.location.hash.slice(1));
 } else {

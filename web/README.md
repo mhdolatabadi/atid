@@ -27,7 +27,7 @@ SITE_URL=https://atid.example.com npm run build
 
 بدون `SITE_URL` صفحه‌ها ساخته می‌شوند ولی canonical و sitemap حذف می‌شوند. در ورک‌فلوی Images این مقدار از متغیر مخزن `ATID_SITE_URL` (Settings → Secrets and variables → Actions → Variables) خوانده می‌شود.
 
-مسیرها تمیزند (`/app/texts/ziyarat_ashura`) و لینک‌های قدیمی `/#/...` به نشانی جدید منتقل می‌شوند. اطلاعات SEO هر صفحه در `src/seo.ts` است.
+مسیرها تمیزند (`/prayer-times/tehran`) و لینک‌های قدیمی `/#/...` به نشانی جدید منتقل می‌شوند. اطلاعات SEO هر صفحه در `src/seo.ts` است.
 
 ## دیپلوی
 
@@ -37,6 +37,5 @@ SITE_URL=https://atid.example.com npm run build
 
 - `src/lib/persianDate.ts` — تبدیل تقویم میلادی↔جلالی (پورت‌شده از منطق اپ اندروید)
 - `src/lib/prayerTimes.ts` — محاسبه‌ی اوقات شرعی (پورت‌شده از منطق اپ اندروید)
-- `src/data/religiousTexts.ts` — متون مذهبی
 - `src/store/qadaStore.ts` — مخزن شمارنده‌های قضا روی localStorage
 - `src/pages/` — صفحات (لندینگ، قضا، تقویم، اوقات شرعی، متون مذهبی)

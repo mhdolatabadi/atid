@@ -35,7 +35,7 @@ This file defines the standing rules for every contributor and coding agent work
 - Jalali dates use the Julian-day algorithm in `web/src/lib/persianDate.ts` (validated against `jdatetime` for 1925–2100). Do not replace it with ad-hoc arithmetic.
 - Lunar (Hijri) dates can differ by a day from Iran's official calendar, which depends on moon sighting. Never present a computed lunar date as authoritative without that caveat.
 - Prayer times are approximate (Tehran angle convention). Say so wherever they are shown.
-- Religious texts must be reproduced exactly; do not paraphrase or trim them.
+- The product is limited to the calendar and prayer times (azan); religious texts (prayers, ziyarat, hadith) were removed on purpose. Do not add them back unless the owner explicitly asks.
 
 ## Privacy
 

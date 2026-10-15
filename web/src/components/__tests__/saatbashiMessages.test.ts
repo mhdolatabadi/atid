@@ -6,10 +6,9 @@ describe('Saatbashi contextual guidance', () => {
     expect(saatbashiMessage('/app/prayer-times')).toContain('تقریبی');
     expect(saatbashiMessage('/prayer-times/tehran')).toContain('تقریبی');
   });
-  it('offers relevant guidance on tools and nested reading routes', () => {
+  it('offers relevant guidance on tools', () => {
     expect(saatbashiMessage('/date-converter')).toContain('معادل');
     expect(saatbashiMessage('/app/calendar')).toContain('مناسبت');
-    expect(saatbashiMessage('/app/texts/hadith_kisa')).toContain('بخوان');
   });
   it('introduces the guide on public pages', () => {
     expect(saatbashiMessage('/')).toContain('ساعت‌باشی');

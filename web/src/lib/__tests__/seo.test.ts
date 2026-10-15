@@ -11,6 +11,10 @@ describe('search metadata', () => {
     expect(metaFor('/not-a-page').noindex).toBe(true);
     expect(metaFor('/calendar').noindex).not.toBe(true);
   });
+  it('no longer publishes the removed religious texts', () => {
+    expect(prerenderRoutes.some(path => path.startsWith('/app/texts'))).toBe(false);
+    expect(metaFor('/app/texts/ziyarat_ashura').noindex).toBe(true);
+  });
   it('has unique metadata and a page identity for every exported route', () => {
     const titles = prerenderRoutes.map(path => metaFor(path).title);
     expect(new Set(titles).size).toBe(titles.length);

@@ -35,15 +35,6 @@ export function ClockIcon({ className }: IconProps) {
   );
 }
 
-export function BookIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" width="22" height="22" {...strokeProps}>
-      <path d="M5 5c1.5-1 4-1 7 0v14c-3-1-5.5-1-7 0z" />
-      <path d="M19 5c-1.5-1-4-1-7 0v14c3-1 5.5-1 7 0z" />
-    </svg>
-  );
-}
-
 export function LocationIcon({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" width="18" height="18" {...strokeProps}>
