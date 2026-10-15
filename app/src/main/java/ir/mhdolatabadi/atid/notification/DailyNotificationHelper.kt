@@ -65,7 +65,7 @@ object DailyNotificationHelper {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setColor(ContextCompat.getColor(context, R.color.brand_primary))
+            .saatbashiBranding(context)
             .setContentTitle(dateLine)
             .setContentText(summaryLine)
             .setStyle(linesStyle)

@@ -43,7 +43,7 @@ class EventReminderReceiver : BroadcastReceiver() {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
         val open = PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(context, EventReminderScheduler.CHANNEL)
-            .setSmallIcon(R.drawable.ic_notification).setContentTitle(event.title)
+            .setSmallIcon(R.drawable.ic_notification).saatbashiBranding(context).setContentTitle(event.title)
             .setContentText("یادآوری ساعت‌باشی").setContentIntent(open).setAutoCancel(true)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setCategory(NotificationCompat.CATEGORY_REMINDER)
             .build()

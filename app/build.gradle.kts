@@ -60,6 +60,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.2"
     }
+    testOptions {
+        // Robolectric tests read real resources (strings, the notification portrait).
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
