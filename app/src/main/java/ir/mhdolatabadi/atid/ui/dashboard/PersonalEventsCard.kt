@@ -1,5 +1,6 @@
 package ir.mhdolatabadi.atid.ui.dashboard
 
+import android.app.TimePickerDialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -34,6 +35,10 @@ fun PersonalEventsCard(date: Date, dateLabel: String) {
 private fun EventEditor(repository: PersonalEventsRepository, day: String, dateLabel: String) {
     var revision by remember { mutableStateOf(0) }
     var adding by rememberSaveable { mutableStateOf(false) }
+    var editingId by rememberSaveable { mutableStateOf<String?>(null) }
+    var minuteOfDay by rememberSaveable { mutableStateOf<Int?>(null) }
+    var pickingTime by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
     var title by rememberSaveable { mutableStateOf("") }
     var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
@@ -55,6 +60,8 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                 revision++
                 adding = false
                 title = ""
+                editingId = null
+                minuteOfDay = null
                 deletingId = null
             } else {
                 error = "ذخیرهٔ تغییرات انجام نشد؛ دوباره تلاش کن."
@@ -64,7 +71,7 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
 
     Column(Modifier.padding(top = 16.dp).fillMaxWidth().glass().padding(16.dp)) {
         Text("رویدادهای من", style = MaterialTheme.typography.titleMedium, color = colors.text)
-        Text("تمام‌روز • فقط روی این دستگاه", style = MaterialTheme.typography.bodySmall, color = colors.muted)
+        Text("فقط روی این دستگاه", style = MaterialTheme.typography.bodySmall, color = colors.muted)
         when {
             result == null -> Text("در حال خواندن…", color = colors.muted)
             result?.isFailure == true -> {
@@ -73,17 +80,30 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
             }
             events.isEmpty() -> Text("برای این روز رویدادی ثبت نکرده‌ای.", modifier = Modifier.padding(top = 12.dp), color = colors.muted)
             else -> events.forEach { event ->
-                Row(Modifier.fillMaxWidth().padding(top = 8.dp)) {
-                    Text(event.title, modifier = Modifier.weight(1f).padding(top = 12.dp), color = colors.text)
-                    TextButton(
-                        onClick = { error = null; deletingId = event.id }, enabled = !busy,
-                        modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = "حذف ${event.title}" }
-                    ) { Text("حذف") }
+                Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
+                    Text(event.title, color = colors.text)
+                    Text(eventTimeLabel(event.minuteOfDay), style = MaterialTheme.typography.bodySmall, color = colors.muted)
+                    Row {
+                        TextButton(
+                            onClick = {
+                                error = null
+                                editingId = event.id
+                                title = event.title
+                                minuteOfDay = event.minuteOfDay
+                                adding = true
+                            }, enabled = !busy,
+                            modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = "ویرایش ${event.title}" }
+                        ) { Text("ویرایش") }
+                        TextButton(
+                            onClick = { error = null; deletingId = event.id }, enabled = !busy,
+                            modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = "حذف ${event.title}" }
+                        ) { Text("حذف") }
+                    }
                 }
             }
         }
         TextButton(
-            onClick = { error = null; adding = true }, enabled = result?.isSuccess == true && !busy,
+            onClick = { error = null; editingId = null; title = ""; minuteOfDay = null; adding = true }, enabled = result?.isSuccess == true && !busy,
             modifier = Modifier.heightIn(min = 48.dp)
         ) { Text("افزودن رویداد") }
     }
@@ -91,26 +111,54 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
     if (adding) {
         AlertDialog(
             onDismissRequest = { if (!busy) adding = false },
-            title = { Text("رویداد جدید") },
+            title = { Text(if (editingId == null) "رویداد جدید" else "ویرایش رویداد") },
             text = {
                 Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
                     Text(dateLabel, modifier = Modifier.padding(bottom = 12.dp))
                     OutlinedTextField(
                         value = title, onValueChange = { title = it; error = null }, enabled = !busy,
                         label = { Text("عنوان رویداد") }, modifier = Modifier.fillMaxWidth(),
-                        isError = title.length > PersonalEventsRepository.MAX_TITLE_LENGTH,
-                        supportingText = { Text(if (title.length > PersonalEventsRepository.MAX_TITLE_LENGTH) "عنوان حداکثر ۱۲۰ نویسه باشد." else "رویداد تمام‌روز ثبت می‌شود.") }
+                        isError = title.trim().length > PersonalEventsRepository.MAX_TITLE_LENGTH,
+                        supportingText = { Text(if (title.trim().length > PersonalEventsRepository.MAX_TITLE_LENGTH) "عنوان حداکثر ۱۲۰ نویسه باشد." else "عنوانی کوتاه برای رویداد بنویس.") }
                     )
+                    Text(eventTimeLabel(minuteOfDay), modifier = Modifier.padding(top = 12.dp))
+                    TextButton(onClick = { pickingTime = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text(if (minuteOfDay == null) "تعیین ساعت" else "تغییر ساعت")
+                    }
+                    if (minuteOfDay != null) {
+                        TextButton(onClick = { minuteOfDay = null }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("تمام‌روز") }
+                    }
+                    Text("ساعت بر اساس زمان محلی دستگاه است؛ یادآوری ارسال نمی‌شود.", style = MaterialTheme.typography.bodySmall)
                     error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 }
             },
             confirmButton = {
-                TextButton(onClick = { mutate { repository.add(day, title) } },
+                TextButton(onClick = {
+                    val id = editingId
+                    val savedTitle = title
+                    val savedTime = minuteOfDay
+                    mutate {
+                        if (id == null) repository.add(day, savedTitle, savedTime)
+                        else repository.update(day, id, savedTitle, savedTime)
+                    }
+                },
                     enabled = !busy && title.trim().isNotEmpty() && title.trim().length <= PersonalEventsRepository.MAX_TITLE_LENGTH,
                     modifier = Modifier.heightIn(min = 48.dp)) { Text(if (busy) "در حال ذخیره…" else "ذخیره") }
             },
             dismissButton = { TextButton(onClick = { adding = false }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("انصراف") } }
         )
+    }
+    if (pickingTime && adding) {
+        DisposableEffect(day) {
+            val initial = minuteOfDay ?: 9 * 60
+            val dialog = TimePickerDialog(context, { _, hour, minute ->
+                minuteOfDay = hour * 60 + minute
+                pickingTime = false
+            }, initial / 60, initial % 60, true)
+            dialog.setOnDismissListener { pickingTime = false }
+            dialog.show()
+            onDispose { dialog.setOnDismissListener(null); dialog.dismiss() }
+        }
     }
     deletingId?.let { id ->
         AlertDialog(
@@ -121,4 +169,11 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
             dismissButton = { TextButton(onClick = { deletingId = null }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("انصراف") } }
         )
     }
+}
+
+internal fun eventTimeLabel(minuteOfDay: Int?): String {
+    if (minuteOfDay == null) return "تمام‌روز"
+    val hour = (minuteOfDay / 60).toString().padStart(2, '0')
+    val minute = (minuteOfDay % 60).toString().padStart(2, '0')
+    return "ساعت ${PersianDateUtils.toPersianDigits(hour + ":" + minute)}"
 }

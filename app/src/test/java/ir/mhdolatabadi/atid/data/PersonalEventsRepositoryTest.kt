@@ -50,4 +50,54 @@ class PersonalEventsRepositoryTest {
         try { repo.add("1405-7-22", "جلسه"); fail("Corrupt data overwritten") } catch (_: org.json.JSONException) { }
         assertEquals("broken", context.getSharedPreferences("personal_events", Context.MODE_PRIVATE).getString("1405-7-22", null))
     }
+    @Test fun legacyEventsRemainAllDayAndSurviveEditing() {
+        context.getSharedPreferences("personal_events", Context.MODE_PRIVATE).edit()
+            .putString("1405-7-22", """[{"id":"legacy","title":"قدیمی"}]""").commit()
+        val repo = PersonalEventsRepository(context)
+        assertNull(repo.on("1405-7-22").single().minuteOfDay)
+        repo.update("1405-7-22", "legacy", "  ویرایش‌شده  ", 570)
+        assertEquals(PersonalEvent("legacy", "ویرایش‌شده", 570), PersonalEventsRepository(context).on("1405-7-22").single())
+        repo.update("1405-7-22", "legacy", "تمام‌روز")
+        assertNull(PersonalEventsRepository(context).on("1405-7-22").single().minuteOfDay)
+    }
+
+    @Test fun updatesPreserveOtherEventsAndDaysAndRejectMissingIds() {
+        val repo = PersonalEventsRepository(context)
+        repo.add("1405-7-22", "اول")
+        repo.add("1405-7-22", "دوم", 720)
+        repo.add("1405-7-23", "فردا", 600)
+        val original = repo.on("1405-7-22")
+        val tomorrow = repo.on("1405-7-23")
+        repo.update("1405-7-22", original.first().id, "تغییر", 540)
+        assertEquals(original.last(), repo.on("1405-7-22").last())
+        assertEquals(tomorrow, repo.on("1405-7-23"))
+        val changed = repo.on("1405-7-22")
+        try { repo.update("1405-7-22", "missing", "ناموجود"); fail("Missing id accepted") } catch (_: IllegalArgumentException) { }
+        assertEquals(changed, repo.on("1405-7-22"))
+    }
+
+    @Test fun allDayFirstThenChronologicalIncludingMidnightAndLastMinute() {
+        val repo = PersonalEventsRepository(context)
+        repo.add("day", "پایان", 1439)
+        repo.add("day", "ظهر", 720)
+        repo.add("day", "تمام‌روز")
+        repo.add("day", "نیمه‌شب", 0)
+        assertEquals(listOf(null, 0, 720, 1439), repo.on("day").map { it.minuteOfDay })
+    }
+
+    @Test fun invalidEditsAndTimesLeaveDataIntact() {
+        val repo = PersonalEventsRepository(context)
+        repo.add("day", "معتبر", 540)
+        val before = repo.on("day")
+        val id = before.single().id
+        for (invalidTime in listOf(-1, 1440)) {
+            try { repo.add("day", "رویداد", invalidTime); fail("Invalid time accepted") } catch (_: IllegalArgumentException) { }
+            try { repo.update("day", id, "رویداد", invalidTime); fail("Invalid time accepted") } catch (_: IllegalArgumentException) { }
+        }
+        for (invalidTitle in listOf("   ", "x".repeat(121))) {
+            try { repo.update("day", id, invalidTitle); fail("Invalid title accepted") } catch (_: IllegalArgumentException) { }
+        }
+        assertEquals(before, repo.on("day"))
+    }
+
 }

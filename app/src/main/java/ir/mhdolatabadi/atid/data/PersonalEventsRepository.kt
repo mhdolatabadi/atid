@@ -5,9 +5,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 
-data class PersonalEvent(val id: String, val title: String)
+data class PersonalEvent(val id: String, val title: String, val minuteOfDay: Int? = null) {
+    init { require(minuteOfDay == null || minuteOfDay in 0..1439) }
+}
 
-/** All-day events keyed by civil Jalali date, never by a timezone-dependent instant. */
+/** Personal events keyed by civil Jalali date, never by a timezone-dependent instant. */
 class PersonalEventsRepository(context: Context) {
     private val preferences = context.getSharedPreferences("personal_events", Context.MODE_PRIVATE)
 
@@ -16,15 +18,28 @@ class PersonalEventsRepository(context: Context) {
         val array = JSONArray(preferences.getString(day, "[]"))
         return (0 until array.length()).map { index ->
             val event = array.getJSONObject(index)
-            PersonalEvent(event.getString("id"), event.getString("title"))
-        }
+            PersonalEvent(
+                event.getString("id"), event.getString("title"),
+                if (event.isNull("minuteOfDay")) null else event.getInt("minuteOfDay")
+            )
+        }.sortedBy { it.minuteOfDay ?: -1 }
     }
 
     @Synchronized
-    fun add(day: String, title: String) {
+    fun add(day: String, title: String, minuteOfDay: Int? = null) {
         val trimmed = title.trim()
         require(trimmed.isNotEmpty() && trimmed.length <= MAX_TITLE_LENGTH)
-        save(day, on(day) + PersonalEvent(UUID.randomUUID().toString(), trimmed))
+        save(day, on(day) + PersonalEvent(UUID.randomUUID().toString(), trimmed, minuteOfDay))
+    }
+
+    @Synchronized
+    fun update(day: String, id: String, title: String, minuteOfDay: Int? = null) {
+        val trimmed = title.trim()
+        require(trimmed.isNotEmpty() && trimmed.length <= MAX_TITLE_LENGTH)
+        val replacement = PersonalEvent(id, trimmed, minuteOfDay)
+        val events = on(day)
+        require(events.any { it.id == id }) { "Event no longer exists" }
+        save(day, events.map { if (it.id == id) replacement else it })
     }
 
     @Synchronized
@@ -32,7 +47,7 @@ class PersonalEventsRepository(context: Context) {
 
     private fun save(day: String, events: List<PersonalEvent>) {
         val array = JSONArray()
-        events.forEach { array.put(JSONObject().put("id", it.id).put("title", it.title)) }
+        events.forEach { array.put(JSONObject().put("id", it.id).put("title", it.title).put("minuteOfDay", it.minuteOfDay ?: JSONObject.NULL)) }
         check(preferences.edit().putString(day, array.toString()).commit())
     }
 
