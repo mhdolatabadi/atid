@@ -1,5 +1,7 @@
 import { religiousTexts } from './data/religiousTexts';
 import { cities } from './data/cities';
+import { calendarYears, monthPath, monthSpan, monthTitle, yearPath } from './lib/calendarPages';
+import { toPersianDigits } from './lib/persianDate';
 
 export const SITE_NAME = 'ساعت‌باشی';
 
@@ -80,6 +82,24 @@ for (const city of cities) {
   };
 }
 
+for (const year of calendarYears) {
+  const y = toPersianDigits(year);
+  pages[yearPath(year)] = {
+    title: `تقویم ${y}؛ تعطیلات رسمی و مناسبت‌های سال ${y} | ساعت‌باشی`,
+    description: `تقویم سال ${y} هجری شمسی ماه‌به‌ماه با تاریخ قمری و میلادی، فهرست تعطیلات رسمی ${y} و مناسبت‌های هر ماه.`,
+    type: 'CollectionPage',
+  };
+  for (let month = 1; month <= 12; month++) {
+    const title = monthTitle(year, month);
+    const span = monthSpan(year, month);
+    pages[monthPath(year, month)] = {
+      title: `تقویم ${title}؛ مناسبت‌ها و تعطیلات | ساعت‌باشی`,
+      description: `تقویم ${title} روزبه‌روز با تاریخ قمری (${span.hijri}) و میلادی (${span.gregorian})، تعطیلات رسمی و مناسبت‌های ماه.`,
+      type: 'WebPage',
+    };
+  }
+}
+
 export const notFoundMeta: PageMeta = {
   title: 'صفحه پیدا نشد | ساعت‌باشی',
   description: 'صفحه‌ای که دنبالش بودید پیدا نشد.',
@@ -115,9 +135,10 @@ export function structuredDataFor(pathname: string, origin: string) {
   };
   const graph: Record<string, unknown>[] = [page];
   if (path !== '/' && !meta.noindex) {
-    const paths = ['/'];
-    if (path.startsWith('/prayer-times/')) paths.push('/prayer-times');
-    if (path.startsWith('/app/texts/')) paths.push('/app/texts');
+    // Every ancestor that is itself a page: /calendar/1405/mehr → /calendar → /calendar/1405.
+    const segments = path.split('/').filter(Boolean);
+    const paths = ['/', ...segments.slice(0, -1).map((_, i) => `/${segments.slice(0, i + 1).join('/')}`)
+      .filter((p) => p in pages && !pages[p].noindex)];
     paths.push(path);
     const breadcrumbId = `${url}#breadcrumb`;
     page.breadcrumb = { '@id': breadcrumbId };

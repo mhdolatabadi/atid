@@ -10,6 +10,7 @@ import { TextsPage } from './pages/TextsPage';
 import { TextDetailPage } from './pages/TextDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { CalendarGuidePage, DateConverterGuidePage } from './pages/SeoGuidePages';
+import { CalendarMonthPage, CalendarYearPage } from './pages/CalendarArchivePages';
 import { CityPrayerTimesPage, PrayerTimesIndexPage } from './pages/CityPrayerTimesPage';
 import { syncPageHead } from './lib/syncPageHead';
 
@@ -31,6 +32,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/calendar" element={<CalendarGuidePage />} />
+        <Route path="/calendar/:year" element={<CalendarYearPage />} />
+        <Route path="/calendar/:year/:month" element={<CalendarMonthPage />} />
         <Route path="/date-converter" element={<DateConverterGuidePage />} />
         <Route path="/prayer-times" element={<PrayerTimesIndexPage />} />
         <Route path="/prayer-times/:city" element={<CityPrayerTimesPage />} />

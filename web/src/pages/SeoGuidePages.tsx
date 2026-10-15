@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { ClientOnly } from '../components/ClientOnly';
 import { DateConverter } from '../components/DateConverter';
 import { PublicLayout } from '../components/SiteChrome';
+import { BUILD_YEAR } from '../lib/calendarPages';
+import { CalendarArchiveLinks } from './CalendarArchivePages';
 import './LandingPage.css';
 
 const faq = {
@@ -20,7 +22,7 @@ function Faq({ items }: { items: string[][] }) {
 }
 
 export function CalendarGuidePage() {
-  return <PublicLayout><main className="ti-main"><article className="ti-about glass"><h1 className="ti-card__title">تقویم شمسی؛ تاریخ امروز، مناسبت‌ها و تعطیلات</h1><p>تقویم ساعت‌باشی برای دیدن تاریخ امروز در سه گاه‌شماری شمسی، میلادی و قمری طراحی شده است. ماه جاری، جمعه‌ها، مناسبت‌ها و اوقات شرعی را در یک نمای خوانا می‌بینید.</p><h2>تقویم امروز و ماه جاری</h2><p>برای تقویم زنده، روزهای ماه و تاریخ امروز به <Link to="/">صفحهٔ اصلی ساعت‌باشی</Link> بروید. برای مرور ماه با کنترل‌های جابه‌جایی، <Link to="/app/calendar">تقویم ماه جاری</Link> در دسترس است.</p><h2>تقویم شمسی چگونه کار می‌کند؟</h2><p>سال هجری شمسی با نوروز آغاز می‌شود؛ شش ماه نخست ۳۱ روز، پنج ماه بعدی ۳۰ روز و اسفند ۲۹ یا در سال کبیسه ۳۰ روز دارد. ساعت‌باشی تاریخ‌های میلادی و قمری را هم کنار تاریخ شمسی نمایش می‌دهد تا برنامه‌ریزی روزمره ساده‌تر شود.</p></article><Faq items={faq.calendar} /></main></PublicLayout>;
+  return <PublicLayout><main className="ti-main"><article className="ti-about glass"><h1 className="ti-card__title">تقویم شمسی؛ تاریخ امروز، مناسبت‌ها و تعطیلات</h1><p>تقویم ساعت‌باشی برای دیدن تاریخ امروز در سه گاه‌شماری شمسی، میلادی و قمری طراحی شده است. ماه جاری، جمعه‌ها، مناسبت‌ها و اوقات شرعی را در یک نمای خوانا می‌بینید.</p><h2>تقویم امروز و ماه جاری</h2><p>برای تقویم زنده، روزهای ماه و تاریخ امروز به <Link to="/">صفحهٔ اصلی ساعت‌باشی</Link> بروید. برای مرور ماه با کنترل‌های جابه‌جایی، <Link to="/app/calendar">تقویم ماه جاری</Link> در دسترس است.</p><h2>تقویم شمسی چگونه کار می‌کند؟</h2><p>سال هجری شمسی با نوروز آغاز می‌شود؛ شش ماه نخست ۳۱ روز، پنج ماه بعدی ۳۰ روز و اسفند ۲۹ یا در سال کبیسه ۳۰ روز دارد. ساعت‌باشی تاریخ‌های میلادی و قمری را هم کنار تاریخ شمسی نمایش می‌دهد تا برنامه‌ریزی روزمره ساده‌تر شود.</p></article><CalendarArchiveLinks year={BUILD_YEAR} /><Faq items={faq.calendar} /></main></PublicLayout>;
 }
 
 export function DateConverterGuidePage() {
