@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds every Saatbashi logo file from one geometry, so web and Android never drift apart.
 
-The mark: a solid golden disc with navy hands at ten past ten, on a night-sky tile. The sa'at-bashi
+The mark: a kind bald elder with curly white side hair, round glasses and a pocket watch. The sa'at-bashi
 was the person who kept the hours and announced the times of prayer.
 
 Run from the repository root:  python3 branding/generate.py
@@ -48,24 +48,49 @@ def hands(s=1.0, ox=0.0, oy=0.0):
 
 def layers(s=1.0, ox=0.0, oy=0.0, monochrome=False):
     """(kind, path, width, paint): paint is "gold" (the gradient), "navy" or "mono"."""
-    if monochrome:
-        return [
-            ("stroke", circle(CX, CY, R - MONO_RING_W / 2, s, ox, oy), MONO_RING_W * s, "mono"),
-            ("stroke", hands(s, ox, oy), HAND_W * s, "mono"),
-            ("fill", circle(CX, CY, HUB_R, s, ox, oy), 0, "mono"),
-        ]
-    return [
-        ("fill", circle(CX, CY, R, s, ox, oy), 0, "gold"),
-        ("stroke", hands(s, ox, oy), HAND_W * s, "navy"),
-        ("fill", circle(CX, CY, HUB_R, s, ox, oy), 0, "navy"),
+    def path(commands):
+        return " ".join(cmd + " " + " ".join(_p(x, y, s, ox, oy) for x, y in points) for cmd, points in commands)
+    def fill_circle(x, y, r, paint):
+        return ("fill", circle(x, y, r, s, ox, oy), 0, paint)
+    def line(commands, width, paint="navy"):
+        return ("stroke", path(commands), width * s, paint)
+    out = [
+        fill_circle(50, 65, 19, "navy"),
+        fill_circle(50, 43, 19, "skin"),
     ]
+    # Deliberately bare crown, with scalloped curls only at the sides.
+    for x, y, r in [(31,34,5),(29,41,5),(30,48,5),(34,52,5),
+                     (69,34,5),(71,41,5),(70,48,5),(66,52,5)]:
+        out.append(fill_circle(x,y,r,"hair"))
+    out += [
+        line([("M",[(36,37)]),("Q",[(40,34),(44,37)])],1.6),
+        line([("M",[(56,37)]),("Q",[(60,34),(64,37)])],1.6),
+        ("stroke",circle(41,43,7,s,ox,oy),1.5*s,"navy"),
+        ("stroke",circle(59,43,7,s,ox,oy),1.5*s,"navy"),
+        line([("M",[(48,43)]),("L",[(52,43)])],1.5),
+        fill_circle(41,43,1.5,"navy"),fill_circle(59,43,1.5,"navy"),
+        fill_circle(35,50,2.5,"rose"),fill_circle(65,50,2.5,"rose"),
+        fill_circle(50,49,3,"skin"),
+        line([("M",[(43,54)]),("Q",[(50,61),(57,54)])],2),
+        fill_circle(41,59,4,"hair"),fill_circle(59,59,4,"hair"),
+        fill_circle(50,72,9,"gold"),
+        line([("M",[(50,67)]),("L",[(50,72),(54,74)])],1.8),
+        line([("M",[(73,23)]),("L",[(73,29)])],1.6,"gold"),
+        line([("M",[(70,26)]),("L",[(76,26)])],1.6,"gold"),
+    ]
+    if monochrome:
+        # Keep face features as outline so the themed icon remains recognizable.
+        return [("stroke" if kind == "fill" and paint in ("skin","navy") else kind,
+                 data, 1.8*s if kind == "fill" and paint in ("skin","navy") else width,
+                 "mono") for kind,data,width,paint in out]
+    return out
 
 
 def tile_svg(size=512, radius=116):
     s = size / 100
     shapes = []
     for kind, path, width, paint in layers(s):
-        colour = "url(#gold)" if paint == "gold" else NAVY
+        colour = "url(#gold)" if paint == "gold" else {"gold": GOLD[1], "navy": NAVY, "skin": "#f6cca5", "hair": "#fff3db", "rose": "#df8e86"}[paint]
         if kind == "stroke":
             shapes.append(f'  <path d="{path}" fill="none" stroke="{colour}" stroke-width="{_n(width)}" stroke-linecap="round"/>')
         else:
@@ -132,7 +157,7 @@ def android_foreground(monochrome=False):
     parts = []
     for kind, path, width, paint in layers(ANDROID_SCALE, OX, OY, monochrome):
         if kind == "stroke":
-            colour = "#FFFFFFFF" if paint == "mono" else NAVY.upper()
+            colour = "#FFFFFFFF" if paint == "mono" else {"gold": GOLD[1], "navy": NAVY, "skin": "#f6cca5", "hair": "#fff3db", "rose": "#df8e86"}[paint].upper()
             parts.append(f'''    <path
         android:strokeColor="{colour}"
         android:strokeWidth="{_n(width)}"
@@ -153,7 +178,7 @@ def android_foreground(monochrome=False):
         </aapt:attr>
     </path>''')
         else:
-            colour = "#FFFFFFFF" if paint == "mono" else NAVY.upper()
+            colour = "#FFFFFFFF" if paint == "mono" else {"gold": GOLD[1], "navy": NAVY, "skin": "#f6cca5", "hair": "#fff3db", "rose": "#df8e86"}[paint].upper()
             parts.append(f'''    <path
         android:fillColor="{colour}"
         android:pathData="{path}" />''')
@@ -161,11 +186,10 @@ def android_foreground(monochrome=False):
 
 
 def main():
+    # Primary icons now use the approved illustration. This generator only keeps
+    # the themed monochrome mark and sky background as native vectors.
     outputs = {
-        "branding/logo.svg": tile_svg(),
-        "web/public/favicon.svg": tile_svg(),
         "app/src/main/res/drawable/ic_launcher_background.xml": android_background(),
-        "app/src/main/res/drawable/ic_launcher_foreground.xml": android_foreground(),
         "app/src/main/res/drawable/ic_launcher_monochrome.xml": android_foreground(monochrome=True),
     }
     for rel, text in outputs.items():

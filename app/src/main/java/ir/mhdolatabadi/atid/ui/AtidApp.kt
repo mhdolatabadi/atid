@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -79,6 +80,13 @@ val BottomBarClearance = 104.dp
 fun AtidApp() {
     val navController = rememberNavController()
     val colors = Atid.colors
+    val guideEntry by navController.currentBackStackEntryAsState()
+    val guideMessage = when {
+        guideEntry?.destination?.route == "prayer_times" -> "بیا وقت‌های امروز را ببینیم؛ اوقات شرعی تقریبی‌اند."
+        guideEntry?.destination?.route?.startsWith("texts") == true -> "با آرامش بخوان؛ من همین‌جا همراهت هستم."
+        guideEntry?.destination?.route == "home" -> "قدم‌به‌قدم پیش می‌رویم؛ حساب روزهایت همین‌جا محفوظ است."
+        else -> "بیا روزها و مناسبت‌های این ماه را با هم بشناسیم."
+    }
 
     // The sky runs behind the system bars, so their icons must contrast with it.
     val view = LocalView.current
@@ -95,30 +103,39 @@ fun AtidApp() {
     Box(modifier = Modifier.fillMaxSize()) {
         SkyBackground()
 
-        NavHost(
-            navController = navController,
-            startDestination = AtidDestination.Dashboard.route,
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding(),
-            enterTransition = { fadeIn(tween(320)) + slideInVertically(tween(420)) { it / 24 } },
-            exitTransition = { fadeOut(tween(160)) },
-            popEnterTransition = { fadeIn(tween(320)) },
-            popExitTransition = { fadeOut(tween(160)) }
-        ) {
-            composable(AtidDestination.Home.route) { HomeScreen() }
-            composable(AtidDestination.Dashboard.route) { DashboardScreen() }
-            composable(AtidDestination.PrayerTimes.route) { PrayerTimesScreen() }
-            composable(AtidDestination.Texts.route) {
-                TextsScreen(onTextClick = { id -> navController.navigate("texts/$id") })
+        Column(Modifier.fillMaxSize().statusBarsPadding()) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Image(painterResource(R.drawable.saatbashi_character), contentDescription = "ساعت‌باشی، پیرمرد مهربان با موهای فرفری سفید", modifier = Modifier.width(56.dp).height(84.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("ساعت‌باشی", color = colors.accent, fontWeight = FontWeight.Bold)
+                    Text(guideMessage, color = colors.muted, style = MaterialTheme.typography.bodySmall)
+                }
             }
-            composable(
-                route = "texts/{textId}",
-                arguments = listOf(navArgument("textId") { })
-            ) { backStackEntry ->
-                val textId = backStackEntry.arguments?.getString("textId").orEmpty()
-                TextDetailScreen(textId = textId, onBack = { navController.popBackStack() })
+            NavHost(
+                navController = navController,
+                startDestination = AtidDestination.Dashboard.route,
+                modifier = Modifier
+                    .weight(1f),
+                enterTransition = { fadeIn(tween(320)) + slideInVertically(tween(420)) { it / 24 } },
+                exitTransition = { fadeOut(tween(160)) },
+                popEnterTransition = { fadeIn(tween(320)) },
+                popExitTransition = { fadeOut(tween(160)) }
+            ) {
+                composable(AtidDestination.Home.route) { HomeScreen() }
+                composable(AtidDestination.Dashboard.route) { DashboardScreen() }
+                composable(AtidDestination.PrayerTimes.route) { PrayerTimesScreen() }
+                composable(AtidDestination.Texts.route) {
+                    TextsScreen(onTextClick = { id -> navController.navigate("texts/$id") })
+                }
+                composable(
+                    route = "texts/{textId}",
+                    arguments = listOf(navArgument("textId") { })
+                ) { backStackEntry ->
+                    val textId = backStackEntry.arguments?.getString("textId").orEmpty()
+                    TextDetailScreen(textId = textId, onBack = { navController.popBackStack() })
+                }
             }
+
         }
 
         val backStackEntry by navController.currentBackStackEntryAsState()

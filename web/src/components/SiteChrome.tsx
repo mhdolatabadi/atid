@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { religiousTexts } from '../data/religiousTexts';
 import './SiteChrome.css';
+import { SaatbashiGuide } from './SaatbashiGuide';
 
 const ANDROID_RELEASE = 'https://github.com/mhdolatabadi/atid/releases/latest';
 
@@ -79,6 +80,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="ti">
       <SiteHeader />
+      <div className="ti-main"><SaatbashiGuide /></div>
       {children}
       <SiteFooter />
     </div>
