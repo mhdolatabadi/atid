@@ -32,7 +32,7 @@ class EventReminderReceiver : BroadcastReceiver() {
         val repo = PersonalEventsRepository(context)
         val event = runCatching { repo.on(day).firstOrNull { it.id == id } }.getOrNull() ?: return
         if (!event.reminder || event.minuteOfDay == null) return
-        val expected = EventReminderScheduler.triggerAt(day, event.minuteOfDay)
+        val expected = EventReminderScheduler.triggerAt(day, event.minuteOfDay, event.reminderLeadMinutes)
         val late = System.currentTimeMillis() - at
         if (at != expected || late < 0 || late > 24 * 60 * 60 * 1000L || EventReminderScheduler.delivered(context, id) == at) return
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

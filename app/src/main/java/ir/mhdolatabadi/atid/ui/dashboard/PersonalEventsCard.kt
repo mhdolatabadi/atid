@@ -46,6 +46,8 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var minuteOfDay by rememberSaveable { mutableStateOf<Int?>(null) }
     var reminder by rememberSaveable { mutableStateOf(false) }
+    var reminderLeadMinutes by rememberSaveable { mutableStateOf(0) }
+    var leadMenuOpen by remember { mutableStateOf(false) }
     var pickingTime by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     var title by rememberSaveable { mutableStateOf("") }
@@ -76,6 +78,7 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                 editingId = null
                 minuteOfDay = null
                 reminder = false
+                reminderLeadMinutes = 0
                 deletingId = null
             } else {
                 error = "ذخیرهٔ تغییرات انجام نشد؛ دوباره تلاش کن."
@@ -96,13 +99,14 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
             else -> events.forEach { event ->
                 Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
                     Text(event.title, color = colors.text)
-                    Text(eventTimeLabel(event.minuteOfDay) + if (event.reminder) " • یادآوری فعال" else "", style = MaterialTheme.typography.bodySmall, color = colors.muted)
+                    Text(eventTimeLabel(event.minuteOfDay) + if (event.reminder) " • ${reminderLeadLabel(event.reminderLeadMinutes)}" else "", style = MaterialTheme.typography.bodySmall, color = colors.muted)
                     Row {
                         TextButton(
                             onClick = {
                                 error = null
                                 editingId = event.id
                                 title = event.title
+                                reminderLeadMinutes = event.reminderLeadMinutes
                                 reminder = event.reminder
                                 minuteOfDay = event.minuteOfDay
                                 adding = true
@@ -118,7 +122,7 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
             }
         }
         TextButton(
-            onClick = { error = null; editingId = null; title = ""; minuteOfDay = null; reminder = false; adding = true }, enabled = result?.isSuccess == true && !busy,
+            onClick = { error = null; editingId = null; title = ""; minuteOfDay = null; reminder = false; reminderLeadMinutes = 0; adding = true }, enabled = result?.isSuccess == true && !busy,
             modifier = Modifier.heightIn(min = 48.dp)
         ) { Text("افزودن رویداد") }
     }
@@ -141,7 +145,7 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                         Text(if (minuteOfDay == null) "تعیین ساعت" else "تغییر ساعت")
                     }
                     if (minuteOfDay != null) {
-                        TextButton(onClick = { minuteOfDay = null; reminder = false }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("تمام‌روز") }
+                        TextButton(onClick = { minuteOfDay = null; reminder = false; reminderLeadMinutes = 0 }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("تمام‌روز") }
                     }
                     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Checkbox(checked = reminder, enabled = !busy && minuteOfDay != null, onCheckedChange = { checked ->
@@ -152,7 +156,23 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                             } else if (NotificationManagerCompat.from(context).areNotificationsEnabled()) reminder = true
                             else error = "اعلان‌های برنامه در تنظیمات دستگاه خاموش‌اند."
                         })
-                        Text("یادآوری در ساعت رویداد", modifier = Modifier.weight(1f))
+                        Text("یادآوری رویداد", modifier = Modifier.weight(1f))
+                    }
+                    if (reminder) {
+                        Box {
+                            TextButton(onClick = { leadMenuOpen = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) {
+                                Text(reminderLeadLabel(reminderLeadMinutes))
+                            }
+                            DropdownMenu(expanded = leadMenuOpen, onDismissRequest = { leadMenuOpen = false }) {
+                                PersonalEvent.REMINDER_LEADS.forEach { lead ->
+                                    DropdownMenuItem(text = { Text(reminderLeadLabel(lead)) }, onClick = {
+                                        reminderLeadMinutes = lead
+                                        leadMenuOpen = false
+                                        error = null
+                                    }, modifier = Modifier.heightIn(min = 48.dp))
+                                }
+                            }
+                        }
                     }
                     TextButton(onClick = {
                         context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
@@ -167,8 +187,9 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                     val savedTitle = title
                     val savedTime = minuteOfDay
                     val savedReminder = reminder
-                    if (savedReminder && (savedTime == null || EventReminderScheduler.triggerAt(day, savedTime) <= System.currentTimeMillis())) {
-                        error = "برای یادآوری، ساعت آینده‌ای انتخاب کن."
+                    val savedLead = reminderLeadMinutes
+                    if (savedReminder && (savedTime == null || EventReminderScheduler.triggerAt(day, savedTime, savedLead) <= System.currentTimeMillis())) {
+                        error = "زمان یادآوری گذشته است؛ ساعت رویداد یا فاصلهٔ یادآوری را تغییر بده."
                         return@TextButton
                     }
                     if (savedReminder && !EventReminderScheduler.notificationsEnabled(context)) {
@@ -176,8 +197,8 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                         return@TextButton
                     }
                     mutate {
-                        if (id == null) repository.add(day, savedTitle, savedTime, savedReminder)
-                        else repository.update(day, id, savedTitle, savedTime, savedReminder)
+                        if (id == null) repository.add(day, savedTitle, savedTime, savedReminder, savedLead)
+                        else repository.update(day, id, savedTitle, savedTime, savedReminder, savedLead)
                     }
                 },
                     enabled = !busy && title.trim().isNotEmpty() && title.trim().length <= PersonalEventsRepository.MAX_TITLE_LENGTH,
@@ -215,3 +236,6 @@ internal fun eventTimeLabel(minuteOfDay: Int?): String {
     val minute = (minuteOfDay % 60).toString().padStart(2, '0')
     return "ساعت ${PersianDateUtils.toPersianDigits(hour + ":" + minute)}"
 }
+
+internal fun reminderLeadLabel(minutes: Int): String =
+    if (minutes == 0) "هنگام رویداد" else "${PersianDateUtils.toPersianDigits(minutes)} دقیقه قبل"

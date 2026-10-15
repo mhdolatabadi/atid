@@ -26,8 +26,9 @@ object EventReminderScheduler {
         return true
     }
 
-    fun triggerAt(day: String, minute: Int): Long {
+    fun triggerAt(day: String, minute: Int, leadMinutes: Int = 0): Long {
         require(minute in 0..1439)
+        require(leadMinutes in PersonalEvent.REMINDER_LEADS)
         val parts = day.split('-').map { it.toInt() }
         require(parts.size == 3)
         val date = PersianDateUtils.toGregorianDate(parts[0], parts[1], parts[2])
@@ -37,7 +38,7 @@ object EventReminderScheduler {
             set(Calendar.MINUTE, minute % 60)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-        }.timeInMillis
+        }.timeInMillis - leadMinutes * 60_000L
     }
 
     internal fun intent(context: Context, day: String, id: String) =
@@ -56,7 +57,7 @@ object EventReminderScheduler {
         }
         current.forEach { event ->
             if (!event.reminder || event.minuteOfDay == null) return@forEach
-            val at = triggerAt(day, event.minuteOfDay)
+            val at = triggerAt(day, event.minuteOfDay, event.reminderLeadMinutes)
             if (at <= System.currentTimeMillis() || delivered(context, event.id) == at) return@forEach
             val token = PendingIntent.getBroadcast(context, 0, intent(context, day, event.id).putExtra("at", at), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             // Inexact by design: no special exact-alarm access is required.
