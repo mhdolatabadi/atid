@@ -31,4 +31,12 @@
     <string name="notification_channel_name">تاریخ و اوقات شرعی</string>
     <string name="notification_channel_description">نمایش دائمی تاریخ روز و اوقات شرعی در نوار اعلان‌ها</string>
     <string name="notification_summary_line">اذان ظهر %1$s • اذان مغرب %2$s</string>
+    <string name="prayer_alert_channel_name">اعلان اذان</string>
+    <string name="prayer_alert_channel_description">اعلان سر وقت هر نمازی که یادآوری‌اش روشن است</string>
+    <string name="prayer_alert_text">ساعت %1$s %2$s (زمان تقریبی)</string>
+    <string name="prayer_alert_on">یادآوری %1$s روشن است</string>
+    <string name="prayer_alert_off">یادآوری %1$s خاموش است</string>
+    <string name="prayer_alert_hint">زنگوله‌ی کنار هر اذان، سر وقتش اعلان می‌دهد.</string>
+    <string name="prayer_alert_exact_hint">برای اعلان سر دقیقه، اجازه‌ی «هشدارها و یادآوری‌ها» را بدهید.</string>
+    <string name="prayer_alert_blocked_hint">اعلان‌های ساعت‌باشی خاموش است؛ برای یادآوری اذان روشنش کنید.</string>
 </resources>

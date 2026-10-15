@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.core.app.NotificationManagerCompat
 import ir.mhdolatabadi.atid.notification.DailyNotificationHelper
+import ir.mhdolatabadi.atid.notification.PrayerAlertScheduler
 import ir.mhdolatabadi.atid.util.LocationUtils
 import ir.mhdolatabadi.atid.util.PrayerTimes
 import ir.mhdolatabadi.atid.util.PrayerTimesCalculator
@@ -18,7 +20,12 @@ data class PrayerTimesUiState(
     /** Key of the next upcoming prayer (fajr/sunrise/dhuhr/asr/sunset/maghrib/isha), for highlighting. */
     val nextPrayerKey: String,
     /** e.g. "۱ ساعت و ۲۰ دقیقه تا اذان ظهر"; after the last prayer, tomorrow's dawn. */
-    val countdown: String? = null
+    val countdown: String? = null,
+    /** Prayers (fajr/dhuhr/asr/maghrib/isha) whose adhan reminder is on. */
+    val alerts: Set<String> = emptySet(),
+    /** False when Android may deliver reminders a few minutes late until the user allows exact alarms. */
+    val exactAlarmsAllowed: Boolean = true,
+    val notificationsAllowed: Boolean = true
 )
 
 class NotificationsViewModel(application: Application) : AndroidViewModel(application) {
@@ -42,9 +49,20 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
             locationLabel = locationLabel,
             citySlug = coordinates.city?.slug,
             nextPrayerKey = computeNextPrayerKey(times),
-            countdown = prayerCountdown(times, if (coordinates.city != null) iranMinutesNow() else localMinutesNow())
+            countdown = prayerCountdown(times, if (coordinates.city != null) iranMinutesNow() else localMinutesNow()),
+            alerts = PrayerAlertScheduler.enabled(context),
+            exactAlarmsAllowed = PrayerAlertScheduler.exactAlarmsAllowed(context),
+            notificationsAllowed = NotificationManagerCompat.from(context).areNotificationsEnabled()
         )
         DailyNotificationHelper.show(context, times)
+        // The place may have changed, which moves every adhan.
+        PrayerAlertScheduler.reschedule(context)
+    }
+
+    /** Turns a prayer's adhan reminder on or off. */
+    fun setAlert(key: String, on: Boolean) {
+        PrayerAlertScheduler.setEnabled(getApplication(), key, on)
+        refresh()
     }
 
     /** Picks a city (remembered on this device) and recomputes. */

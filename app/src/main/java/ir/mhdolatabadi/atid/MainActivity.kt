@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ir.mhdolatabadi.atid.notification.EventReminderScheduler
 import ir.mhdolatabadi.atid.notification.DailyNotificationHelper
+import ir.mhdolatabadi.atid.notification.PrayerAlertScheduler
 import ir.mhdolatabadi.atid.ui.AtidApp
 import ir.mhdolatabadi.atid.ui.theme.AtidTheme
 import ir.mhdolatabadi.atid.util.LocationUtils
@@ -58,7 +59,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        lifecycleScope.launch(Dispatchers.IO) { EventReminderScheduler.restore(applicationContext) }
+        lifecycleScope.launch(Dispatchers.IO) {
+            EventReminderScheduler.restore(applicationContext)
+            PrayerAlertScheduler.reschedule(applicationContext)
+        }
     }
 
     private fun postDailyNotification() {
