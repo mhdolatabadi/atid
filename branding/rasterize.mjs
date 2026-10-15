@@ -45,6 +45,9 @@ await render(
    </div>`,
 );
 
+// Notifications use the same minimal mark, not an illustration crop.
+await render('app/src/main/res/drawable-nodpi/saatbashi_notification.png', 128, 128, img(tile(116), 128));
+
 // Android launcher icons for API 24–25 (26+ uses the adaptive vector icon).
 const densities = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
 for (const [density, size] of Object.entries(densities)) {
