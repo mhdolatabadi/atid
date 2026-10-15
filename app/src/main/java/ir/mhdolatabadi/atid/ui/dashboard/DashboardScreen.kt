@@ -150,6 +150,7 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
             Text("برو به امروز")
         }
         SelectedDayCard(current.selected)
+        PersonalEventsCard(current.selectedDate, current.selected.solarLabel)
         MonthOccasionsCard(current)
         DateConverterCard(modifier = Modifier.padding(top = 16.dp))
     }
