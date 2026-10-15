@@ -1,6 +1,14 @@
 package ir.mhdolatabadi.atid.ui.dashboard
 
 import android.app.TimePickerDialog
+import android.Manifest
+import android.os.Build
+import android.content.Intent
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.NotificationManagerCompat
+import ir.mhdolatabadi.atid.notification.EventReminderScheduler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -37,12 +45,17 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
     var adding by rememberSaveable { mutableStateOf(false) }
     var editingId by rememberSaveable { mutableStateOf<String?>(null) }
     var minuteOfDay by rememberSaveable { mutableStateOf<Int?>(null) }
+    var reminder by rememberSaveable { mutableStateOf(false) }
     var pickingTime by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     var title by rememberSaveable { mutableStateOf("") }
     var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        reminder = granted && minuteOfDay != null
+        if (!granted) error = "اجازهٔ اعلان داده نشد؛ رویداد بدون یادآوری قابل ذخیره است."
+    }
     val scope = rememberCoroutineScope()
     val result by produceState<Result<List<PersonalEvent>>?>(null, day, revision) {
         value = withContext(Dispatchers.IO) { runCatching { repository.on(day) } }
@@ -62,6 +75,7 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                 title = ""
                 editingId = null
                 minuteOfDay = null
+                reminder = false
                 deletingId = null
             } else {
                 error = "ذخیرهٔ تغییرات انجام نشد؛ دوباره تلاش کن."
@@ -82,13 +96,14 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
             else -> events.forEach { event ->
                 Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
                     Text(event.title, color = colors.text)
-                    Text(eventTimeLabel(event.minuteOfDay), style = MaterialTheme.typography.bodySmall, color = colors.muted)
+                    Text(eventTimeLabel(event.minuteOfDay) + if (event.reminder) " • یادآوری فعال" else "", style = MaterialTheme.typography.bodySmall, color = colors.muted)
                     Row {
                         TextButton(
                             onClick = {
                                 error = null
                                 editingId = event.id
                                 title = event.title
+                                reminder = event.reminder
                                 minuteOfDay = event.minuteOfDay
                                 adding = true
                             }, enabled = !busy,
@@ -103,7 +118,7 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
             }
         }
         TextButton(
-            onClick = { error = null; editingId = null; title = ""; minuteOfDay = null; adding = true }, enabled = result?.isSuccess == true && !busy,
+            onClick = { error = null; editingId = null; title = ""; minuteOfDay = null; reminder = false; adding = true }, enabled = result?.isSuccess == true && !busy,
             modifier = Modifier.heightIn(min = 48.dp)
         ) { Text("افزودن رویداد") }
     }
@@ -126,9 +141,23 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                         Text(if (minuteOfDay == null) "تعیین ساعت" else "تغییر ساعت")
                     }
                     if (minuteOfDay != null) {
-                        TextButton(onClick = { minuteOfDay = null }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("تمام‌روز") }
+                        TextButton(onClick = { minuteOfDay = null; reminder = false }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("تمام‌روز") }
                     }
-                    Text("ساعت بر اساس زمان محلی دستگاه است؛ یادآوری ارسال نمی‌شود.", style = MaterialTheme.typography.bodySmall)
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Checkbox(checked = reminder, enabled = !busy && minuteOfDay != null, onCheckedChange = { checked ->
+                            error = null
+                            if (!checked) reminder = false
+                            else if (Build.VERSION.SDK_INT >= 33 && !NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+                                permission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else if (NotificationManagerCompat.from(context).areNotificationsEnabled()) reminder = true
+                            else error = "اعلان‌های برنامه در تنظیمات دستگاه خاموش‌اند."
+                        })
+                        Text("یادآوری در ساعت رویداد", modifier = Modifier.weight(1f))
+                    }
+                    TextButton(onClick = {
+                        context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
+                    }, modifier = Modifier.heightIn(min = 48.dp)) { Text("تنظیمات اعلان‌ها") }
+                    Text("ساعت محلی دستگاه؛ محدودیت باتری ممکن است یادآوری را با تأخیر نمایش دهد.", style = MaterialTheme.typography.bodySmall)
                     error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 }
             },
@@ -137,9 +166,18 @@ private fun EventEditor(repository: PersonalEventsRepository, day: String, dateL
                     val id = editingId
                     val savedTitle = title
                     val savedTime = minuteOfDay
+                    val savedReminder = reminder
+                    if (savedReminder && (savedTime == null || EventReminderScheduler.triggerAt(day, savedTime) <= System.currentTimeMillis())) {
+                        error = "برای یادآوری، ساعت آینده‌ای انتخاب کن."
+                        return@TextButton
+                    }
+                    if (savedReminder && !EventReminderScheduler.notificationsEnabled(context)) {
+                        error = "اعلان‌ها خاموش‌اند؛ تنظیمات اعلان‌ها را بررسی کن یا یادآوری را غیرفعال کن."
+                        return@TextButton
+                    }
                     mutate {
-                        if (id == null) repository.add(day, savedTitle, savedTime)
-                        else repository.update(day, id, savedTitle, savedTime)
+                        if (id == null) repository.add(day, savedTitle, savedTime, savedReminder)
+                        else repository.update(day, id, savedTitle, savedTime, savedReminder)
                     }
                 },
                     enabled = !busy && title.trim().isNotEmpty() && title.trim().length <= PersonalEventsRepository.MAX_TITLE_LENGTH,

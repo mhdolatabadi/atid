@@ -9,6 +9,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ir.mhdolatabadi.atid.notification.EventReminderScheduler
 import ir.mhdolatabadi.atid.notification.DailyNotificationHelper
 import ir.mhdolatabadi.atid.ui.AtidApp
 import ir.mhdolatabadi.atid.ui.theme.AtidTheme
@@ -50,6 +54,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             postDailyNotification()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch(Dispatchers.IO) { EventReminderScheduler.restore(applicationContext) }
     }
 
     private fun postDailyNotification() {
