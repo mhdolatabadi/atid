@@ -1,6 +1,6 @@
 import { religiousTexts } from './data/religiousTexts';
 import { cities } from './data/cities';
-import { calendarYears, monthPath, monthSpan, monthTitle, yearPath } from './lib/calendarPages';
+import { calendarYears, monthPath, monthSpan, monthTitle, prayerMonthPath, prayerYears, yearPath } from './lib/calendarPages';
 import { toPersianDigits } from './lib/persianDate';
 
 export const SITE_NAME = 'ساعت‌باشی';
@@ -97,6 +97,19 @@ for (const year of calendarYears) {
       description: `تقویم ${title} روزبه‌روز با تاریخ قمری (${span.hijri}) و میلادی (${span.gregorian})، تعطیلات رسمی و مناسبت‌های ماه.`,
       type: 'WebPage',
     };
+  }
+}
+
+for (const city of cities) {
+  for (const year of prayerYears) {
+    for (let month = 1; month <= 12; month++) {
+      const title = monthTitle(year, month);
+      pages[prayerMonthPath(city.slug, year, month)] = {
+        title: `اوقات شرعی ${city.name} ${title}؛ جدول اذان صبح، ظهر و مغرب | ساعت‌باشی`,
+        description: `جدول ماهانه‌ی اوقات شرعی ${city.name} در ${title}: اذان صبح، طلوع آفتاب، اذان ظهر، غروب آفتاب، اذان مغرب و نیمه‌شب شرعی برای همه‌ی روزهای ماه؛ محاسبه‌ی تقریبی به روش تهران.`,
+        type: 'WebPage',
+      };
+    }
   }
 }
 

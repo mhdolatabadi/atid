@@ -3,6 +3,8 @@
 
 import { daysInMonth, fromDate, gregorianMonthNames, monthName, toGregorianDate, toPersianDigits } from './persianDate';
 import { hijriMonthName, toHijri } from './hijriDate';
+import { calculate, IRAN_UTC_OFFSET, midnight } from './prayerTimes';
+import type { City } from '../data/cities';
 
 export const monthSlugs = [
   'farvardin', 'ordibehesht', 'khordad', 'tir', 'mordad', 'shahrivar',
@@ -14,6 +16,9 @@ export const BUILD_YEAR: number = __BUILD_JALALI_YEAR__;
 
 /** Published years: last year, this year and next year. */
 export const calendarYears = [BUILD_YEAR - 1, BUILD_YEAR, BUILD_YEAR + 1];
+
+/** Years with monthly prayer-time tables per city: this year and next year. */
+export const prayerYears = [BUILD_YEAR, BUILD_YEAR + 1];
 
 export function isCalendarYear(year: number): boolean {
   return calendarYears.includes(year);
@@ -39,10 +44,16 @@ export function monthPath(year: number, month: number): string {
 }
 
 /** The neighbouring month, or undefined when it falls outside the published years. */
-export function shiftMonth(year: number, month: number, delta: number): { year: number; month: number } | undefined {
+export function shiftMonth(
+  year: number, month: number, delta: number, years: number[] = calendarYears,
+): { year: number; month: number } | undefined {
   const index = year * 12 + (month - 1) + delta;
   const next = { year: Math.floor(index / 12), month: (index % 12) + 1 };
-  return isCalendarYear(next.year) ? next : undefined;
+  return years.includes(next.year) ? next : undefined;
+}
+
+export function prayerMonthPath(citySlug: string, year: number, month: number): string {
+  return `/prayer-times/${citySlug}/${year}/${monthSlugs[month - 1]}`;
 }
 
 export function monthDays(year: number, month: number): Date[] {
@@ -85,4 +96,10 @@ export function monthSpan(year: number, month: number): { hijri: string; gregori
 export function solarDayLabel(date: Date): string {
   const p = fromDate(date);
   return `${toPersianDigits(p.day)} ${monthName(p.month)}`;
+}
+
+/** A city's prayer times on one day, on Iran time, including shar'i midnight. */
+export function cityTimesOn(city: City, date: Date) {
+  const times = calculate(date.getFullYear(), date.getMonth() + 1, date.getDate(), city.latitude, city.longitude, IRAN_UTC_OFFSET);
+  return { ...times, midnight: midnight(times) };
 }
