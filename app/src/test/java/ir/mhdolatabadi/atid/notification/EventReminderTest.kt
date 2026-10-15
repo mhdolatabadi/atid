@@ -1,8 +1,11 @@
 package ir.mhdolatabadi.atid.notification
 
 import android.app.AlarmManager
+import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import androidx.core.content.ContextCompat
+import ir.mhdolatabadi.atid.R
 import ir.mhdolatabadi.atid.data.PersonalEventsRepository
 import ir.mhdolatabadi.atid.util.PersianDateUtils
 import java.util.Calendar
@@ -75,6 +78,13 @@ class EventReminderTest {
         val receiver = EventReminderReceiver()
         receiver.deliver(context, intent)
         assertEquals(1, notifications.allNotifications.size)
+        val delivered = notifications.allNotifications.single()
+        assertNotNull("reminder carries the Saatbashi portrait", delivered.getLargeIcon())
+        assertEquals(ContextCompat.getColor(context, R.color.brand_primary), delivered.color)
+        assertEquals("عنوان", delivered.extras.getString(Notification.EXTRA_TITLE))
+        assertEquals("یادآوری ساعت‌باشی", delivered.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString())
+        assertEquals(Notification.VISIBILITY_PRIVATE, delivered.visibility)
+        assertNotNull(delivered.contentIntent)
         receiver.deliver(context, intent)
         assertEquals(at, EventReminderScheduler.delivered(context, event.id))
         repo.delete(day, event.id)
