@@ -11,15 +11,13 @@ import { TextDetailPage } from './pages/TextDetailPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { CalendarGuidePage, DateConverterGuidePage } from './pages/SeoGuidePages';
 import { CityPrayerTimesPage, PrayerTimesIndexPage } from './pages/CityPrayerTimesPage';
-import { metaFor } from './seo';
+import { syncPageHead } from './lib/syncPageHead';
 
 /** Keeps the title and description right when navigating without a page load. */
 function HeadSync() {
   const { pathname } = useLocation();
   useEffect(() => {
-    const meta = metaFor(pathname);
-    document.title = meta.title;
-    document.querySelector('meta[name="description"]')?.setAttribute('content', meta.description);
+    syncPageHead(pathname);
   }, [pathname]);
   return null;
 }

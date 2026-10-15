@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
 import App from './App.tsx';
 
-export { metaFor, prerenderRoutes, notFoundMeta, SITE_NAME } from './seo';
+export { metaFor, prerenderRoutes, notFoundMeta, SITE_NAME, structuredDataFor } from './seo';
 export { getReligiousTextById } from './data/religiousTexts';
 
 /** Renders one route to static HTML for scripts/prerender.mjs. */
