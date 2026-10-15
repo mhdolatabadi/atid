@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +38,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -277,6 +280,7 @@ private fun SelectedDayCard(details: DayDetails) {
 
 @Composable
 private fun MonthOccasionsCard(month: CalendarMonthUiState) {
+    var expanded by remember(month.monthIndex) { mutableStateOf(false) }
     val colors = Atid.colors
     Column(
         modifier = Modifier
@@ -295,7 +299,13 @@ private fun MonthOccasionsCard(month: CalendarMonthUiState) {
         if (month.monthOccasions.isEmpty()) {
             Text(text = "مناسبتی ثبت نشده است.", style = MaterialTheme.typography.bodyMedium, color = colors.muted)
         } else {
-            month.monthOccasions.forEach { OccasionLine(dayLabel = it.dayLabel, occasion = it.occasion) }
+            val visible = if (expanded) month.monthOccasions else month.monthOccasions.take(4)
+            visible.forEach { OccasionLine(dayLabel = it.dayLabel, occasion = it.occasion) }
+            if (month.monthOccasions.size > 4) {
+                TextButton(onClick = { expanded = !expanded }, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(if (expanded) "نمایش کمتر" else "نمایش ${PersianDateUtils.toPersianDigits(month.monthOccasions.size - 4)} مناسبت دیگر")
+                }
+            }
         }
         Text(
             text = "تاریخ‌های قمری محاسبه‌ای‌اند و ممکن است با تقویم رسمی کشور یک روز اختلاف داشته باشند.",

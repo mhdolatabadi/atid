@@ -55,10 +55,10 @@
   --radius: 16px;
 }
 
-:root[data-sky='night'] { --sky-top: #081a38; --sky-mid: #123565; --sky-low: #31477f; --orb-1: #5875e8; --orb-2: #4cb9d6; --orb-3: #9a6cd5; }
-:root[data-sky='dawn']  { --sky-top: #cfd8ff; --sky-mid: #f4c6d6; --sky-low: #fde2d0; --orb-1: #ff9fb5; --orb-2: #ffcf8f; --orb-3: #a9b6ff; }
-:root[data-sky='day']   { --sky-top: #b9dcff; --sky-mid: #d6ebff; --sky-low: #eef7ff; --orb-1: #7fc0ff; --orb-2: #9fe3e0; --orb-3: #c6c0ff; }
-:root[data-sky='dusk']  { --sky-top: #5d2b60; --sky-mid: #e76d4c; --sky-low: #ffc77f; --orb-1: #ff8954; --orb-2: #ffb25f; --orb-3: #d86bc1; }
+:root[data-sky='night'] { --sky-top: #b0b8e4; --sky-mid: #a9a0d8; --sky-low: #c5bce8; --orb-1: #5875e8; --orb-2: #4cb9d6; --orb-3: #9a6cd5; }
+:root[data-sky='dawn']  { --sky-top: #f2b1b0; --sky-mid: #ffd1b0; --sky-low: #fff0d2; --orb-1: #ff9fb5; --orb-2: #ffcf8f; --orb-3: #a9b6ff; }
+:root[data-sky='day']   { --sky-top: #83cfff; --sky-mid: #b4e8ff; --sky-low: #e0fbff; --orb-1: #7fc0ff; --orb-2: #9fe3e0; --orb-3: #c6c0ff; }
+:root[data-sky='dusk']  { --sky-top: #d49ac0; --sky-mid: #f4af97; --sky-low: #ffd79b; --orb-1: #ff8954; --orb-2: #ffb25f; --orb-3: #d86bc1; }
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -81,10 +81,10 @@
     --glass-shadow: 0 14px 44px -14px rgb(0 0 0 / 0.6);
   }
 
-  :root[data-sky='night'] { --sky-top: #050817; --sky-mid: #120f38; --sky-low: #241a52; --orb-1: #4a3fc4; --orb-2: #1f7f8c; --orb-3: #7a3a86; }
-  :root[data-sky='dawn']  { --sky-top: #0c1233; --sky-mid: #33265f; --sky-low: #8a4e6c; --orb-1: #c2587a; --orb-2: #d08a4a; --orb-3: #4d4fb8; }
-  :root[data-sky='day']   { --sky-top: #0a2146; --sky-mid: #173f78; --sky-low: #2c6aa6; --orb-1: #2f8fd6; --orb-2: #2bb3a6; --orb-3: #5a5ad0; }
-  :root[data-sky='dusk']  { --sky-top: #140f2e; --sky-mid: #4a2456; --sky-low: #b0603f; --orb-1: #d8664a; --orb-2: #b04c8c; --orb-3: #5a47b8; }
+  :root[data-sky='night'] { --sky-top: #030617; --sky-mid: #0b1234; --sky-low: #17224c; --orb-1: #4a3fc4; --orb-2: #1f7f8c; --orb-3: #7a3a86; }
+  :root[data-sky='dawn']  { --sky-top: #281534; --sky-mid: #693950; --sky-low: #a65d65; --orb-1: #c2587a; --orb-2: #d08a4a; --orb-3: #4d4fb8; }
+  :root[data-sky='day']   { --sky-top: #072c46; --sky-mid: #105c78; --sky-low: #298b9c; --orb-1: #2f8fd6; --orb-2: #2bb3a6; --orb-3: #5a5ad0; }
+  :root[data-sky='dusk']  { --sky-top: #361128; --sky-mid: #853b48; --sky-low: #b56640; --orb-1: #d8664a; --orb-2: #b04c8c; --orb-3: #5a47b8; }
 }
 
 * {
@@ -156,7 +156,7 @@ a {
   height: 60vmax;
   border-radius: 50%;
   filter: blur(70px);
-  opacity: 0.7;
+  opacity: 0.4;
   will-change: transform;
 }
 
@@ -180,7 +180,7 @@ a {
   left: 35%;
   width: 40vmax;
   height: 40vmax;
-  opacity: 0.35;
+  opacity: 0.22;
   animation: drift-3 52s ease-in-out infinite alternate;
 }
 
