@@ -20,8 +20,10 @@
   padding: 0 12px 0 8px;
   min-height: 60px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 20px;
+  gap: 8px 20px;
+  padding-block: 8px;
 }
 
 .ti-brand {
@@ -38,6 +40,9 @@
 
 .ti-nav {
   display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
   gap: 2px;
 }
 
@@ -65,8 +70,8 @@
   color: var(--text);
 }
 
-@media (max-width: 640px) {
-  /* Two rows of links are too tall to keep pinned over the content on a phone. */
+@media (max-width: 900px) {
+  /* A wrapped header should scroll away on compact screens instead of covering content. */
   .ti-header {
     position: static;
   }
