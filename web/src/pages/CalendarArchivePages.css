@@ -121,3 +121,57 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* Monthly prayer-time table: seven narrow columns that fit a 360px screen. */
+
+.ti-prayer-month {
+  overflow-x: auto;
+}
+
+.ti-prayer-month table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.ti-prayer-month th,
+.ti-prayer-month td {
+  padding: 7px 2px;
+  white-space: nowrap;
+}
+
+.ti-prayer-month thead th {
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px solid var(--glass-line);
+}
+
+.ti-prayer-month abbr {
+  text-decoration: none;
+}
+
+.ti-prayer-month tbody tr + tr {
+  border-top: 1px solid var(--glass-line);
+}
+
+.ti-prayer-month tbody th {
+  text-align: start;
+  font-weight: 600;
+}
+
+.ti-prayer-month .is-friday th {
+  color: var(--holiday);
+}
+
+.ti-prayer-month__weekday {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+@media (max-width: 420px) {
+  .ti-prayer-month__weekday {
+    display: none;
+  }
+}
