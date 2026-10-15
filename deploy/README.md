@@ -41,13 +41,21 @@
    docker exec <نام کانتینر caddy> caddy reload --config /etc/caddy/Caddyfile
    ```
 
-   بهتر است این بلوک در خود مخزن نفیر commit شود تا دیپلوی بعدی نفیر آن را پاک نکند.
+   دامنه‌ی production `saatbashi.ir` است. نشانی قدیمی را با یک 301 دائمی به آن بفرستید تا رتبه‌ی صفحه‌های ایندکس‌شده منتقل شود:
+
+   ```caddy
+   atid.mhdolatabadi.ir {
+     redir https://saatbashi.ir{uri} permanent
+   }
+   ```
+
+   بهتر است این بلوک‌ها در خود مخزن نفیر commit شوند تا دیپلوی بعدی نفیر آن را پاک نکند.
 
 ## ایمیج‌ها
 
 ورک‌فلوی **Images** با هر push به `master` ایمیج را می‌سازد و با تگ commit و `latest` در `ghcr.io/mhdolatabadi/atid/web` منتشر می‌کند. پکیج باید public باشد، یا سرور با توکن `read:packages` روی `ghcr.io` لاگین کرده باشد.
 
-پیش از اولین build، در **Settings → Secrets and variables → Actions → Variables** متغیر `ATID_SITE_URL` را دقیقاً برابر نشانی عمومی HTTPS سایت (برای production: `https://atid.mhdolatabadi.ir`) بگذارید. image بدون آن ساخته نمی‌شود تا canonical URL و `sitemap.xml` هرگز ناقص deploy نشوند.
+پیش از اولین build، در **Settings → Secrets and variables → Actions → Variables** متغیر `ATID_SITE_URL` را دقیقاً برابر نشانی عمومی HTTPS سایت (برای production: `https://saatbashi.ir`) بگذارید. image بدون آن ساخته نمی‌شود تا canonical URL و `sitemap.xml` هرگز ناقص deploy نشوند.
 
 ## به‌روزرسانی
 

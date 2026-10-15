@@ -84,8 +84,10 @@ if (siteUrl) robots.push(`Sitemap: ${siteUrl}/sitemap.xml`);
 await writeFile(join(dist, 'robots.txt'), robots.join('\n') + '\n');
 
 if (siteUrl) {
+  // Every deploy re-renders every page from the current data, so the build date is each page's last change.
+  const lastmod = new Date().toISOString().slice(0, 10);
   const urls = indexable
-    .map((route) => `  <url><loc>${siteUrl}${route === '/' ? '/' : route}</loc></url>`)
+    .map((route) => `  <url><loc>${siteUrl}${route === '/' ? '/' : route}</loc><lastmod>${lastmod}</lastmod></url>`)
     .join('\n');
   await writeFile(
     join(dist, 'sitemap.xml'),
