@@ -10,4 +10,10 @@ class PersonalEventTimeLabelTest {
         assertEquals("ساعت ۰۹:۰۵", eventTimeLabel(545))
         assertEquals("ساعت ۲۳:۵۹", eventTimeLabel(1439))
     }
+    @Test fun formatsReminderLeadsInPersian() {
+        assertEquals("هنگام رویداد", reminderLeadLabel(0))
+        assertEquals("۱۵ دقیقه قبل", reminderLeadLabel(15))
+        assertEquals("۶۰ دقیقه قبل", reminderLeadLabel(60))
+    }
+
 }
