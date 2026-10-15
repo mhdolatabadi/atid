@@ -27,11 +27,11 @@ jobs:
       - name: Check pre-rendered pages
         run: |
           set -e
-          page=dist/app/texts/ziyarat_ashura/index.html
-          grep -q '<title>متن کامل زیارت عاشورا' "$page"
-          grep -q 'rel="canonical" href="https://atid.example.com/app/texts/ziyarat_ashura"' "$page"
+          page=dist/prayer-times/tehran/index.html
+          grep -q '<title>اوقات شرعی تهران' "$page"
+          grep -q 'rel="canonical" href="https://atid.example.com/prayer-times/tehran"' "$page"
           grep -q 'application/ld+json' "$page"
-          grep -q 'السَّلامُ' "$page"   # the text itself is in the HTML
+          if [ -e dist/app/texts ]; then echo "religious texts were removed" >&2; exit 1; fi
           grep -q 'name="robots" content="noindex"' dist/app/home/index.html
           if grep -q 'noindex' dist/index.html; then echo "home page must be indexable" >&2; exit 1; fi
           grep -q '<loc>https://atid.example.com/app/prayer-times</loc>' dist/sitemap.xml

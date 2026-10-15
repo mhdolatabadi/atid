@@ -46,7 +46,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import ir.mhdolatabadi.atid.R
 import ir.mhdolatabadi.atid.ui.components.SkyBackground
 import ir.mhdolatabadi.atid.ui.components.glass
@@ -54,22 +53,18 @@ import ir.mhdolatabadi.atid.ui.components.pressScale
 import ir.mhdolatabadi.atid.ui.dashboard.DashboardScreen
 import ir.mhdolatabadi.atid.ui.home.HomeScreen
 import ir.mhdolatabadi.atid.ui.notifications.PrayerTimesScreen
-import ir.mhdolatabadi.atid.ui.texts.TextDetailScreen
-import ir.mhdolatabadi.atid.ui.texts.TextsScreen
 import ir.mhdolatabadi.atid.ui.theme.Atid
 
 private sealed class AtidDestination(val route: String, val labelRes: Int, val iconRes: Int) {
     object Home : AtidDestination("home", R.string.title_home, R.drawable.ic_tab_qada)
     object Dashboard : AtidDestination("dashboard", R.string.title_dashboard, R.drawable.ic_tab_calendar)
     object PrayerTimes : AtidDestination("prayer_times", R.string.title_notifications, R.drawable.ic_tab_prayer_times)
-    object Texts : AtidDestination("texts", R.string.title_texts, R.drawable.ic_tab_texts)
 }
 
 private val bottomBarDestinations = listOf(
     AtidDestination.Dashboard,
     AtidDestination.Home,
-    AtidDestination.PrayerTimes,
-    AtidDestination.Texts
+    AtidDestination.PrayerTimes
 )
 
 /** Space the floating tab bar takes, so screens can keep their last item clear of it. */
@@ -108,23 +103,12 @@ fun AtidApp() {
             composable(AtidDestination.Home.route) { HomeScreen() }
             composable(AtidDestination.Dashboard.route) { DashboardScreen() }
             composable(AtidDestination.PrayerTimes.route) { PrayerTimesScreen() }
-            composable(AtidDestination.Texts.route) {
-                TextsScreen(onTextClick = { id -> navController.navigate("texts/$id") })
-            }
-            composable(
-                route = "texts/{textId}",
-                arguments = listOf(navArgument("textId") { })
-            ) { backStackEntry ->
-                val textId = backStackEntry.arguments?.getString("textId").orEmpty()
-                TextDetailScreen(textId = textId, onBack = { navController.popBackStack() })
-            }
         }
 
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = backStackEntry?.destination
         val selectedIndex = bottomBarDestinations.indexOfFirst { destination ->
-            currentRoute?.hierarchy?.any { it.route == destination.route } == true ||
-                (destination == AtidDestination.Texts && currentRoute?.route?.startsWith("texts/") == true)
+            currentRoute?.hierarchy?.any { it.route == destination.route } == true
         }.coerceAtLeast(0)
 
         FloatingTabBar(

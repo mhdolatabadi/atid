@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { religiousTexts } from '../data/religiousTexts';
 import './SiteChrome.css';
 
 const ANDROID_RELEASE = 'https://github.com/mhdolatabadi/atid/releases/latest';
@@ -10,7 +9,6 @@ const navLinks = [
   { to: '/app/prayer-times', label: 'اوقات شرعی' },
   { to: '/date-converter', label: 'تبدیل تاریخ' },
   { to: '/app/home', label: 'نماز و روزه قضا' },
-  { to: '/app/texts', label: 'متون مذهبی' },
 ];
 
 export function SiteHeader() {
@@ -48,14 +46,6 @@ export function SiteFooter() {
             <li><Link to="/date-converter">تبدیل تاریخ شمسی، قمری و میلادی</Link></li>
             <li><Link to="/app/prayer-times">اوقات شرعی امروز</Link></li>
             <li><Link to="/prayer-times">اوقات شرعی شهرهای ایران</Link></li>
-          </ul>
-        </section>
-        <section aria-labelledby="footer-texts">
-          <h2 id="footer-texts">متون مذهبی</h2>
-          <ul>
-            {religiousTexts.map((text) => (
-              <li key={text.id}><Link to={`/app/texts/${text.id}`}>{text.title}</Link></li>
-            ))}
           </ul>
         </section>
         <section aria-labelledby="footer-more">

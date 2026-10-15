@@ -1,19 +1,18 @@
 import type { CSSProperties } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { QadaIcon, CalendarIcon, ClockIcon, BookIcon } from './icons';
+import { QadaIcon, CalendarIcon, ClockIcon } from './icons';
 import './AppShell.css';
 
 const tabs = [
   { to: '/app/home', label: 'قضا', Icon: QadaIcon },
   { to: '/app/calendar', label: 'تقویم', Icon: CalendarIcon },
   { to: '/app/prayer-times', label: 'اوقات شرعی', Icon: ClockIcon },
-  { to: '/app/texts', label: 'متون مذهبی', Icon: BookIcon },
 ];
 
 export function AppShell() {
   const { pathname } = useLocation();
   const active = Math.max(0, tabs.findIndex((tab) => pathname.startsWith(tab.to)));
-  // Keyed by path so every navigation, including texts → a text, plays the page entrance.
+  // Keyed by path so every navigation plays the page entrance.
   return (
     <div className="app-shell">
       <main key={pathname} className="app-shell__content page-enter">

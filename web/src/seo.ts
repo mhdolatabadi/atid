@@ -1,4 +1,3 @@
-import { religiousTexts } from './data/religiousTexts';
 import { cities } from './data/cities';
 
 export const SITE_NAME = 'ساعت‌باشی';
@@ -9,7 +8,7 @@ export interface PageMeta {
   /** Personal pages are kept out of search results. */
   noindex?: boolean;
   /** schema.org type for the page's JSON-LD. */
-  type: 'WebSite' | 'WebPage' | 'Article' | 'CollectionPage';
+  type: 'WebSite' | 'WebPage' | 'CollectionPage';
   faq?: { question: string; answer: string }[];
 }
 
@@ -51,20 +50,7 @@ const pages: Record<string, PageMeta> = {
       'اوقات شرعی امروز به افق تهران یا موقعیت شما: اذان صبح، طلوع آفتاب، اذان ظهر، عصر، غروب آفتاب، اذان مغرب و عشا.',
     type: 'WebPage',
   },
-  '/app/texts': {
-    title: 'متون مذهبی؛ زیارت عاشورا، دعای هفتم صحیفه و حدیث کساء | ساعت‌باشی',
-    description: 'متن کامل زیارت عاشورا، دعای هفتم صحیفه سجادیه و حدیث شریف کساء.',
-    type: 'CollectionPage',
-  },
 };
-
-for (const text of religiousTexts) {
-  pages[`/app/texts/${text.id}`] = {
-    title: `متن کامل ${text.title} | ساعت‌باشی`,
-    description: `${text.title}: ${text.subtitle}. متن کامل برای خواندن در موبایل و رایانه.`,
-    type: 'Article',
-  };
-}
 
 pages['/prayer-times'] = {
   title: 'اوقات شرعی شهرهای ایران؛ اذان صبح، ظهر و مغرب امروز | ساعت‌باشی',
@@ -111,13 +97,11 @@ export function structuredDataFor(pathname: string, origin: string) {
     name: meta.title, description: meta.description, inLanguage: 'fa',
     ...(path === '/' ? { name: SITE_NAME, alternateName: 'Saatbashi' } :
       { isPartOf: { '@id': `${site}#page` } }),
-    ...(meta.type === 'Article' ? { headline: religiousTexts.find(t => path.endsWith(`/${t.id}`))?.title ?? meta.title } : {}),
   };
   const graph: Record<string, unknown>[] = [page];
   if (path !== '/' && !meta.noindex) {
     const paths = ['/'];
     if (path.startsWith('/prayer-times/')) paths.push('/prayer-times');
-    if (path.startsWith('/app/texts/')) paths.push('/app/texts');
     paths.push(path);
     const breadcrumbId = `${url}#breadcrumb`;
     page.breadcrumb = { '@id': breadcrumbId };
