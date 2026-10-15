@@ -25,11 +25,12 @@ export function PrayerTimesTable({ times, nowMinutes }: { times: PrayerTimes; no
   const next = nextRow?.key;
   return (
     <>
-    {nextRow && (
-      <p className="ti-prayer__countdown" aria-live="polite">
-        {formatDuration(toMinutes(values[nextRow.key]) - nowMinutes)} تا {nextRow.label}
-      </p>
-    )}
+    <p className="ti-prayer__countdown" aria-live="polite">
+      {nextRow
+        ? `${formatDuration(toMinutes(values[nextRow.key]) - nowMinutes)} تا ${nextRow.label}`
+        : // After the last prayer, count down to tomorrow's dawn (today's time is within a minute or two).
+          `${formatDuration(toMinutes(values.fajr) + 1440 - nowMinutes)} تا اذان صبح فردا`}
+    </p>
     <dl className="ti-prayer__list">
       {rows.map(({ key, label }) => (
         <div key={key} className={'ti-prayer__row' + (key === next ? ' is-next' : '')}>

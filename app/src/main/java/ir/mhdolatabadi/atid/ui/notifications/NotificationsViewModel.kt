@@ -17,7 +17,7 @@ data class PrayerTimesUiState(
     val citySlug: String?,
     /** Key of the next upcoming prayer (fajr/sunrise/dhuhr/asr/sunset/maghrib/isha), for highlighting. */
     val nextPrayerKey: String,
-    /** e.g. "۱ ساعت و ۲۰ دقیقه تا اذان ظهر"; null after the last prayer of the day. */
+    /** e.g. "۱ ساعت و ۲۰ دقیقه تا اذان ظهر"; after the last prayer, tomorrow's dawn. */
     val countdown: String? = null
 )
 
@@ -82,7 +82,8 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
     private fun countdown(times: PrayerTimes, nowMinutes: Int): String? {
         val values = listOf(times.fajr, times.sunrise, times.dhuhr, times.asr, times.sunset, times.maghrib, times.isha)
         val index = values.indexOfFirst { toMinutesOfDay(it) > nowMinutes }
-        if (index < 0) return null
+        // After the last prayer, count down to tomorrow's dawn (today's time is within a minute or two).
+        if (index < 0) return "${PrayerTimesCalculator.formatDuration(toMinutesOfDay(times.fajr) + 1440 - nowMinutes)} تا اذان صبح فردا"
         return "${PrayerTimesCalculator.formatDuration(toMinutesOfDay(values[index]) - nowMinutes)} تا ${labels[index]}"
     }
 
