@@ -2,7 +2,6 @@ import type { CSSProperties } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { QadaIcon, CalendarIcon, ClockIcon, BookIcon } from './icons';
 import './AppShell.css';
-import { SaatbashiGuide } from './SaatbashiGuide';
 
 const tabs = [
   { to: '/app/home', label: 'قضا', Icon: QadaIcon },
@@ -18,7 +17,6 @@ export function AppShell() {
   return (
     <div className="app-shell">
       <main key={pathname} className="app-shell__content page-enter">
-        <SaatbashiGuide />
         <Outlet />
       </main>
       <nav className="app-shell__nav glass" aria-label="بخش‌ها" style={{ '--active': active } as CSSProperties}>
