@@ -263,7 +263,13 @@ function CalendarSection({ now }: { now: Date }) {
 
       <section className="ti-card ti-occasions glass enter" style={{ animationDelay: '160ms' }} aria-label="مناسبت‌های ماه">
         <h2 className="ti-card__title">مناسبت‌های {monthName(view.month)}</h2>
-        <OccasionList items={monthOccasions} />
+        <OccasionList items={monthOccasions.slice(0, 4)} />
+        {monthOccasions.length > 4 && (
+          <details key={`${view.year}-${view.month}`} className="ti-occasions__more">
+            <summary>نمایش {toPersianDigits(monthOccasions.length - 4)} مناسبت دیگر</summary>
+            <OccasionList items={monthOccasions.slice(4)} />
+          </details>
+        )}
         <p className="ti-note">
           تاریخ‌های قمری محاسبه‌ای‌اند و ممکن است با تقویم رسمی کشور یک روز اختلاف داشته باشند.
         </p>

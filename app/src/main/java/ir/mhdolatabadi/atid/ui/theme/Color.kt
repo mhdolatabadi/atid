@@ -67,16 +67,16 @@ data class SkyPalette(val top: Color, val mid: Color, val low: Color, val orb1: 
 
 fun skyPalette(period: SkyPeriod, dark: Boolean): SkyPalette = if (dark) {
     when (period) {
-        SkyPeriod.NIGHT -> SkyPalette(Color(0xFF050817), Color(0xFF120F38), Color(0xFF241A52), Color(0xFF4A3FC4), Color(0xFF1F7F8C), Color(0xFF7A3A86))
-        SkyPeriod.DAWN -> SkyPalette(Color(0xFF0C1233), Color(0xFF33265F), Color(0xFF8A4E6C), Color(0xFFC2587A), Color(0xFFD08A4A), Color(0xFF4D4FB8))
-        SkyPeriod.DAY -> SkyPalette(Color(0xFF0A2146), Color(0xFF173F78), Color(0xFF2C6AA6), Color(0xFF2F8FD6), Color(0xFF2BB3A6), Color(0xFF5A5AD0))
-        SkyPeriod.DUSK -> SkyPalette(Color(0xFF140F2E), Color(0xFF4A2456), Color(0xFFB0603F), Color(0xFFD8664A), Color(0xFFB04C8C), Color(0xFF5A47B8))
+        SkyPeriod.NIGHT -> SkyPalette(Color(0xFF030617), Color(0xFF0B1234), Color(0xFF17224C), Color(0xFF4A3FC4), Color(0xFF1F7F8C), Color(0xFF7A3A86))
+        SkyPeriod.DAWN -> SkyPalette(Color(0xFF281534), Color(0xFF693950), Color(0xFFA65D65), Color(0xFFC2587A), Color(0xFFD08A4A), Color(0xFF4D4FB8))
+        SkyPeriod.DAY -> SkyPalette(Color(0xFF072C46), Color(0xFF105C78), Color(0xFF298B9C), Color(0xFF2F8FD6), Color(0xFF2BB3A6), Color(0xFF5A5AD0))
+        SkyPeriod.DUSK -> SkyPalette(Color(0xFF361128), Color(0xFF853B48), Color(0xFFB56640), Color(0xFFD8664A), Color(0xFFB04C8C), Color(0xFF5A47B8))
     }
 } else {
     when (period) {
-        SkyPeriod.NIGHT -> SkyPalette(Color(0xFFC3CDF0), Color(0xFFB3ACEA), Color(0xFFD9CCF2), Color(0xFF8F86FF), Color(0xFF7CC6FF), Color(0xFFD59CF0))
-        SkyPeriod.DAWN -> SkyPalette(Color(0xFFCFD8FF), Color(0xFFF4C6D6), Color(0xFFFDE2D0), Color(0xFFFF9FB5), Color(0xFFFFCF8F), Color(0xFFA9B6FF))
-        SkyPeriod.DAY -> SkyPalette(Color(0xFFB9DCFF), Color(0xFFD6EBFF), Color(0xFFEEF7FF), Color(0xFF7FC0FF), Color(0xFF9FE3E0), Color(0xFFC6C0FF))
-        SkyPeriod.DUSK -> SkyPalette(Color(0xFFD6C8F5), Color(0xFFF8C0C8), Color(0xFFFFDCB8), Color(0xFFFF9A7A), Color(0xFFF5A3C7), Color(0xFFB39CF5))
+        SkyPeriod.NIGHT -> SkyPalette(Color(0xFFB0B8E4), Color(0xFFA9A0D8), Color(0xFFC5BCE8), Color(0xFF8F86FF), Color(0xFF7CC6FF), Color(0xFFD59CF0))
+        SkyPeriod.DAWN -> SkyPalette(Color(0xFFF2B1B0), Color(0xFFFFD1B0), Color(0xFFFFF0D2), Color(0xFFFF9FB5), Color(0xFFFFCF8F), Color(0xFFA9B6FF))
+        SkyPeriod.DAY -> SkyPalette(Color(0xFF83CFFF), Color(0xFFB4E8FF), Color(0xFFE0FBFF), Color(0xFF7FC0FF), Color(0xFF9FE3E0), Color(0xFFC6C0FF))
+        SkyPeriod.DUSK -> SkyPalette(Color(0xFFD49AC0), Color(0xFFF4AF97), Color(0xFFFFD79B), Color(0xFFFF9A7A), Color(0xFFF5A3C7), Color(0xFFB39CF5))
     }
 }

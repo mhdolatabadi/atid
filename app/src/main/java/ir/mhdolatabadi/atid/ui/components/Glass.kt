@@ -110,7 +110,7 @@ fun SkyBackground(modifier: Modifier = Modifier) {
         label = "driftT"
     )
     val eased = FastOutSlowInEasing.transform(t)
-    val orbAlpha = if (dark) 0.75f else 0.85f
+    val orbAlpha = 0.4f
 
     Canvas(modifier.fillMaxSize()) {
         drawRect(Brush.verticalGradient(listOf(top, mid, low)))
