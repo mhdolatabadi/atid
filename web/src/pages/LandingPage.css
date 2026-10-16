@@ -317,6 +317,8 @@
 
 .ti-day__sub {
   display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
   justify-content: space-between;
   align-items: baseline;
   font-size: 12px;
@@ -378,7 +380,7 @@
   }
   .ti-day {
     min-height: 58px;
-    padding: 5px 4px 4px;
+    padding: 5px 3px 4px;
     border-radius: 9px;
   }
   .ti-day__solar {
@@ -386,7 +388,7 @@
     text-align: center;
   }
   .ti-day__sub {
-    font-size: 10.5px;
+    font-size: 12px;
   }
 }
 
