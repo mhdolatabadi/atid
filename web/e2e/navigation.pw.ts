@@ -11,6 +11,11 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await expect(page).toHaveURL(/\/app\/prayer-times$/);
     await nav.getByRole('link', { name: 'تقویم', exact: true }).click();
     await expect(page).toHaveURL(/\/app\/calendar$/);
+    await expect(page.getByRole('heading', { name: 'تقویم', exact: true })).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('.page-enter').evaluate(async el => {
+      await Promise.all(el.getAnimations().map(animation => animation.finished));
+    });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const links = await nav.getByRole('link').all();
     for (const link of links) {
