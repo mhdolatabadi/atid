@@ -5,7 +5,7 @@
 ## ۱. تأیید مالکیت دامنه (یک بار، توسط صاحب سایت)
 
 1. به [search.google.com/search-console](https://search.google.com/search-console) بروید و **Add property** را بزنید.
-2. نوع **Domain** را انتخاب کنید و `atid.mhdolatabadi.ir` (یا کل `mhdolatabadi.ir`) را وارد کنید.
+2. نوع **Domain** را انتخاب کنید و `saatbashi.ir` را وارد کنید.
 3. گوگل یک رکورد `TXT` می‌دهد. آن را در پنل DNS دامنه اضافه کنید و **Verify** را بزنید. ممکن است چند دقیقه تا چند ساعت طول بکشد.
 
 نوع Domain همه‌ی زیردامنه‌ها و هر دو `http`/`https` را پوشش می‌دهد و به تغییر کد سایت نیاز ندارد.
@@ -15,7 +15,7 @@
 در **Sitemaps** نشانی زیر را ثبت کنید:
 
 ```
-https://atid.mhdolatabadi.ir/sitemap.xml
+https://saatbashi.ir/sitemap.xml
 ```
 
 این فایل موقع build از روی `web/src/seo.ts` ساخته می‌شود و فقط صفحه‌های قابل‌ایندکس را دارد (صفحه‌ی شخصی قضا `noindex` است و در آن نیست). وضعیت باید «Success» شود و تعداد آدرس‌های کشف‌شده با فایل یکی باشد.
@@ -24,10 +24,12 @@ https://atid.mhdolatabadi.ir/sitemap.xml
 
 در **URL Inspection** هر کدام از این‌ها را بررسی کنید و اگر ایندکس نشده بود **Request indexing** را بزنید:
 
-- `https://atid.mhdolatabadi.ir/` (تقویم و اوقات شرعی امروز)
-- `https://atid.mhdolatabadi.ir/app/prayer-times`
-- `https://atid.mhdolatabadi.ir/prayer-times/tehran`
-- `https://atid.mhdolatabadi.ir/app/calendar`
+- `https://saatbashi.ir/` (تقویم و اوقات شرعی امروز)
+- `https://saatbashi.ir/prayer-times/tehran`
+- `https://saatbashi.ir/prayer-times`
+- `https://saatbashi.ir/calendar`
+- `https://saatbashi.ir/date-converter`
+
 
 در همین ابزار، **View crawled page** نشان می‌دهد گوگل چه HTMLای دیده است؛ متن کامل صفحه باید آنجا باشد (صفحه‌ها موقع build از قبل ساخته می‌شوند).
 
@@ -47,11 +49,16 @@ https://atid.mhdolatabadi.ir/sitemap.xml
 
 هر چند هفته یک بار:
 
-1. در **Performance → Queries** ببینید کاربران با چه عبارت‌هایی سایت را پیدا می‌کنند (مثلاً «اوقات شرعی تهران»، «تقویم مهر ۱۴۰۵»).
+1. در **Performance → Queries** ببینید کاربران با چه عبارت‌هایی سایت را پیدا می‌کنند (مثلاً «اوقات شرعی تهران»، «تبدیل تاریخ شمسی به میلادی»، «تقویم مهر ۱۴۰۵»).
+
 2. عبارت‌هایی که نمایش دارند ولی کلیک کم، نشانه‌ی عنوان یا توضیح ضعیف‌اند؛ آن‌ها را در `web/src/seo.ts` اصلاح کنید.
 3. عبارت‌های پرجست‌وجویی که صفحه‌ای برایشان نداریم، ایده‌ی محتوای جدید هستند؛ برایشان issue بسازید.
 4. بعد از هر تغییر مهم، صفحه‌ی مربوط را در URL Inspection دوباره بررسی و درخواست ایندکس کنید.
 
-## Bing (اختیاری)
+## انتقال از دامنه‌ی قدیمی
+
+اگر `atid.mhdolatabadi.ir` قبلاً در Search Console ثبت شده، بعد از فعال شدن redirect دائمی آن به `saatbashi.ir` (بخش Caddy در `deploy/README.md`)، در property قدیمی از **Settings → Change of address** دامنه‌ی جدید را معرفی کنید. نشانی‌های قدیمی متون مذهبی (`/app/texts/...`) با 301 به صفحه‌ی اصلی می‌روند و لازم نیست جداگانه حذف شوند.
+
+## Bing
 
 [Bing Webmaster Tools](https://www.bing.com/webmasters) می‌تواند تنظیمات Search Console را مستقیم وارد کند (**Import from Google Search Console**) و همان sitemap را می‌خواند.

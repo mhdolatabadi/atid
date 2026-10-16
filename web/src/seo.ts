@@ -1,6 +1,10 @@
 import { cities } from './data/cities';
+import { faqs } from './data/faq';
 
 export const SITE_NAME = 'ساعت‌باشی';
+
+/** Public Android builds (same page as the site's download link). */
+export const ANDROID_RELEASE = 'https://github.com/mhdolatabadi/saatbashi/releases/latest';
 
 export interface PageMeta {
   title: string;
@@ -9,7 +13,6 @@ export interface PageMeta {
   noindex?: boolean;
   /** schema.org type for the page's JSON-LD. */
   type: 'WebSite' | 'WebPage' | 'CollectionPage';
-  faq?: { question: string; answer: string }[];
 }
 
 const home: PageMeta = {
@@ -25,13 +28,11 @@ const pages: Record<string, PageMeta> = {
     title: 'تقویم شمسی؛ تاریخ امروز، مناسبت‌ها و تعطیلات | ساعت‌باشی',
     description: 'راهنمای تقویم شمسی ایران: تاریخ امروز، تقویم ماه جاری، مناسبت‌ها، تعطیلات و نمایش هم‌زمان تاریخ میلادی و قمری.',
     type: 'WebPage',
-    faq: [{ question: 'تقویم شمسی چیست؟', answer: 'تقویم هجری شمسی، تقویم رسمی ایران است و سال آن با نوروز آغاز می‌شود.' }],
   },
   '/date-converter': {
     title: 'تبدیل تاریخ شمسی به میلادی و قمری | ساعت‌باشی',
     description: 'تبدیل آنلاین تاریخ شمسی به میلادی و قمری، میلادی به شمسی و قمری به شمسی، همراه با روز هفته.',
     type: 'WebPage',
-    faq: [{ question: 'چطور تاریخ شمسی را به میلادی تبدیل کنم؟', answer: 'در صفحهٔ تبدیل تاریخ ساعت‌باشی گزینهٔ «از شمسی» را انتخاب کنید و روز، ماه و سال را وارد کنید.' }],
   },
   '/app/home': {
     title: 'شمارنده‌ی نماز و روزه‌ی قضا | ساعت‌باشی',
@@ -99,6 +100,24 @@ export function structuredDataFor(pathname: string, origin: string) {
       { isPartOf: { '@id': `${site}#page` } }),
   };
   const graph: Record<string, unknown>[] = [page];
+  if (path === '/') {
+    page.publisher = { '@id': `${site}#organization` };
+    graph.push(
+      { '@type': 'Organization', '@id': `${site}#organization`, name: SITE_NAME, alternateName: 'Saatbashi',
+        url: site, logo: `${origin}/icon-512.png` },
+      { '@type': 'SoftwareApplication', '@id': `${site}#android`, name: SITE_NAME, operatingSystem: 'Android',
+        applicationCategory: 'LifestyleApplication', inLanguage: 'fa', downloadUrl: ANDROID_RELEASE,
+        publisher: { '@id': `${site}#organization` },
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'IRR' } },
+    );
+  }
+  const faq = faqs[path];
+  if (faq) {
+    page.mainEntity = { '@id': `${url}#faq` };
+    graph.push({ '@type': 'FAQPage', '@id': `${url}#faq`, url, inLanguage: 'fa',
+      mainEntity: faq.map(({ question, answer }) => ({ '@type': 'Question', name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer } })) });
+  }
   if (path !== '/' && !meta.noindex) {
     const paths = ['/'];
     if (path.startsWith('/prayer-times/')) paths.push('/prayer-times');

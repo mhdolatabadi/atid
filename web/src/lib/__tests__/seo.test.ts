@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { faqs } from '../../data/faq';
 import { canonicalPath, metaFor, prerenderRoutes, structuredDataFor } from '../../seo';
 
 describe('search metadata', () => {
@@ -29,5 +30,16 @@ describe('search metadata', () => {
     expect(JSON.stringify(city)).toContain('https://example.test/prayer-times');
     expect(city['@graph'][1]['@type']).toBe('BreadcrumbList');
     expect(structuredDataFor('/app/home', 'https://example.test')['@graph']).toHaveLength(1);
+  });
+  it('describes the site, its publisher and the Android app on the home page', () => {
+    const types = structuredDataFor('/', 'https://example.test')['@graph'].map(node => node['@type']);
+    expect(types).toEqual(['WebSite', 'Organization', 'SoftwareApplication']);
+  });
+  it('emits the visible FAQ of guide pages as FAQPage', () => {
+    for (const [path, entries] of Object.entries(faqs)) {
+      const faq = structuredDataFor(path, 'https://example.test')['@graph'].find(node => node['@type'] === 'FAQPage');
+      expect(faq?.mainEntity).toEqual(entries.map(({ question, answer }) =>
+        ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })));
+    }
   });
 });

@@ -93,6 +93,10 @@ jobs:
           trap 'docker rm -f "$container_id"' EXIT
           for attempt in $(seq 1 30); do
             if curl --fail --silent --show-error --head http://127.0.0.1:8080/ | tr -d '\r' | grep -Fqx 'X-Atid-Revision: ci-test'; then
+              # Removed religious-text URLs redirect home instead of returning 404.
+              curl --silent --show-error --head http://127.0.0.1:8080/app/texts/hadith_kisa | tr -d '\r' > redirect.txt
+              head -1 redirect.txt | grep -q ' 301'
+              grep -Fqx 'Location: /' redirect.txt
               exit 0
             fi
             sleep 1
