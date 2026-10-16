@@ -21,6 +21,7 @@ import { ClientOnly } from '../components/ClientOnly';
 import { PublicLayout } from '../components/SiteChrome';
 import { DateConverter } from '../components/DateConverter';
 import { gregorianLabel, hijriLabel, solarLabel } from '../lib/dateLabels';
+import { BUILD_YEAR, yearPath } from '../lib/calendarPages';
 import './LandingPage.css';
 
 const weekdayHeaders = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
@@ -361,6 +362,7 @@ export function LandingPage() {
             می‌توانید تاریخ شمسی و میلادی را به هم تبدیل کنید.
           </p>
           <ul className="ti-about__links">
+            <li><Link to={yearPath(BUILD_YEAR)}>تقویم {toPersianDigits(BUILD_YEAR)}</Link></li>
             <li><Link to="/app/prayer-times">اوقات شرعی امروز</Link></li>
             <li><Link to="/prayer-times">اوقات شرعی شهرهای ایران</Link></li>
             <li><Link to="/app/calendar">تقویم ماه جاری</Link></li>

@@ -1,0 +1,177 @@
+/* Static yearly and monthly calendar pages. */
+
+.ti-archive {
+  margin-top: 20px;
+}
+
+.ti-archive__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.ti-archive__nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-weak);
+  color: var(--text);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.ti-archive__nav a:hover {
+  background: var(--accent-soft);
+}
+
+.ti-archive__days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ti-archive__day {
+  padding: 10px 0;
+}
+
+.ti-archive__day + .ti-archive__day {
+  border-top: 1px solid var(--glass-line);
+}
+
+.ti-archive__date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 12px;
+}
+
+.ti-archive__solar {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ti-archive__sub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ti-archive__day--holiday .ti-archive__solar {
+  color: var(--holiday);
+}
+
+.ti-archive__occasions {
+  margin: 6px 0 0;
+  padding-inline-start: 18px;
+  font-size: 14px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.ti-archive__occasions .ti-occasion--holiday {
+  color: var(--holiday);
+}
+
+.ti-archive__months {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.ti-archive__months a {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 56px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-line);
+  background: var(--glass-weak);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.ti-archive__months a:hover {
+  background: var(--accent-soft);
+}
+
+.ti-archive__month-name {
+  font-weight: 700;
+}
+
+.ti-archive__holiday-day {
+  flex-basis: 128px;
+}
+
+.ti-about__links + .ti-about__links {
+  margin-top: 10px;
+}
+
+.ti-archive a:focus-visible,
+.ti-archive__nav a:focus-visible,
+.ti-archive__months a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Monthly prayer-time table: seven narrow columns that fit a 360px screen. */
+
+.ti-prayer-month {
+  overflow-x: auto;
+}
+
+.ti-prayer-month table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.ti-prayer-month th,
+.ti-prayer-month td {
+  padding: 7px 2px;
+  white-space: nowrap;
+}
+
+.ti-prayer-month thead th {
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px solid var(--glass-line);
+}
+
+.ti-prayer-month abbr {
+  text-decoration: none;
+}
+
+.ti-prayer-month tbody tr + tr {
+  border-top: 1px solid var(--glass-line);
+}
+
+.ti-prayer-month tbody th {
+  text-align: start;
+  font-weight: 600;
+}
+
+.ti-prayer-month .is-friday th {
+  color: var(--holiday);
+}
+
+.ti-prayer-month__weekday {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+@media (max-width: 420px) {
+  .ti-prayer-month__weekday {
+    display: none;
+  }
+}

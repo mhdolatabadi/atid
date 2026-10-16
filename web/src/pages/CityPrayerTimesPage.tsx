@@ -6,6 +6,7 @@ import { APPROXIMATE_NOTE } from '../lib/prayerTimes';
 import { cities, cityBySlug, type City } from '../data/cities';
 import { minutesAt, timesFor } from '../lib/place';
 import { NotFoundPage } from './NotFoundPage';
+import { PrayerMonthLinks } from './PrayerMonthPage';
 import './LandingPage.css';
 
 function CityList({ current }: { current?: string }) {
@@ -42,6 +43,7 @@ export function CityPrayerTimesPage() {
           </ClientOnly>
           <p className="ti-note">{APPROXIMATE_NOTE} ساعت‌ها به وقت رسمی ایران‌اند.</p>
         </section>
+        <PrayerMonthLinks city={city} />
         <section className="ti-about glass" aria-labelledby="cities-title">
           <h2 id="cities-title" className="ti-card__title">شهرهای دیگر</h2>
           <CityList current={city.slug} />
