@@ -4,7 +4,9 @@ This file defines the standing rules for every contributor and coding agent work
 
 ## Product identity and scope
 
-- The product name is **Saatbashi** (ساعت‌باشی). The project was first called Atid; the repository, the Android application ID, the Docker/Compose names (`atid`, `atid-web`) and the domain keep the `atid` identifier on purpose. Do not rename them.
+- The product name is **Saatbashi** (ساعت‌باشی). The project was first called Atid; the repository is now `mhdolatabadi/saatbashi` and the public domain is `saatbashi.ir`. The Android application ID and Docker/Compose names (`atid`, `atid-web`) retain `atid` for compatibility; do not rename them.
+- Product scope is a Persian calendar and prayer-time/adhan app. Prioritize dates, occasions, date conversion, city selection and reliable prayer alerts. Do not expand into task management, recurring personal-event workflows, qada counters or religious reading.
+- Primary app navigation has only Calendar and Prayer times. Qada is a legacy feature: keep its stored data and the existing web `/app/home` URL, but do not promote it in navigation or marketing. Personal-event data already shipped must also be preserved; new event features are out of scope.
 - The supported clients are **Android** (`app/`, Kotlin + Jetpack Compose) and **Web** (`web/`, Vite + React + TypeScript). Do not add iOS-specific code or workflows unless the owner explicitly changes this rule.
 - The Android application ID is `ir.mhdolatabadi.atid`.
 - Keep Web and Android behavior consistent where platform capabilities allow it. Shared logic (Jalali calendar conversion, prayer-time calculation) is ported 1:1 between the two; a fix in one must be mirrored in the other.

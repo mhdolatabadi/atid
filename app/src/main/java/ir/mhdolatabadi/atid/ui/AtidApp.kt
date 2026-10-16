@@ -63,7 +63,6 @@ private sealed class AtidDestination(val route: String, val labelRes: Int, val i
 
 private val bottomBarDestinations = listOf(
     AtidDestination.Dashboard,
-    AtidDestination.Home,
     AtidDestination.PrayerTimes
 )
 
