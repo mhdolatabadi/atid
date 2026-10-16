@@ -18,7 +18,7 @@
 }
 
 .app-shell__nav {
-  --tab-count: 3;
+  --tab-count: 2;
   position: fixed;
   bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   left: 50%;

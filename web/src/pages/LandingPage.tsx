@@ -364,7 +364,6 @@ export function LandingPage() {
             <li><Link to="/app/prayer-times">اوقات شرعی امروز</Link></li>
             <li><Link to="/prayer-times">اوقات شرعی شهرهای ایران</Link></li>
             <li><Link to="/app/calendar">تقویم ماه جاری</Link></li>
-            <li><Link to="/app/home">شمارنده‌ی نماز و روزه‌ی قضا</Link></li>
           </ul>
         </section>
       </main>

@@ -8,7 +8,6 @@ const navLinks = [
   { to: '/app/calendar', label: 'تقویم' },
   { to: '/app/prayer-times', label: 'اوقات شرعی' },
   { to: '/date-converter', label: 'تبدیل تاریخ' },
-  { to: '/app/home', label: 'نماز و روزه قضا' },
 ];
 
 export function SiteHeader() {
@@ -51,7 +50,6 @@ export function SiteFooter() {
         <section aria-labelledby="footer-more">
           <h2 id="footer-more">ساعت‌باشی</h2>
           <ul>
-            <li><Link to="/app/home">شمارنده‌ی نماز و روزه‌ی قضا</Link></li>
             <li><a href={ANDROID_RELEASE} target="_blank" rel="noreferrer">دریافت نسخه اندروید</a></li>
           </ul>
         </section>
