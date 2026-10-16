@@ -18,12 +18,12 @@
 }
 
 .app-shell__nav {
-  --tab-count: 4;
+  --tab-count: 2;
   position: fixed;
   bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
-  width: min(488px, calc(100% - 24px));
+  width: min(392px, calc(100% - 24px));
   display: grid;
   grid-template-columns: repeat(var(--tab-count), 1fr);
   padding: 6px;

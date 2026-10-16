@@ -1,6 +1,9 @@
 // Validate the actual HTML delivered to crawlers, not only metadata source objects.
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+const escapeHtml = (value) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
 export async function checkSeo({ metaFor, prerenderRoutes, origin }) {
 const sitemap = origin ? await readFile('dist/sitemap.xml', 'utf8') : '';
 for (const path of prerenderRoutes) {
@@ -20,7 +23,16 @@ for (const path of prerenderRoutes) {
     const schema = JSON.parse(blocks[0][1]);
     assert.equal(schema['@graph'][0].url, url, `schema URL: ${path}`);
     assert.equal(sitemap.includes(`<loc>${url}</loc>`), !meta.noindex, `sitemap coverage: ${path}`);
+    for (const faq of schema['@graph'].filter((node) => node['@type'] === 'FAQPage')) {
+      for (const { name, acceptedAnswer } of faq.mainEntity) {
+        assert.ok(html.includes(escapeHtml(name)) && html.includes(escapeHtml(acceptedAnswer.text)), `FAQ visible: ${path}`);
+      }
+    }
   }
+}
+if (origin) {
+  const urls = sitemap.match(/<url>/g)?.length ?? 0;
+  assert.equal(sitemap.match(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/g)?.length ?? 0, urls, 'sitemap lastmod');
 }
 const missing = await readFile('dist/404.html', 'utf8');
 assert.match(missing, /name="robots" content="noindex"/);

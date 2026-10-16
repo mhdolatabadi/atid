@@ -4,25 +4,17 @@ import { DateConverter } from '../components/DateConverter';
 import { PublicLayout } from '../components/SiteChrome';
 import { BUILD_YEAR } from '../lib/calendarPages';
 import { CalendarArchiveLinks } from './CalendarArchivePages';
+import { faqs, type FaqEntry } from '../data/faq';
+
 import './LandingPage.css';
 
-const faq = {
-  calendar: [
-    ['تقویم شمسی چیست؟', 'تقویم هجری شمسی، تقویم رسمی ایران است و آغاز سال آن با نوروز هم‌زمان می‌شود. در ساعت‌باشی می‌توانید تاریخ شمسی، میلادی و قمری را کنار هم ببینید.'],
-    ['امروز چندم است؟', 'صفحهٔ اصلی ساعت‌باشی تاریخ امروز را به‌صورت زنده نشان می‌دهد. این صفحه راهنمایی ماندگار برای استفاده از تقویم شمسی و مناسبت‌ها است.'],
-  ],
-  converter: [
-    ['چطور تاریخ شمسی را به میلادی تبدیل کنم؟', 'در همین صفحه گزینهٔ «از شمسی» را انتخاب کنید و روز، ماه و سال را وارد کنید تا معادل میلادی و قمری آن را ببینید.'],
-    ['آیا تاریخ قمری قطعی است؟', 'تاریخ قمری محاسبه‌شده ممکن است با تقویم رسمی مبتنی بر رؤیت هلال تا یک روز اختلاف داشته باشد.'],
-  ],
-};
-
-function Faq({ items }: { items: string[][] }) {
-  return <section className="ti-about glass" aria-labelledby="faq-title"><h2 id="faq-title" className="ti-card__title">پرسش‌های پرتکرار</h2>{items.map(([question, answer]) => <div key={question}><h3>{question}</h3><p>{answer}</p></div>)}</section>;
+function Faq({ items }: { items: FaqEntry[] }) {
+  return <section className="ti-about glass" aria-labelledby="faq-title"><h2 id="faq-title" className="ti-card__title">پرسش‌های پرتکرار</h2>{items.map(({ question, answer }) => <div key={question}><h3>{question}</h3><p>{answer}</p></div>)}</section>;
 }
 
 export function CalendarGuidePage() {
-  return <PublicLayout><main className="ti-main"><article className="ti-about glass"><h1 className="ti-card__title">تقویم شمسی؛ تاریخ امروز، مناسبت‌ها و تعطیلات</h1><p>تقویم ساعت‌باشی برای دیدن تاریخ امروز در سه گاه‌شماری شمسی، میلادی و قمری طراحی شده است. ماه جاری، جمعه‌ها، مناسبت‌ها و اوقات شرعی را در یک نمای خوانا می‌بینید.</p><h2>تقویم امروز و ماه جاری</h2><p>برای تقویم زنده، روزهای ماه و تاریخ امروز به <Link to="/">صفحهٔ اصلی ساعت‌باشی</Link> بروید. برای مرور ماه با کنترل‌های جابه‌جایی، <Link to="/app/calendar">تقویم ماه جاری</Link> در دسترس است.</p><h2>تقویم شمسی چگونه کار می‌کند؟</h2><p>سال هجری شمسی با نوروز آغاز می‌شود؛ شش ماه نخست ۳۱ روز، پنج ماه بعدی ۳۰ روز و اسفند ۲۹ یا در سال کبیسه ۳۰ روز دارد. ساعت‌باشی تاریخ‌های میلادی و قمری را هم کنار تاریخ شمسی نمایش می‌دهد تا برنامه‌ریزی روزمره ساده‌تر شود.</p></article><CalendarArchiveLinks year={BUILD_YEAR} /><Faq items={faq.calendar} /></main></PublicLayout>;
+  return <PublicLayout><main className="ti-main"><article className="ti-about glass"><h1 className="ti-card__title">تقویم شمسی؛ تاریخ امروز، مناسبت‌ها و تعطیلات</h1><p>تقویم ساعت‌باشی برای دیدن تاریخ امروز در سه گاه‌شماری شمسی، میلادی و قمری طراحی شده است. ماه جاری، جمعه‌ها، مناسبت‌ها و اوقات شرعی را در یک نمای خوانا می‌بینید.</p><h2>تقویم امروز و ماه جاری</h2><p>برای تقویم زنده، روزهای ماه و تاریخ امروز به <Link to="/">صفحهٔ اصلی ساعت‌باشی</Link> بروید. برای مرور ماه با کنترل‌های جابه‌جایی، <Link to="/app/calendar">تقویم ماه جاری</Link> در دسترس است.</p><h2>تقویم شمسی چگونه کار می‌کند؟</h2><p>سال هجری شمسی با نوروز آغاز می‌شود؛ شش ماه نخست ۳۱ روز، پنج ماه بعدی ۳۰ روز و اسفند ۲۹ یا در سال کبیسه ۳۰ روز دارد. ساعت‌باشی تاریخ‌های میلادی و قمری را هم کنار تاریخ شمسی نمایش می‌دهد تا برنامه‌ریزی روزمره ساده‌تر شود.</p></article><CalendarArchiveLinks year={BUILD_YEAR} /><Faq items={faqs['/calendar']} /></main></PublicLayout>;
+
 }
 
 export function DateConverterGuidePage() {
@@ -39,7 +31,7 @@ export function DateConverterGuidePage() {
           <h2>تفاوت تقویم قمری و شمسی</h2>
           <p>تقویم شمسی با فصل‌ها هماهنگ است؛ تقویم قمری بر پایهٔ ماه است و هر سال حدود یازده روز کوتاه‌تر از سال شمسی است. بنابراین مناسبت‌های قمری هر سال در تقویم شمسی جابه‌جا می‌شوند. برای دیدن ماه جاری، <Link to="/">تقویم ساعت‌باشی</Link> را ببینید.</p>
         </article>
-        <Faq items={faq.converter} />
+        <Faq items={faqs['/date-converter']} />
       </main>
     </PublicLayout>
   );

@@ -40,7 +40,7 @@ function headTags(route, meta) {
     url ? `<link rel="canonical" href="${url}" />` : null,
     `<meta property="og:site_name" content="${SITE_NAME}" />`,
     '<meta property="og:locale" content="fa_IR" />',
-    `<meta property="og:type" content="${meta.type === 'Article' ? 'article' : 'website'}" />`,
+    `<meta property="og:type" content="website" />`,
     `<meta property="og:title" content="${escapeHtml(meta.title)}" />`,
     `<meta property="og:description" content="${escapeHtml(meta.description)}" />`,
     url ? `<meta property="og:url" content="${url}" />` : null,
@@ -84,8 +84,10 @@ if (siteUrl) robots.push(`Sitemap: ${siteUrl}/sitemap.xml`);
 await writeFile(join(dist, 'robots.txt'), robots.join('\n') + '\n');
 
 if (siteUrl) {
+  // Every deploy re-renders every page from the current data, so the build date is each page's last change.
+  const lastmod = new Date().toISOString().slice(0, 10);
   const urls = indexable
-    .map((route) => `  <url><loc>${siteUrl}${route === '/' ? '/' : route}</loc></url>`)
+    .map((route) => `  <url><loc>${siteUrl}${route === '/' ? '/' : route}</loc><lastmod>${lastmod}</lastmod></url>`)
     .join('\n');
   await writeFile(
     join(dist, 'sitemap.xml'),

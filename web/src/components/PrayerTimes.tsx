@@ -15,8 +15,8 @@ export function PrayerTimesTable({ times, nowMinutes }: { times: PrayerTimes; no
     <dl className="ti-prayer__list">
       {rows.map(({ key, label }) => (
         <div key={key} className={'ti-prayer__row' + (key === next ? ' is-next' : '')}>
-          <dt>{label}</dt>
-          <dd>{toPersianDigits(values[key])}</dd>
+          <dt>{label}{key === next && <span className="prayer-next-label">بعدی</span>}</dt>
+          <dd dir="ltr">{toPersianDigits(values[key])}</dd>
         </div>
       ))}
     </dl>

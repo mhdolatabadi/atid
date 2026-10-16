@@ -19,7 +19,7 @@ export function syncPageHead(pathname: string, doc: Document = document) {
   tag('property', 'og:title', meta.title);
   tag('property', 'og:description', meta.description);
   tag('property', 'og:url', url);
-  tag('property', 'og:type', meta.type === 'Article' ? 'article' : 'website');
+  tag('property', 'og:type', 'website');
   tag('property', 'og:image', `${origin}/og-image.png`);
   tag('name', 'twitter:title', meta.title);
   tag('name', 'twitter:description', meta.description);

@@ -1,9 +1,13 @@
-import { religiousTexts } from './data/religiousTexts';
 import { cities } from './data/cities';
 import { calendarYears, monthPath, monthSpan, monthTitle, prayerMonthPath, prayerYears, yearPath } from './lib/calendarPages';
 import { toPersianDigits } from './lib/persianDate';
+import { faqs } from './data/faq';
+
 
 export const SITE_NAME = 'ساعت‌باشی';
+
+/** Public Android builds (same page as the site's download link). */
+export const ANDROID_RELEASE = 'https://github.com/mhdolatabadi/saatbashi/releases/latest';
 
 export interface PageMeta {
   title: string;
@@ -11,8 +15,7 @@ export interface PageMeta {
   /** Personal pages are kept out of search results. */
   noindex?: boolean;
   /** schema.org type for the page's JSON-LD. */
-  type: 'WebSite' | 'WebPage' | 'Article' | 'CollectionPage';
-  faq?: { question: string; answer: string }[];
+  type: 'WebSite' | 'WebPage' | 'CollectionPage';
 }
 
 const home: PageMeta = {
@@ -28,13 +31,11 @@ const pages: Record<string, PageMeta> = {
     title: 'تقویم شمسی؛ تاریخ امروز، مناسبت‌ها و تعطیلات | ساعت‌باشی',
     description: 'راهنمای تقویم شمسی ایران: تاریخ امروز، تقویم ماه جاری، مناسبت‌ها، تعطیلات و نمایش هم‌زمان تاریخ میلادی و قمری.',
     type: 'WebPage',
-    faq: [{ question: 'تقویم شمسی چیست؟', answer: 'تقویم هجری شمسی، تقویم رسمی ایران است و سال آن با نوروز آغاز می‌شود.' }],
   },
   '/date-converter': {
     title: 'تبدیل تاریخ شمسی به میلادی و قمری | ساعت‌باشی',
     description: 'تبدیل آنلاین تاریخ شمسی به میلادی و قمری، میلادی به شمسی و قمری به شمسی، همراه با روز هفته.',
     type: 'WebPage',
-    faq: [{ question: 'چطور تاریخ شمسی را به میلادی تبدیل کنم؟', answer: 'در صفحهٔ تبدیل تاریخ ساعت‌باشی گزینهٔ «از شمسی» را انتخاب کنید و روز، ماه و سال را وارد کنید.' }],
   },
   '/app/home': {
     title: 'شمارنده‌ی نماز و روزه‌ی قضا | ساعت‌باشی',
@@ -53,20 +54,7 @@ const pages: Record<string, PageMeta> = {
       'اوقات شرعی امروز به افق تهران یا موقعیت شما: اذان صبح، طلوع آفتاب، اذان ظهر، عصر، غروب آفتاب، اذان مغرب و عشا.',
     type: 'WebPage',
   },
-  '/app/texts': {
-    title: 'متون مذهبی؛ زیارت عاشورا، دعای هفتم صحیفه و حدیث کساء | ساعت‌باشی',
-    description: 'متن کامل زیارت عاشورا، دعای هفتم صحیفه سجادیه و حدیث شریف کساء.',
-    type: 'CollectionPage',
-  },
 };
-
-for (const text of religiousTexts) {
-  pages[`/app/texts/${text.id}`] = {
-    title: `متن کامل ${text.title} | ساعت‌باشی`,
-    description: `${text.title}: ${text.subtitle}. متن کامل برای خواندن در موبایل و رایانه.`,
-    type: 'Article',
-  };
-}
 
 pages['/prayer-times'] = {
   title: 'اوقات شرعی شهرهای ایران؛ اذان صبح، ظهر و مغرب امروز | ساعت‌باشی',
@@ -144,14 +132,32 @@ export function structuredDataFor(pathname: string, origin: string) {
     name: meta.title, description: meta.description, inLanguage: 'fa',
     ...(path === '/' ? { name: SITE_NAME, alternateName: 'Saatbashi' } :
       { isPartOf: { '@id': `${site}#page` } }),
-    ...(meta.type === 'Article' ? { headline: religiousTexts.find(t => path.endsWith(`/${t.id}`))?.title ?? meta.title } : {}),
   };
   const graph: Record<string, unknown>[] = [page];
+  if (path === '/') {
+    page.publisher = { '@id': `${site}#organization` };
+    graph.push(
+      { '@type': 'Organization', '@id': `${site}#organization`, name: SITE_NAME, alternateName: 'Saatbashi',
+        url: site, logo: `${origin}/icon-512.png` },
+      { '@type': 'SoftwareApplication', '@id': `${site}#android`, name: SITE_NAME, operatingSystem: 'Android',
+        applicationCategory: 'LifestyleApplication', inLanguage: 'fa', downloadUrl: ANDROID_RELEASE,
+        publisher: { '@id': `${site}#organization` },
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'IRR' } },
+    );
+  }
+  const faq = faqs[path];
+  if (faq) {
+    page.mainEntity = { '@id': `${url}#faq` };
+    graph.push({ '@type': 'FAQPage', '@id': `${url}#faq`, url, inLanguage: 'fa',
+      mainEntity: faq.map(({ question, answer }) => ({ '@type': 'Question', name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer } })) });
+  }
   if (path !== '/' && !meta.noindex) {
     // Every ancestor that is itself a page: /calendar/1405/mehr → /calendar → /calendar/1405.
     const segments = path.split('/').filter(Boolean);
     const paths = ['/', ...segments.slice(0, -1).map((_, i) => `/${segments.slice(0, i + 1).join('/')}`)
       .filter((p) => p in pages && !pages[p].noindex)];
+
     paths.push(path);
     const breadcrumbId = `${url}#breadcrumb`;
     page.breadcrumb = { '@id': breadcrumbId };

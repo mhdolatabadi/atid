@@ -5,6 +5,7 @@ import { fromDate } from './src/lib/persianDate.ts'
 // https://vite.dev/config/
 export default defineConfig({
   // Absolute asset paths: pages live at nested URLs such as /calendar/1405/mehr.
+
   base: '/',
   plugins: [react()],
   define: {
