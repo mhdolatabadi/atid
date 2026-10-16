@@ -34,6 +34,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -74,6 +76,7 @@ private val prayerRowSpecs = listOf(
     PrayerRowSpec("isha", R.string.label_isha) { it.isha }
 )
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PrayerTimesScreen(viewModel: NotificationsViewModel = viewModel()) {
     val state by viewModel.uiState.observeAsState()
@@ -135,10 +138,10 @@ fun PrayerTimesScreen(viewModel: NotificationsViewModel = viewModel()) {
             modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp)
         )
 
-        Row(
+        FlowRow(
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             CityPicker(selectedSlug = current.citySlug, onSelect = viewModel::selectCity)
             Text(

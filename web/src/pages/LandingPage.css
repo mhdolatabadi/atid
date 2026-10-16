@@ -514,6 +514,7 @@
 
 .ti-prayer__place {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -530,12 +531,15 @@
 
 .ti-city-picker {
   display: inline-flex;
+  flex: 0 1 auto;
+  max-width: 100%;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
 
 .ti-city-picker select {
+  flex: 1;
   min-height: 44px;
   min-width: 0;
   max-width: 100%;
