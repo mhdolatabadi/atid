@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Absolute asset paths: pages live at nested URLs such as /app/texts/ziyarat_ashura.
+  // Absolute asset paths: pages live at nested URLs such as /prayer-times/tehran.
   base: '/',
   plugins: [react()],
 })
