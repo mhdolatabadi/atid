@@ -45,6 +45,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -204,6 +207,7 @@ private fun MonthNavButton(description: String, mirrored: Boolean, onClick: () -
 
 @Composable
 private fun DayCell(cell: DayCellState, isSelected: Boolean, onClick: () -> Unit) {
+    val largeText = LocalDensity.current.fontScale > 1.2f
     val colors = Atid.colors
     val shape = RoundedCornerShape(10.dp)
     val interaction = remember { MutableInteractionSource() }
@@ -220,7 +224,8 @@ private fun DayCell(cell: DayCellState, isSelected: Boolean, onClick: () -> Unit
     val sub = if (cell.isToday) colors.onAccent else colors.muted
     Column(
         modifier = Modifier
-            .aspectRatio(0.8f)
+            .fillMaxWidth()
+            .heightIn(min = 60.dp)
             .padding(2.dp)
             .pressScale(interaction, pressed = 0.94f)
             .then(if (cell.isToday) Modifier.shadow(8.dp, shape, ambientColor = colors.accent, spotColor = colors.accent) else Modifier)
@@ -228,9 +233,10 @@ private fun DayCell(cell: DayCellState, isSelected: Boolean, onClick: () -> Unit
             .background(background)
             .then(if (isSelected && !cell.isToday) Modifier.border(1.5.dp, colors.accent, shape) else Modifier)
             .clickable(interactionSource = interaction, indication = null, role = Role.Button, onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 4.dp),
+            .semantics { selected = isSelected }
+            .padding(horizontal = 3.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
     ) {
         Text(
             text = PersianDateUtils.toPersianDigits(cell.solarDay),
@@ -238,9 +244,16 @@ private fun DayCell(cell: DayCellState, isSelected: Boolean, onClick: () -> Unit
             fontWeight = FontWeight.Bold,
             color = main
         )
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = PersianDateUtils.toArabicDigits(cell.hijriDay), fontSize = 10.sp, color = sub)
-            Text(text = cell.gregorianDay.toString(), fontSize = 10.sp, color = sub)
+        if (largeText) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = PersianDateUtils.toArabicDigits(cell.hijriDay), fontSize = 12.sp, color = sub)
+                Text(text = cell.gregorianDay.toString(), fontSize = 12.sp, color = sub)
+            }
+        } else {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = PersianDateUtils.toArabicDigits(cell.hijriDay), fontSize = 12.sp, color = sub)
+                Text(text = cell.gregorianDay.toString(), fontSize = 12.sp, color = sub)
+            }
         }
     }
 }
