@@ -58,8 +58,8 @@ function PrayerTimesPageView() {
       <div className="prayer-times-list glass">
         {rows.map(({ key, label }) => (
           <div key={key} className={'prayer-times-row' + (key === nextKey ? ' prayer-times-row--next' : '')}>
-            <span>{label}</span>
-            <span>{toPersianDigits(times[key])}</span>
+            <span className="prayer-times-row__label">{label}{key === nextKey && <span className="prayer-next-label">بعدی</span>}</span>
+            <span className="prayer-times-row__time" dir="ltr">{toPersianDigits(times[key])}</span>
           </div>
         ))}
       </div>

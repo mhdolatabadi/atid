@@ -39,4 +39,5 @@
     <string name="prayer_alert_hint">زنگوله‌ی کنار هر اذان، سر وقتش اعلان می‌دهد.</string>
     <string name="prayer_alert_exact_hint">برای اعلان سر دقیقه، اجازه‌ی «هشدارها و یادآوری‌ها» را بدهید.</string>
     <string name="prayer_alert_blocked_hint">اعلان‌های ساعت‌باشی خاموش است؛ برای یادآوری اذان روشنش کنید.</string>
+    <string name="prayer_next_label">بعدی</string>
 </resources>

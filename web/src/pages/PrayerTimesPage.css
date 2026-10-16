@@ -43,6 +43,7 @@
 }
 
 .prayer-times-row {
+  gap: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -65,4 +66,17 @@
   line-height: 1.8;
   color: var(--muted);
   margin: 12px 4px 0;
+}
+
+.prayer-times-row__label {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.prayer-times-row__time {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
