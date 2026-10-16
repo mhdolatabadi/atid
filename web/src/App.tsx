@@ -33,7 +33,7 @@ export default function App() {
         <Route path="/prayer-times" element={<PrayerTimesIndexPage />} />
         <Route path="/prayer-times/:city" element={<CityPrayerTimesPage />} />
         <Route path="/app" element={<AppShell />}>
-          <Route index element={<Navigate to="home" replace />} />
+          <Route index element={<Navigate to="calendar" replace />} />
           <Route path="home" element={<HomePage />} />
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="prayer-times" element={<PrayerTimesPage />} />

@@ -17,4 +17,25 @@ describe('unobstructed page chrome', () => {
     expect(html).toContain('/favicon.svg');
     expect(html).not.toContain('saatbashi-guide');
   });
+  it('offers only calendar and prayer tabs with a two-column indicator', () => {
+    const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/app/calendar']}><AppShell /></MemoryRouter>);
+    expect(html.match(/class="app-shell__tab/g)).toHaveLength(2);
+    expect(html).toContain('--tab-count:2');
+    expect(html).toContain('aria-current="page"');
+    expect(html).not.toContain('/app/home');
+    expect(html).not.toContain('قضا');
+  });
+  it('does not falsely highlight calendar on the retained legacy route', () => {
+    const html = renderToStaticMarkup(<MemoryRouter initialEntries={['/app/home']}><AppShell /></MemoryRouter>);
+    expect(html).not.toContain('app-shell__indicator');
+    expect(html).not.toContain('aria-current="page"');
+  });
+  it('does not promote legacy counters in public navigation', () => {
+    const html = renderToStaticMarkup(<MemoryRouter><PublicLayout><main>تقویم</main></PublicLayout></MemoryRouter>);
+    expect(html).not.toContain('/app/home');
+    expect(html).not.toContain('قضا');
+    expect(html).toContain('/app/calendar');
+    expect(html).toContain('/app/prayer-times');
+  });
+
 });

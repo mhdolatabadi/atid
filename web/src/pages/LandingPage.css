@@ -609,6 +609,7 @@
 }
 
 .ti-prayer__row {
+  gap: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -619,10 +620,17 @@
 }
 
 .ti-prayer__row dt {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
   color: var(--muted);
 }
 
 .ti-prayer__row dd {
+  flex-shrink: 0;
+  white-space: nowrap;
   margin: 0;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -639,20 +647,16 @@
   font-weight: 700;
 }
 
-.ti-prayer__row.is-next dt::before {
-  content: '';
+/* Text identifies the next time independently of color and motion. */
+.prayer-next-label {
   display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-inline-end: 8px;
-  border-radius: 50%;
-  background: currentColor;
-  vertical-align: middle;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  50% { opacity: 0.3; transform: scale(0.7); }
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 0 6px;
+  font-size: 0.75em;
+  line-height: 1.8;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .ti-more {
@@ -837,9 +841,6 @@
   .ti-calendar__grid.is-from-next,
   .ti-calendar__grid.is-from-prev {
     animation: fade-in 200ms ease-out both;
-  }
-  .ti-prayer__row.is-next dt::before {
-    animation: none;
   }
   .ti-day:hover {
     transform: none;
